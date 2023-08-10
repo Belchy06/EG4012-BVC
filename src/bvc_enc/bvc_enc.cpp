@@ -1,5 +1,7 @@
 #include "bvc_enc.h"
 
+#include <vector>
+
 BvcEncoder::BvcEncoder()
 {
 }
@@ -7,12 +9,12 @@ BvcEncoder::BvcEncoder()
 BvcEncResult BvcEncoder::Init(BvcEncConfig* InConfig)
 {
 	// Validate config
-	if (InConfig->Width < 0)
+	if (InConfig->Width == 0)
 	{
 		return BvcEncResult::BVC_ENC_INVALID_DIMENSIONS;
 	}
 
-	if (InConfig->Height < 0)
+	if (InConfig->Height == 0)
 	{
 		return BvcEncResult::BVC_ENC_INVALID_DIMENSIONS;
 	}
@@ -22,7 +24,7 @@ BvcEncResult BvcEncoder::Init(BvcEncConfig* InConfig)
 		return BvcEncResult::BVC_ENC_INVALID_FORMAT;
 	}
 
-	Config = InConfig;
+	Config = *InConfig;
 	return BvcEncResult::BVC_ENC_OK;
 }
 
