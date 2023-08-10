@@ -38,6 +38,7 @@ if(MSVC)
     /we4389 # error: signed/unsigned mismatch
     /we4706 # error: assignment within conditional expression
     /wd4100 # disabled: unreferenced formal parameter
+    /wd4018 # disabled: signed/unsigned mismatch
     /wd4127 # disabled: conditional expression is constant
     /wd4752 # disabled: found Intel(R) Advanced Vector Extensions; consider using /arch:AVX
   )
