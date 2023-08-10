@@ -35,6 +35,7 @@ BvcEncResult BvcEncoder::Encode(const uint8_t* InPictureBytes, BvcEncNal** OutNa
 	BvcEncNal			   Nal;
 
 	Nal.Size = Config.Width * Config.Height * GetFormatSizeInBytes(Config.Format);
+	Nal.Bytes = new uint8_t[Nal.Size];
 	memcpy(Nal.Bytes, InPictureBytes, Nal.Size);
 
 	OutputNals.push_back(Nal);
