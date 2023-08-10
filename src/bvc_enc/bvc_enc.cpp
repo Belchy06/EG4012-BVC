@@ -33,8 +33,9 @@ BvcEncResult BvcEncoder::Encode(const uint8_t* InPictureBytes, BvcEncNal** OutNa
 	// TODO (belchy06): Actually compress lmao
 	std::vector<BvcEncNal> OutputNals;
 	BvcEncNal			   Nal;
-	Nal.Bytes = InPictureBytes;
+
 	Nal.Size = Config.Width * Config.Height * GetFormatSizeInBytes(Config.Format);
+	memcpy(Nal.Bytes, InPictureBytes, Nal.Size);
 
 	OutputNals.push_back(Nal);
 	*OutNumNalUnits = static_cast<int>(OutputNals.size());
