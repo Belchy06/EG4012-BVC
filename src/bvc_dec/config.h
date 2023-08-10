@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "format.h"
+#include "bvc_common/format.h"
 
 class BvcDecConfig
 {
