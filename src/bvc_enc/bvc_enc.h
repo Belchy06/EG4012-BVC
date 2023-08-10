@@ -13,7 +13,7 @@ public:
 	bvc_enc_result encode(const uint8_t* in_picture_bytes, bvc_enc_nal** out_nal_units, int* out_num_nal_units);
 
 private:
-	int get_format_size_in_bytes(bvc_chroma_format in_format);
+	int get_size_in_bytes(bvc_chroma_format in_format);
 
 private:
 	bvc_enc_config config;

@@ -34,7 +34,7 @@ bvc_enc_result bvc_encoder::encode(const uint8_t* in_picture_bytes, bvc_enc_nal*
 	std::vector<bvc_enc_nal> output_nals;
 	bvc_enc_nal				 nal;
 
-	nal.size = config.width * config.height * get_format_size_in_bytes(config.format);
+	nal.size = get_size_in_bytes(config.format);
 	nal.bytes = new uint8_t[nal.size];
 	memcpy(nal.bytes, in_picture_bytes, nal.size);
 
@@ -45,22 +45,24 @@ bvc_enc_result bvc_encoder::encode(const uint8_t* in_picture_bytes, bvc_enc_nal*
 	return bvc_enc_result::BVC_ENC_OK;
 }
 
-int bvc_encoder::get_format_size_in_bytes(bvc_chroma_format in_format)
+int bvc_encoder::get_size_in_bytes(bvc_chroma_format in_format)
 {
-	switch (in_format)
+	int picture_samples = 0;
+	if (in_format == bvc_chroma_format::BVC_CHROMA_FORMAT_MONOCHROME)
 	{
-		case bvc_chroma_format::BVC_CHROMA_FORMAT_MONOCHROME:
-			return 1;
-		case bvc_chroma_format::BVC_CHROMA_FORMAT_420:
-			// TODO (belchy06): Fix
-			return 3;
-		case bvc_chroma_format::BVC_CHROMA_FORMAT_422:
-			// TODO (belchy06): Fix
-			return 3;
-		case bvc_chroma_format::BVC_CHROMA_FORMAT_444:
-			return 3;
-		case bvc_chroma_format::BVC_CHROMA_FORMAT_UNDEFINED:
-		default:
-			return 0;
+		picture_samples = config.width * config.height;
 	}
+	else if (in_format == bvc_chroma_format::BVC_CHROMA_FORMAT_420)
+	{
+		picture_samples = (3 * (config.width * config.height)) >> 1;
+	}
+	else if (in_format == bvc_chroma_format::BVC_CHROMA_FORMAT_422)
+	{
+		picture_samples = 2 * config.width * config.height;
+	}
+	else if (in_format == bvc_chroma_format::BVC_CHROMA_FORMAT_444)
+	{
+		picture_samples = 3 * config.width * config.height;
+	}
+	return picture_samples;
 }

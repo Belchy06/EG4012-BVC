@@ -1,8 +1,10 @@
 #pragma once
 
+#include <vector>
+
+#include "nal.h"
 #include "picture.h"
 #include "result.h"
-#include "nal.h"
 
 class bvc_decoder
 {
@@ -14,5 +16,8 @@ public:
 	bvc_dec_result get_picture(bvc_decoded_picture* out_picture);
 
 private:
-	bvc_decoded_picture* decoded_picture;
+	int get_size_in_bytes(bvc_chroma_format in_format);
+
+private:
+	std::vector<uint8_t> output_picture_bytes;
 };

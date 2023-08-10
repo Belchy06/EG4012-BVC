@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "info.h"
+
 class bvc_decoded_picture
 {
 public:
