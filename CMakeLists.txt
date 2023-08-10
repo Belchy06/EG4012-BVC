@@ -1,6 +1,10 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.14)
 if(POLICY CMP0056) # added in CMake 3.2
   cmake_policy(SET CMP0056 NEW)
+endif()
+
+if(POLICY CMP0091) # added in CMake 3.14
+  cmake_policy(SET CMP0091 NEW)
 endif()
 
 project (bvc CXX C)
@@ -14,12 +18,10 @@ endif()
 
 
 # Target arch detection
-set(BVC_HAVE_NEON FALSE)
 if(NOT BVC_TARGET_ARCH)
   # Determine arch based on host cpu and generator used
   if("${CMAKE_GENERATOR}" MATCHES "^Visual Studio .+ ARM$")
     set(BVC_TARGET_ARCH "ARM")
-    set(BVC_HAVE_NEON TRUE)
   elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64" OR
     "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "amd64" OR
     "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR
@@ -28,7 +30,6 @@ if(NOT BVC_TARGET_ARCH)
     set(BVC_TARGET_ARCH "x86")
   elseif("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "aarch64|armv7")
     set(BVC_TARGET_ARCH "ARM")
-    set(BVC_HAVE_NEON TRUE)
   else()
     message(FATAL_ERROR "Unexpected host cpu: ${CMAKE_SYSTEM_PROCESSOR}")
   endif()
@@ -37,11 +38,6 @@ else()
   if("${BVC_TARGET_ARCH}" STREQUAL "x86_64")
     set(BVC_TARGET_ARCH "x86")
   elseif("${BVC_TARGET_ARCH}" MATCHES "^arm")
-    if ("${BVC_TARGET_ARCH}" MATCHES "^arm64")
-      set(BVC_HAVE_NEON TRUE)
-    elseif ("${BVC_TARGET_ARCH}" MATCHES "^armv7|^arm.*-v7")
-      set(BVC_HAVE_NEON TRUE)
-    endif()
     set(BVC_TARGET_ARCH "ARM")
   elseif("${BVC_TARGET_ARCH}" MATCHES "^mips")
     set(BVC_TARGET_ARCH "MIPS")

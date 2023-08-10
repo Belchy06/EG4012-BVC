@@ -1,12 +1,25 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
-set(BVC_COMMON_SOURCES)
+set(BVC_COMMON_SOURCES
+    "format.h")
 
-set(BVC_DEC_SOURCES)
+set(BVC_DEC_SOURCES
+    "result.h"
+    "picture.h"
+    "nal.h"
+    "config.h"
+    "bvc_dec.h"
+    "bvc_dec.cpp")
 
-set(BVC_ENC_SOURCES)
+set(BVC_ENC_SOURCES
+    "result.h"
+    "nal.h"
+    "config.h"
+    "bvc_enc.h"
+    "bvc_enc.cpp")
 
 if(MSVC)
   set(cxx_base_flags /GS /W4 /WX /Za)
