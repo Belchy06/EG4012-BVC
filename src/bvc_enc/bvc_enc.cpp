@@ -17,7 +17,7 @@ BvcEncResult BvcEncoder::Init(BvcEncConfig* InConfig)
 		return BvcEncResult::BVC_ENC_INVALID_DIMENSIONS;
 	}
 
-	if (InConfig->Format == BvcChromaFormat::BVC_ENC_CHROMA_FORMAT_UNDEFINED)
+	if (InConfig->Format == BvcChromaFormat::BVC_CHROMA_FORMAT_UNDEFINED)
 	{
 		return BvcEncResult::BVC_ENC_INVALID_FORMAT;
 	}
@@ -45,17 +45,17 @@ int BvcEncoder::GetFormatSizeInBytes(BvcChromaFormat InFormat)
 {
 	switch (InFormat)
 	{
-		case BvcChromaFormat::BVC_ENC_CHROMA_FORMAT_MONOCHROME:
+		case BvcChromaFormat::BVC_CHROMA_FORMAT_MONOCHROME:
 			return 1;
-		case BvcChromaFormat::BVC_ENC_CHROMA_FORMAT_420:
+		case BvcChromaFormat::BVC_CHROMA_FORMAT_420:
 			// TODO (belchy06): Fix
 			return 3;
-		case BvcChromaFormat::BVC_ENC_CHROMA_FORMAT_422:
+		case BvcChromaFormat::BVC_CHROMA_FORMAT_422:
 			// TODO (belchy06): Fix
 			return 3;
-		case BvcChromaFormat::BVC_ENC_CHROMA_FORMAT_444:
+		case BvcChromaFormat::BVC_CHROMA_FORMAT_444:
 			return 3;
-		case BvcChromaFormat::BVC_ENC_CHROMA_FORMAT_UNDEFINED:
+		case BvcChromaFormat::BVC_CHROMA_FORMAT_UNDEFINED:
 		default:
 			return 0;
 	}
