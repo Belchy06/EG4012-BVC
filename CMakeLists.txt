@@ -11,6 +11,8 @@ project (bvc CXX C)
 
 include(GNUInstallDirs)
 
+find_package(Threads REQUIRED)
+
 # Project options
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
