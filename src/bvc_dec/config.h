@@ -4,10 +4,11 @@
 
 #include "bvc_common/format.h"
 
-class BvcDecConfig
+class bvc_dec_config
 {
 public:
-	size_t			Width;
-	size_t			Height;
-	BvcChromaFormat Format;
+	size_t			  width;
+	size_t			  height;
+	bvc_chroma_format format;
+	double			  framerate;
 };

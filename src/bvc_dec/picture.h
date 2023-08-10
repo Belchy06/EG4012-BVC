@@ -2,8 +2,10 @@
 
 #include <stdint.h>
 
-class BvcDecodedPicture
+class bvc_decoded_picture
 {
-	uint8_t* Bytes;
-	size_t	 Size;
+public:
+	uint8_t*	   bytes;
+	size_t		   size;
+	bvc_image_info info;
 };

@@ -4,15 +4,15 @@
 #include "result.h"
 #include "nal.h"
 
-class BvcDecoder
+class bvc_decoder
 {
 public:
-	BvcDecoder();
+	bvc_decoder();
 
-	BvcDecResult Init();
-	BvcDecResult DecodeNal(BvcDecNal* InNalUnit);
-	BvcDecResult GetPicture(BvcDecodedPicture& OutPicture);
+	bvc_dec_result init();
+	bvc_dec_result decode_nal(bvc_dec_nal* in_nal_unit);
+	bvc_dec_result get_picture(bvc_decoded_picture* out_picture);
 
 private:
-	BvcDecodedPicture* DecodedPicture;
+	bvc_decoded_picture* decoded_picture;
 };

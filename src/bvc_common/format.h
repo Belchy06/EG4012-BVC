@@ -7,4 +7,4 @@ typedef enum
 	BVC_CHROMA_FORMAT_422,
 	BVC_CHROMA_FORMAT_444,
 	BVC_CHROMA_FORMAT_UNDEFINED
-} BvcChromaFormat;
+} bvc_chroma_format;

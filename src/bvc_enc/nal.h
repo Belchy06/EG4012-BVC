@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-class BvcEncNal
+class bvc_enc_nal
 {
 public:
-	uint8_t* Bytes;
-	size_t	 Size;
+	uint8_t* bytes;
+	size_t	 size;
 };

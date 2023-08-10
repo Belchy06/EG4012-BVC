@@ -2,64 +2,64 @@
 
 #include <vector>
 
-BvcEncoder::BvcEncoder()
+bvc_encoder::bvc_encoder()
 {
 }
 
-BvcEncResult BvcEncoder::Init(BvcEncConfig* InConfig)
+bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 {
 	// Validate config
-	if (InConfig->Width == 0)
+	if (in_config->width == 0)
 	{
-		return BvcEncResult::BVC_ENC_INVALID_DIMENSIONS;
+		return bvc_enc_result::BVC_ENC_INVALID_DIMENSIONS;
 	}
 
-	if (InConfig->Height == 0)
+	if (in_config->height == 0)
 	{
-		return BvcEncResult::BVC_ENC_INVALID_DIMENSIONS;
+		return bvc_enc_result::BVC_ENC_INVALID_DIMENSIONS;
 	}
 
-	if (InConfig->Format == BvcChromaFormat::BVC_CHROMA_FORMAT_UNDEFINED)
+	if (in_config->format == bvc_chroma_format::BVC_CHROMA_FORMAT_UNDEFINED)
 	{
-		return BvcEncResult::BVC_ENC_INVALID_FORMAT;
+		return bvc_enc_result::BVC_ENC_INVALID_FORMAT;
 	}
 
-	Config = *InConfig;
-	return BvcEncResult::BVC_ENC_OK;
+	config = *in_config;
+	return bvc_enc_result::BVC_ENC_OK;
 }
 
-BvcEncResult BvcEncoder::Encode(const uint8_t* InPictureBytes, BvcEncNal** OutNalUnits, int* OutNumNalUnits)
+bvc_enc_result bvc_encoder::encode(const uint8_t* in_picture_bytes, bvc_enc_nal** out_nal_units, int* out_num_nal_units)
 {
 	// TODO (belchy06): Actually compress lmao
-	std::vector<BvcEncNal> OutputNals;
-	BvcEncNal			   Nal;
+	std::vector<bvc_enc_nal> output_nals;
+	bvc_enc_nal				 nal;
 
-	Nal.Size = Config.Width * Config.Height * GetFormatSizeInBytes(Config.Format);
-	Nal.Bytes = new uint8_t[Nal.Size];
-	memcpy(Nal.Bytes, InPictureBytes, Nal.Size);
+	nal.size = config.width * config.height * get_format_size_in_bytes(config.format);
+	nal.bytes = new uint8_t[nal.size];
+	memcpy(nal.bytes, in_picture_bytes, nal.size);
 
-	OutputNals.push_back(Nal);
-	*OutNumNalUnits = static_cast<int>(OutputNals.size());
-	*OutNalUnits = &OutputNals[0];
+	output_nals.push_back(nal);
+	*out_nal_units = &output_nals[0];
+	*out_num_nal_units = static_cast<int>(output_nals.size());
 
-	return BvcEncResult::BVC_ENC_OK;
+	return bvc_enc_result::BVC_ENC_OK;
 }
 
-int BvcEncoder::GetFormatSizeInBytes(BvcChromaFormat InFormat)
+int bvc_encoder::get_format_size_in_bytes(bvc_chroma_format in_format)
 {
-	switch (InFormat)
+	switch (in_format)
 	{
-		case BvcChromaFormat::BVC_CHROMA_FORMAT_MONOCHROME:
+		case bvc_chroma_format::BVC_CHROMA_FORMAT_MONOCHROME:
 			return 1;
-		case BvcChromaFormat::BVC_CHROMA_FORMAT_420:
+		case bvc_chroma_format::BVC_CHROMA_FORMAT_420:
 			// TODO (belchy06): Fix
 			return 3;
-		case BvcChromaFormat::BVC_CHROMA_FORMAT_422:
+		case bvc_chroma_format::BVC_CHROMA_FORMAT_422:
 			// TODO (belchy06): Fix
 			return 3;
-		case BvcChromaFormat::BVC_CHROMA_FORMAT_444:
+		case bvc_chroma_format::BVC_CHROMA_FORMAT_444:
 			return 3;
-		case BvcChromaFormat::BVC_CHROMA_FORMAT_UNDEFINED:
+		case bvc_chroma_format::BVC_CHROMA_FORMAT_UNDEFINED:
 		default:
 			return 0;
 	}

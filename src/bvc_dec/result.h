@@ -3,4 +3,4 @@
 typedef enum
 {
 	BVC_DEC_OK
-} BvcDecResult;
+} bvc_dec_result;

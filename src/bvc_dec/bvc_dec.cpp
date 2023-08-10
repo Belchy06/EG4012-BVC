@@ -1,27 +1,27 @@
 #include "bvc_dec.h"
 
-BvcDecoder::BvcDecoder()
+bvc_decoder::bvc_decoder()
 {
 }
 
-BvcDecResult BvcDecoder::Init()
+bvc_dec_result bvc_decoder::init()
 {
-	return BvcDecResult::BVC_DEC_OK;
+	return bvc_dec_result::BVC_DEC_OK;
 }
 
-BvcDecResult BvcDecoder::DecodeNal(BvcDecNal* InNalUnit)
+bvc_dec_result bvc_decoder::decode_nal(bvc_dec_nal* in_nal_unit)
 {
-	DecodedPicture = new BvcDecodedPicture();
+	decoded_picture = new bvc_decoded_picture();
 
-	DecodedPicture->Bytes = InNalUnit->Bytes;
-	DecodedPicture->Size = InNalUnit->Size;
+	decoded_picture->bytes = in_nal_unit->bytes;
+	decoded_picture->size = in_nal_unit->size;
 
-	return BvcDecResult::BVC_DEC_OK;
+	return bvc_dec_result::BVC_DEC_OK;
 }
 
-BvcDecResult BvcDecoder::GetPicture(BvcDecodedPicture& OutPicture)
+bvc_dec_result bvc_decoder::get_picture(bvc_decoded_picture* out_picture)
 {
-	OutPicture = *DecodedPicture;
+	out_picture = decoded_picture;
 
-	return BvcDecResult::BVC_DEC_OK;
+	return bvc_dec_result::BVC_DEC_OK;
 }
