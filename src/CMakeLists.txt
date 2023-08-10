@@ -12,6 +12,7 @@ set(BVC_COMMON_SOURCES
     "bvc_common/wavelet.cpp")
 
 set(BVC_DEC_SOURCES
+    "bvc_common/format.h"
     "bvc_dec/result.h"
     "bvc_dec/picture.h"
     "bvc_dec/nal.h"
@@ -20,6 +21,7 @@ set(BVC_DEC_SOURCES
     "bvc_dec/bvc_dec.cpp")
 
 set(BVC_ENC_SOURCES
+    "bvc_common/format.h"
     "bvc_enc/result.h"
     "bvc_enc/nal.h"
     "bvc_enc/config.h"
