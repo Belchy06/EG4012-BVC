@@ -4,7 +4,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(BVC_COMMON_SOURCES
-    "bvc_common/format.h")
+    "bvc_common/format.h"
+    "bvc_common/vector.h"
+    "bvc_common/matrix.h"
+    "bvc_common/matrix.cpp"
+    "bvc_common/wavelet.h"
+    "bvc_common/wavelet.cpp")
 
 set(BVC_DEC_SOURCES
     "bvc_dec/result.h"
