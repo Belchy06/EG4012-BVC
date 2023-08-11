@@ -5,6 +5,9 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(BVC_COMMON_SOURCES
     "bvc_common/format.h"
+    "bvc_common/bitstream.h"
+    "bvc_common/bitstream.cpp"
+    "bvc_common/entropy.h"
     "bvc_common/vector.h"
     "bvc_common/matrix.h"
     "bvc_common/matrix.cpp"
@@ -13,6 +16,13 @@ set(BVC_COMMON_SOURCES
 
 set(BVC_DEC_SOURCES
     "bvc_common/format.h"
+    "bvc_common/entropy.h"
+    "bvc_dec/entropy_coding/cabac/cabac.h"
+    "bvc_dec/entropy_coding/cabac/context.h"
+    "bvc_dec/entropy_coding/cabac/cabac.cpp"
+    "bvc_dec/entropy_coding/entropy_decoder.h"
+    "bvc_dec/entropy_coding/entropy_decoder_factory.h"
+    "bvc_dec/entropy_coding/entropy_decoder_factory.cpp"
     "bvc_dec/result.h"
     "bvc_dec/picture.h"
     "bvc_dec/nal.h"
@@ -22,6 +32,13 @@ set(BVC_DEC_SOURCES
 
 set(BVC_ENC_SOURCES
     "bvc_common/format.h"
+    "bvc_common/entropy.h"
+    "bvc_enc/entropy_coding/cabac/cabac.h"
+    "bvc_enc/entropy_coding/cabac/context.h"
+    "bvc_enc/entropy_coding/cabac/cabac.cpp"
+    "bvc_enc/entropy_coding/entropy_coder.h"
+    "bvc_enc/entropy_coding/entropy_coder_factory.h"
+    "bvc_enc/entropy_coding/entropy_coder_factory.cpp"
     "bvc_enc/result.h"
     "bvc_enc/nal.h"
     "bvc_enc/config.h"

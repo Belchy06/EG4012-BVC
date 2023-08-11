@@ -1,6 +1,8 @@
 #pragma once
 
 #include "config.h"
+#include "entropy_coding/entropy_coder.h"
+#include "entropy_coding/entropy_coder_factory.h"
 #include "result.h"
 #include "nal.h"
 
@@ -17,4 +19,6 @@ private:
 
 private:
 	bvc_enc_config config;
+
+	std::shared_ptr<bvc_entropy_coder> entropy_coder;
 };

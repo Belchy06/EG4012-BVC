@@ -25,6 +25,9 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 	}
 
 	config = *in_config;
+
+	entropy_coder = bvc_entropy_coder_factory::create_entropy_coder(in_config->entropy_coder);
+
 	return bvc_enc_result::BVC_ENC_OK;
 }
 
@@ -34,9 +37,26 @@ bvc_enc_result bvc_encoder::encode(const uint8_t* in_picture_bytes, bvc_enc_nal*
 	std::vector<bvc_enc_nal> output_nals;
 	bvc_enc_nal				 nal;
 
-	nal.size = get_size_in_bytes(config.format);
-	nal.bytes = new uint8_t[nal.size];
-	memcpy(nal.bytes, in_picture_bytes, nal.size);
+	// Entropy coding
+	int pic_bytes_size = get_size_in_bytes(config.format);
+	if (entropy_coder != nullptr)
+	{
+		for (int i = 0; i < pic_bytes_size; i++)
+		{
+			for (int j = 7; j >= 0; j--)
+			{
+				entropy_coder->encode_symbol(in_picture_bytes[i] & ((1 >> j) & 0x1));
+			}
+		}
+
+		entropy_coder->flush(nal.bytes, &nal.size);
+	}
+	else
+	{
+		nal.size = get_size_in_bytes(config.format);
+		nal.bytes = new uint8_t[nal.size];
+		memcpy(nal.bytes, in_picture_bytes, nal.size);
+	}
 
 	output_nals.push_back(nal);
 	*out_nal_units = &output_nals[0];
