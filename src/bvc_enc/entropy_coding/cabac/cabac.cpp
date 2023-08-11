@@ -38,6 +38,40 @@ void cabac::encode_symbol(uint8_t in_symbol)
 	}
 
 	history[in_symbol]++;
+
+	while (true)
+	{
+		uint32_t entropy_precision = 16;
+		uint64_t entropy_msb_mask = (uint64_t(0x1) << (entropy_precision - 1));
+		uint32_t entropy_precision_max = (uint32_t(0x1) << entropy_precision);
+		uint32_t entropy_half_range = (entropy_precision_max >> 1);
+		uint32_t entropy_qtr_range = (entropy_half_range >> 1);
+
+		if ((high & entropy_msb_mask) == (low & entropy_msb_mask))
+		{
+			/* E1/E2 scaling violation. */
+			uint8_t msb = (uint8_t)((high & entropy_msb_mask) >> 15);
+			low -= entropy_half_range * msb + msb;
+			high -= entropy_half_range * msb + msb;
+
+			stream->write_bit(msb);
+			flush_inverse_bits(msb);
+		}
+		else if (high <= 3 * entropy_qtr_range && low > entropy_qtr_range)
+		{
+			/* E3 scaling violation. */
+			high -= entropy_qtr_range + 1;
+			low -= entropy_qtr_range + 1;
+			e3_count += 1;
+		}
+		else
+		{
+			break;
+		}
+
+		high = ((high << 0x1) & entropy_precision_max) | 0x1;
+		low = ((low << 0x1) & entropy_precision_max) | 0x0;
+	}
 }
 
 void cabac::flush(uint8_t* out_bits, uint32_t* out_size)

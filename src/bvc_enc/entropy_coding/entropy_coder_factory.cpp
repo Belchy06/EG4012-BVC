@@ -1,7 +1,7 @@
 #include "entropy_coder_factory.h"
 #include "cabac/cabac.h"
 
-std::shared_ptr<bvc_entropy_coder> bvc_entropy_coder_factory::create_entropy_coder(bvc_entropy in_coder)
+std::shared_ptr<bvc_entropy_encoder> bvc_entropy_encoder_factory::create_entropy_encoder(bvc_entropy in_coder)
 {
 	switch (in_coder)
 	{

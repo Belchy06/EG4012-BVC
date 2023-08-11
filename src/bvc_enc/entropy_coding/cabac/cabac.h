@@ -4,7 +4,7 @@
 #include "context.h"
 #include "../entropy_coder.h"
 
-class cabac : public bvc_entropy_coder
+class cabac : public bvc_entropy_encoder
 {
 public:
 	cabac();

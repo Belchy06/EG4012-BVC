@@ -20,5 +20,5 @@ private:
 private:
 	bvc_enc_config config;
 
-	std::shared_ptr<bvc_entropy_coder> entropy_coder;
+	std::shared_ptr<bvc_entropy_encoder> entropy_coder;
 };

@@ -8,13 +8,28 @@ bvc_decoder::bvc_decoder()
 
 bvc_dec_result bvc_decoder::init()
 {
+	entropy_decoder = bvc_entropy_decoder_factory::create_entropy_coder(bvc_entropy::BVC_ENTROPY_CODER_CABAC);
+
 	return bvc_dec_result::BVC_DEC_OK;
 }
 
 bvc_dec_result bvc_decoder::decode_nal(bvc_dec_nal* in_nal_unit)
 {
-	output_picture_bytes.resize(in_nal_unit->size);
-	memcpy(output_picture_bytes.data(), in_nal_unit->bytes, in_nal_unit->size);
+	if (entropy_decoder != nullptr)
+	{
+		for (int i = 0; i < in_nal_unit->size / 4; i++)
+		{
+			entropy_decoder->decode_symbol((uint32_t)(in_nal_unit->bytes[i] << 24 | in_nal_unit->bytes[i + 1] << 16 | in_nal_unit->bytes[i + 2] << 8 | in_nal_unit->bytes[i + 3] << 0));
+		}
+
+		uint32_t size = output_picture_bytes.size();
+		entropy_decoder->flush(output_picture_bytes.data(), &size);
+	}
+	else
+	{
+		output_picture_bytes.resize(in_nal_unit->size);
+		memcpy(output_picture_bytes.data(), in_nal_unit->bytes, in_nal_unit->size);
+	}
 
 	return bvc_dec_result::BVC_DEC_OK;
 }

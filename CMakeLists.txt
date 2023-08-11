@@ -50,6 +50,7 @@ if(NOT "${BVC_TARGET_ARCH}" MATCHES "^(x86|ARM|MIPS)$")
 endif()
 
 add_subdirectory(src)
+add_subdirectory(test)
 
 # pkg-config support
 set(PKG_CONFIG_LINK_LIBS "")

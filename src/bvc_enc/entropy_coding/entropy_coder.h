@@ -4,10 +4,10 @@
 
 #include "bvc_common/bitstream.h"
 
-class bvc_entropy_coder
+class bvc_entropy_encoder
 {
 public:
-	bvc_entropy_coder();
+	bvc_entropy_encoder() = default;
 
 	virtual void encode_symbol(uint8_t in_symbol) = 0;
 

@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "entropy_coding/entropy_decoder.h"
+#include "entropy_coding/entropy_decoder_factory.h"
 #include "nal.h"
 #include "picture.h"
 #include "result.h"
@@ -20,4 +22,6 @@ private:
 
 private:
 	std::vector<uint8_t> output_picture_bytes;
+
+	std::shared_ptr<bvc_entropy_decoder> entropy_decoder;
 };

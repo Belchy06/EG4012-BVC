@@ -26,7 +26,7 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 
 	config = *in_config;
 
-	entropy_coder = bvc_entropy_coder_factory::create_entropy_coder(in_config->entropy_coder);
+	entropy_coder = bvc_entropy_encoder_factory::create_entropy_encoder(in_config->entropy_coder);
 
 	return bvc_enc_result::BVC_ENC_OK;
 }
