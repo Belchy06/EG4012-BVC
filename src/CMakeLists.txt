@@ -17,9 +17,8 @@ set(BVC_COMMON_SOURCES
 set(BVC_DEC_SOURCES
     "bvc_common/format.h"
     "bvc_common/entropy.h"
-    "bvc_dec/entropy_coding/cabac/cabac.h"
-    "bvc_dec/entropy_coding/cabac/context.h"
-    "bvc_dec/entropy_coding/cabac/cabac.cpp"
+    "bvc_dec/entropy_coding/abac/abac.h"
+    "bvc_dec/entropy_coding/abac/abac.cpp"
     "bvc_dec/entropy_coding/entropy_decoder.h"
     "bvc_dec/entropy_coding/entropy_decoder_factory.h"
     "bvc_dec/entropy_coding/entropy_decoder_factory.cpp"
@@ -33,9 +32,8 @@ set(BVC_DEC_SOURCES
 set(BVC_ENC_SOURCES
     "bvc_common/format.h"
     "bvc_common/entropy.h"
-    "bvc_enc/entropy_coding/cabac/cabac.h"
-    "bvc_enc/entropy_coding/cabac/context.h"
-    "bvc_enc/entropy_coding/cabac/cabac.cpp"
+    "bvc_enc/entropy_coding/abac/abac.h"
+    "bvc_enc/entropy_coding/abac/abac.cpp"
     "bvc_enc/entropy_coding/entropy_encoder.h"
     "bvc_enc/entropy_coding/entropy_encoder_factory.h"
     "bvc_enc/entropy_coding/entropy_encoder_factory.cpp"

@@ -1,8 +1,8 @@
 #include <cstring>
 
-#include "cabac.h"
+#include "abac.h"
 
-cabac::cabac()
+abac::abac()
 	: low(0)
 	// 16 bit precision
 	, high((uint32_t(0x1) << 16) - 1)
@@ -13,7 +13,7 @@ cabac::cabac()
 	stream = new bitstream();
 }
 
-void cabac::decode_symbol(uint32_t in_symbol)
+void abac::decode_symbol(uint32_t in_symbol)
 {
 	update();
 
@@ -66,14 +66,14 @@ void cabac::decode_symbol(uint32_t in_symbol)
 	}
 }
 
-void cabac::flush(uint8_t* out_bits, uint32_t* out_size)
+void abac::flush(uint8_t* out_bits, uint32_t* out_size)
 {
 	out_bits = new uint8_t[stream->occupancy()];
 	memcpy(out_bits, stream->data(), stream->occupancy());
 	*out_size = stream->occupancy();
 }
 
-void cabac::clear()
+void abac::clear()
 {
 	low = 0;
 	value = 0;
@@ -83,7 +83,7 @@ void cabac::clear()
 	mid = high >> 1;
 }
 
-void cabac::update()
+void abac::update()
 {
 	uint32_t range = high - low;
 	uint64_t mid_range = range * history[0] / (history[0] + history[1]);

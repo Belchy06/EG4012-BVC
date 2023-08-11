@@ -1,8 +1,8 @@
 #include <cstring>
 
-#include "cabac.h"
+#include "abac.h"
 
-cabac::cabac()
+abac::abac()
 	: low(0)
 	// 16 bit precision
 	, high((uint32_t(0x1) << 16) - 1)
@@ -14,7 +14,7 @@ cabac::cabac()
 	stream = new bitstream();
 }
 
-void cabac::encode_symbol(uint8_t in_symbol)
+void abac::encode_symbol(uint8_t in_symbol)
 {
 	// Zero out the 7 MSBs, leaving just the LSB
 	in_symbol = in_symbol & 0b1;
@@ -74,7 +74,7 @@ void cabac::encode_symbol(uint8_t in_symbol)
 	}
 }
 
-void cabac::flush(uint8_t** out_bits, uint32_t* out_size)
+void abac::flush(uint8_t** out_bits, uint32_t* out_size)
 {
 	e3_count++;
 
@@ -89,7 +89,7 @@ void cabac::flush(uint8_t** out_bits, uint32_t* out_size)
 	clear();
 }
 
-void cabac::clear()
+void abac::clear()
 {
 	low = 0;
 	value = 0;
@@ -100,7 +100,7 @@ void cabac::clear()
 	mid = high >> 1;
 }
 
-void cabac::update()
+void abac::update()
 {
 	uint32_t range = high - low;
 	uint64_t mid_range = range * history[0] / (history[0] + history[1]);
@@ -108,7 +108,7 @@ void cabac::update()
 	mid = low + (uint32_t)mid_range;
 }
 
-void cabac::flush_inverse_bits(uint8_t in_symbol)
+void abac::flush_inverse_bits(uint8_t in_symbol)
 {
 	in_symbol = !in_symbol;
 	for (uint32_t i = 0; i < e3_count; i++)

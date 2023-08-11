@@ -1,13 +1,12 @@
 #pragma once
 
 #include "bvc_common/bitstream.h"
-#include "context.h"
 #include "../entropy_encoder.h"
 
-class cabac : public bvc_entropy_encoder
+class abac : public bvc_entropy_encoder
 {
 public:
-	cabac();
+	abac();
 
 	virtual void encode_symbol(uint8_t in_symbol) override;
 
@@ -20,9 +19,6 @@ private:
 	void flush_inverse_bits(uint8_t in_symbol);
 
 private:
-	// TODO (belchy06): Move this to a class
-	uint32_t model;
-
 	uint32_t* history;
 	uint32_t  value;
 	uint32_t  e3_count;
