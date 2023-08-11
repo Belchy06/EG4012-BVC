@@ -5,7 +5,7 @@ std::shared_ptr<bvc_entropy_decoder> bvc_entropy_decoder_factory::create_entropy
 {
 	switch (in_coder)
 	{
-		case bvc_entropy::BVC_ENTROPY_CODER_CABAC:
+		case bvc_entropy::BVC_ENTROPY_CODER_ABAC:
 			return std::make_shared<abac>();
 		case bvc_entropy::BVC_ENTROPY_CODER_NONE:
 			return nullptr;
