@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <vector>
 
 class bitstream
 {
@@ -14,18 +15,16 @@ public:
 	void read_byte(uint8_t* out_byte);
 
 	uint8_t* data();
-	// Return the size (in bytes) of the bit stream
-	uint32_t size();
-
-	uint32_t resize(uint32_t in_bit_capacity);
+	uint32_t size();	  // Return the size (in bytes)
+	uint32_t occupancy(); // Return the occupied space (in bytes) (rounding up if needed)
 
 private:
 	void	 clear();
 	uint32_t align(uint32_t in_value, uint32_t in_alignment);
 
 private:
-	uint32_t read_idx;
-	uint32_t write_idx;
-	uint32_t capacity;
-	uint8_t* stream;
+	uint32_t			 read_idx;	// Bit
+	uint32_t			 write_idx; // Bit
+	uint32_t			 capacity;	// Bytes
+	std::vector<uint8_t> stream;
 };

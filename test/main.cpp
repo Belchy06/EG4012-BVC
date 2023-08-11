@@ -5,7 +5,9 @@
 int main(int argc, const char* argv[])
 {
 	bool bSuccess = true;
-	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_CABAC);
+	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_CABAC, 32);
+	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_CABAC, 64);
+	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_CABAC, 128);
 
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 

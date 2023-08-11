@@ -39,14 +39,14 @@ void cabac::encode_symbol(uint8_t in_symbol)
 
 	history[in_symbol]++;
 
+	uint32_t entropy_precision = 16;
+	uint32_t entropy_precision_max = (uint32_t(0x1) << entropy_precision) - 1;
+	uint32_t entropy_half_range = (entropy_precision_max >> 1);
+	uint32_t entropy_qtr_range = (entropy_half_range >> 1);
+	uint32_t entropy_3qtr_range = 3 * entropy_qtr_range;
+	uint64_t entropy_msb_mask = (uint64_t(0x1) << (entropy_precision - 1));
 	while (true)
 	{
-		uint32_t entropy_precision = 16;
-		uint64_t entropy_msb_mask = (uint64_t(0x1) << (entropy_precision - 1));
-		uint32_t entropy_precision_max = (uint32_t(0x1) << entropy_precision);
-		uint32_t entropy_half_range = (entropy_precision_max >> 1);
-		uint32_t entropy_qtr_range = (entropy_half_range >> 1);
-
 		if ((high & entropy_msb_mask) == (low & entropy_msb_mask))
 		{
 			/* E1/E2 scaling violation. */
@@ -57,7 +57,7 @@ void cabac::encode_symbol(uint8_t in_symbol)
 			stream->write_bit(msb);
 			flush_inverse_bits(msb);
 		}
-		else if (high <= 3 * entropy_qtr_range && low > entropy_qtr_range)
+		else if (high <= entropy_3qtr_range && low > entropy_qtr_range)
 		{
 			/* E3 scaling violation. */
 			high -= entropy_qtr_range + 1;
@@ -74,7 +74,7 @@ void cabac::encode_symbol(uint8_t in_symbol)
 	}
 }
 
-void cabac::flush(uint8_t* out_bits, uint32_t* out_size)
+void cabac::flush(uint8_t** out_bits, uint32_t* out_size)
 {
 	e3_count++;
 
@@ -82,9 +82,11 @@ void cabac::flush(uint8_t* out_bits, uint32_t* out_size)
 	stream->write_bit(val);
 	flush_inverse_bits(val);
 
-	out_bits = new uint8_t[stream->size()];
-	memcpy(out_bits, stream->data(), stream->size());
-	*out_size = stream->size();
+	*out_bits = new uint8_t[stream->occupancy()];
+	memcpy(*out_bits, stream->data(), stream->occupancy());
+	*out_size = stream->occupancy();
+
+	clear();
 }
 
 void cabac::clear()
@@ -104,10 +106,6 @@ void cabac::update()
 	uint64_t mid_range = range * history[0] / (history[0] + history[1]);
 
 	mid = low + (uint32_t)mid_range;
-}
-
-void cabac::encode_symbol(uint8_t in_symbol, context* in_ctx)
-{
 }
 
 void cabac::flush_inverse_bits(uint8_t in_symbol)

@@ -9,16 +9,16 @@ bitstream::bitstream()
 	: read_idx(0)
 	, write_idx(0)
 	, capacity(0)
-	, stream(new uint8_t[capacity])
 {
+	stream.resize(capacity);
 }
 
 void bitstream::write_bit(uint8_t in_bit)
 {
-	if (write_idx + 1 > capacity << 3)
+	if (write_idx + 1 > stream.size() << 3)
 	{
-		// Double the capacity (in bytes)
-		resize(capacity << 4);
+		// Add a new empty element to the end of the vector
+		stream.push_back(0);
 	}
 
 	uint32_t dest_byte = write_idx >> 3;
@@ -45,7 +45,7 @@ void bitstream::read_bit(uint8_t* out_bit)
 	/* Determine the current byte to read from. */
 	uint32_t src_byte = read_idx >> 3;
 	uint8_t	 src_bit = read_idx % 8;
-	uint8_t* dest = reinterpret_cast<uint8_t*>(stream);
+	uint8_t* dest = stream.data();
 
 	/* Pull the correct byte from our stream store. Note that we
 	   preserve the high bits of *dest. */
@@ -62,27 +62,17 @@ void bitstream::read_byte(uint8_t* out_byte)
 
 uint8_t* bitstream::data()
 {
-	return stream;
+	return stream.data();
 }
 
 uint32_t bitstream::size()
 {
-	return align(capacity, 8) >> 3;
+	return capacity;
 }
 
-uint32_t bitstream::resize(uint32_t in_bit_capacity)
+uint32_t bitstream::occupancy()
 {
-	uint32_t byte_size = align(in_bit_capacity, 8) >> 3;
-	uint8_t* tempData = new uint8_t[byte_size];
-
-	memcpy(tempData, stream, byte_size);
-
-	uint8_t* oldData = stream;
-	delete[] oldData;
-
-	stream = tempData;
-	capacity = in_bit_capacity;
-	return in_bit_capacity;
+	return align(write_idx - read_idx, 8) >> 3;
 }
 
 void bitstream::clear()
@@ -90,8 +80,8 @@ void bitstream::clear()
 	write_idx = 0;
 	read_idx = 0;
 
-	delete[] stream;
-	stream = 0;
+	stream.clear();
+	stream.resize(0);
 	capacity = 0;
 }
 

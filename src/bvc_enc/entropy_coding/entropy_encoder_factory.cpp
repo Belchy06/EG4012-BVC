@@ -1,4 +1,4 @@
-#include "entropy_coder_factory.h"
+#include "entropy_encoder_factory.h"
 #include "cabac/cabac.h"
 
 std::shared_ptr<bvc_entropy_encoder> bvc_entropy_encoder_factory::create_entropy_encoder(bvc_entropy in_coder)

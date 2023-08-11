@@ -49,7 +49,7 @@ bvc_enc_result bvc_encoder::encode(const uint8_t* in_picture_bytes, bvc_enc_nal*
 			}
 		}
 
-		entropy_coder->flush(nal.bytes, &nal.size);
+		entropy_coder->flush(&nal.bytes, &nal.size);
 	}
 	else
 	{

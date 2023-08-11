@@ -2,7 +2,7 @@
 
 #include "bvc_common/bitstream.h"
 #include "context.h"
-#include "../entropy_coder.h"
+#include "../entropy_encoder.h"
 
 class cabac : public bvc_entropy_encoder
 {
@@ -11,12 +11,11 @@ public:
 
 	virtual void encode_symbol(uint8_t in_symbol) override;
 
-	virtual void flush(uint8_t* out_bits, uint32_t* out_size) override;
+	virtual void flush(uint8_t** out_bits, uint32_t* out_size) override;
 
 private:
 	void clear();
 	void update();
-	void encode_symbol(uint8_t in_symbol, context* in_ctx);
 
 	void flush_inverse_bits(uint8_t in_symbol);
 

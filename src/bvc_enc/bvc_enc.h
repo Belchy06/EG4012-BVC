@@ -1,8 +1,8 @@
 #pragma once
 
 #include "config.h"
-#include "entropy_coding/entropy_coder.h"
-#include "entropy_coding/entropy_coder_factory.h"
+#include "entropy_coding/entropy_encoder.h"
+#include "entropy_coding/entropy_encoder_factory.h"
 #include "result.h"
 #include "nal.h"
 

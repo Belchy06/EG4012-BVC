@@ -68,9 +68,9 @@ void cabac::decode_symbol(uint32_t in_symbol)
 
 void cabac::flush(uint8_t* out_bits, uint32_t* out_size)
 {
-	out_bits = new uint8_t[stream->size()];
-	memcpy(out_bits, stream->data(), stream->size());
-	*out_size = stream->size();
+	out_bits = new uint8_t[stream->occupancy()];
+	memcpy(out_bits, stream->data(), stream->occupancy());
+	*out_size = stream->occupancy();
 }
 
 void cabac::clear()
