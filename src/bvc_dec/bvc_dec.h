@@ -21,7 +21,8 @@ private:
 	int get_size_in_bytes(bvc_chroma_format in_format);
 
 private:
-	std::vector<uint8_t> output_picture_bytes;
+	uint8_t* output_picture_bytes;
+	uint32_t output_picture_size;
 
 	std::shared_ptr<bvc_entropy_decoder> entropy_decoder;
 };

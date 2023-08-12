@@ -3,10 +3,10 @@
 #include "bvc_common/bitstream.h"
 #include "../entropy_encoder.h"
 
-class abac : public bvc_entropy_encoder
+class abac_encoder : public bvc_entropy_encoder
 {
 public:
-	abac();
+	abac_encoder();
 
 	virtual void encode_symbol(uint8_t in_symbol) override;
 
@@ -20,10 +20,17 @@ private:
 
 private:
 	uint32_t* history;
-	uint32_t  value;
-	uint32_t  e3_count;
+	uint32_t  encoded;
+	uint32_t  underflow_count;
 
 	uint32_t low;
 	uint32_t mid;
 	uint32_t high;
+
+	uint32_t entropy_precision;
+	uint32_t entropy_precision_max;
+	uint32_t entropy_half_range;
+	uint32_t entropy_qtr_range;
+	uint32_t entropy_3qtr_range;
+	uint64_t entropy_msb_mask;
 };
