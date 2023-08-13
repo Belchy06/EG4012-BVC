@@ -9,7 +9,10 @@
             "request": "launch",
             "program": "${workspaceFolder}\\build\\test\\Debug\\bvc_test.exe",
             "preLaunchTask": "",
-            "args": [],
+            "args": [
+                "-verbosity",
+                "veryverbose"
+            ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole",

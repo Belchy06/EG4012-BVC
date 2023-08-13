@@ -38,7 +38,7 @@ bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosit
 	}
 
 	uint8_t* coded_data = new uint8_t();
-	size_t	 coded_size;
+	size_t	 coded_size = 0;
 	encode(in_entropy, raw_data, raw_size, &coded_data, &coded_size);
 
 	// Print coded data info
@@ -57,7 +57,7 @@ bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosit
 
 	// Decode
 	uint8_t* decoded_data = new uint8_t();
-	size_t	 decoded_size;
+	size_t	 decoded_size = 0;
 	decode(in_entropy, coded_data, coded_size, raw_size, &decoded_data, &decoded_size);
 
 	// Print coded data info

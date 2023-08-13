@@ -8,6 +8,11 @@ set(BVC_COMMON_SOURCES
     "bvc_common/bitstream.h"
     "bvc_common/bitstream.cpp"
     "bvc_common/entropy.h"
+    "bvc_common/huffman/huffman.h"
+    "bvc_common/huffman/node.h"
+    "bvc_common/huffman/linked_list.h"
+    "bvc_common/huffman/huffman_node.h"
+    "bvc_common/huffman/huffman_node.cpp"
     "bvc_common/vector.h"
     "bvc_common/matrix.h"
     "bvc_common/matrix.cpp"
@@ -15,10 +20,10 @@ set(BVC_COMMON_SOURCES
     "bvc_common/wavelet.cpp")
 
 set(BVC_DEC_SOURCES
-    "bvc_common/format.h"
-    "bvc_common/entropy.h"
     "bvc_dec/entropy_coding/abac/abac_decoder.h"
     "bvc_dec/entropy_coding/abac/abac_decoder.cpp"
+    "bvc_dec/entropy_coding/huffman/huffman_decoder.h"
+    "bvc_dec/entropy_coding/huffman/huffman_decoder.cpp"
     "bvc_dec/entropy_coding/entropy_decoder.h"
     "bvc_dec/entropy_coding/entropy_decoder_factory.h"
     "bvc_dec/entropy_coding/entropy_decoder_factory.cpp"
@@ -30,10 +35,10 @@ set(BVC_DEC_SOURCES
     "bvc_dec/bvc_dec.cpp")
 
 set(BVC_ENC_SOURCES
-    "bvc_common/format.h"
-    "bvc_common/entropy.h"
     "bvc_enc/entropy_coding/abac/abac_encoder.h"
     "bvc_enc/entropy_coding/abac/abac_encoder.cpp"
+    "bvc_enc/entropy_coding/huffman/huffman_encoder.h"
+    "bvc_enc/entropy_coding/huffman/huffman_encoder.cpp"
     "bvc_enc/entropy_coding/entropy_encoder.h"
     "bvc_enc/entropy_coding/entropy_encoder_factory.h"
     "bvc_enc/entropy_coding/entropy_encoder_factory.cpp"

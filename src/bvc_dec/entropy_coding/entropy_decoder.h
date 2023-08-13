@@ -8,7 +8,8 @@
 class bvc_entropy_decoder
 {
 public:
-	bvc_entropy_decoder() = default;
+	bvc_entropy_decoder()
+		: stream(new bitstream()) {}
 
 	virtual void decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbols) = 0;
 

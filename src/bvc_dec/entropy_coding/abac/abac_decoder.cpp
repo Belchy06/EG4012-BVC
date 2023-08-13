@@ -10,7 +10,6 @@ abac_decoder::abac_decoder()
 	, encoded(0)
 {
 	history[0] = history[1] = 1;
-	stream = new bitstream();
 
 	entropy_precision = 16;
 	entropy_precision_max = (uint32_t(0x1) << entropy_precision) - 1;
@@ -25,9 +24,7 @@ void abac_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbo
 	{
 		for (size_t j = 0; j < 8; j++)
 		{
-			// size_t	bitIdx = i * 8 + j;
 			uint8_t bit = (in_bytes[i] >> j) & 0x1;
-
 			bits.push(bit);
 		}
 	}

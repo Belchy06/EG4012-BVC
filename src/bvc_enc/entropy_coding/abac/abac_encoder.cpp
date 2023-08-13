@@ -10,7 +10,6 @@ abac_encoder::abac_encoder()
 	, underflow_count(0)
 {
 	history[0] = history[1] = 1;
-	stream = new bitstream();
 
 	entropy_precision = 16;
 	entropy_precision_max = (uint32_t(0x1) << entropy_precision) - 1;

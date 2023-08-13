@@ -4,8 +4,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(BVC_TEST_SOURCES
-    "entropy/encoding_test.h"
-    "entropy/encoding_test.cpp"
+    "entropy/entropy_test.h"
+    "entropy/entropy_test.cpp"
     "main.cpp")
 
 if(MSVC)

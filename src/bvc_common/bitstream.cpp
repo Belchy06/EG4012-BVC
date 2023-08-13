@@ -38,11 +38,11 @@ void bitstream::write_byte(uint8_t in_byte)
 {
 }
 
-void bitstream::read_bit(uint8_t* out_bit)
+bool bitstream::read_bit(uint8_t* out_bit)
 {
 	if (read_idx >= write_idx)
 	{
-		return;
+		return false;
 	}
 
 	/* Determine the current byte to read from. */
@@ -56,11 +56,12 @@ void bitstream::read_bit(uint8_t* out_bit)
 	*dest |= ((stream[src_byte]) >> src_bit) & 0x1;
 	read_idx++;
 
-	return;
+	return true;
 }
 
-void bitstream::read_byte(uint8_t* out_byte)
+bool bitstream::read_byte(uint8_t* out_byte)
 {
+	return true;
 }
 
 uint8_t* bitstream::data()
@@ -70,7 +71,7 @@ uint8_t* bitstream::data()
 
 uint32_t bitstream::size()
 {
-	return capacity;
+	return write_idx - read_idx;
 }
 
 uint32_t bitstream::occupancy()

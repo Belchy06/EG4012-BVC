@@ -57,6 +57,11 @@
         "xtr1common": "cpp",
         "bitset": "cpp",
         "queue": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "string": "cpp",
+        "sstream": "cpp",
+        "xtree": "cpp"
     }
 }

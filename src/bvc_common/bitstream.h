@@ -11,8 +11,8 @@ public:
 	void write_bit(uint8_t in_bit);
 	void write_byte(uint8_t in_byte);
 
-	void read_bit(uint8_t* out_bit);
-	void read_byte(uint8_t* out_byte);
+	bool read_bit(uint8_t* out_bit);
+	bool read_byte(uint8_t* out_byte);
 
 	uint8_t* data();
 	uint32_t size();	  // Return the size (in bytes)

@@ -32,6 +32,10 @@ int main(int argc, const char* argv[])
 	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_ABAC, 64, verbosity);
 	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_ABAC, 128, verbosity);
 
+	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_HUFFMAN, 32, verbosity);
+	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_HUFFMAN, 64, verbosity);
+	bSuccess = entropy_test::test(bvc_entropy::BVC_ENTROPY_CODER_HUFFMAN, 128, verbosity);
+
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 
 	return bSuccess ? 0 : -1;
