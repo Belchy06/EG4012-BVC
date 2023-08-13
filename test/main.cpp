@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "bvc_common/verbosity.h"
-#include "entropy/encoding_test.h"
+#include "entropy/entropy_test.h"
 
 int main(int argc, const char* argv[])
 {

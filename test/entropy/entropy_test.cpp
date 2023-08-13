@@ -8,7 +8,7 @@
 #include "bvc_enc/entropy_coding/entropy_encoder.h"
 #include "bvc_enc/entropy_coding/entropy_encoder_factory.h"
 
-#include "encoding_test.h"
+#include "entropy_test.h"
 
 bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosity in_verbosity)
 {
