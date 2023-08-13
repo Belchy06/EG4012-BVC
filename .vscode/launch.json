@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Entropy Test (Debug)",
+            "name": "Launch Test (Debug)",
             "request": "launch",
             "program": "${workspaceFolder}\\build\\test\\Debug\\bvc_test.exe",
-            "preLaunchTask": "",
+            "preLaunchTask": "Build Test",
             "args": [
                 "-verbosity",
                 "veryverbose"
