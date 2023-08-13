@@ -78,10 +78,14 @@ void entropy_test::encode(bvc_entropy in_entropy, uint8_t* in_raw_data, uint32_t
 	{
 		for (size_t j = 0; j < 8; j++)
 		{
+			size_t	bitIdx = i * 8 + j;
 			uint8_t bit = (in_raw_data[i] >> j) & 0x1;
+			std::cout << (bit ? "1" : "0");
 			entropy_encoder->encode_symbol(bit);
 		}
+		std::cout << " ";
 	}
+	std::cout << std::endl;
 
 	// extract encoded info
 	entropy_encoder->flush(out_coded_data, out_coded_size);
@@ -95,18 +99,23 @@ void entropy_test::decode(bvc_entropy in_entropy, uint8_t* in_coded_data, uint32
 	{
 		for (size_t j = 0; j < 8; j++)
 		{
+			size_t	bitIdx = i * 8 + j;
 			uint8_t bit = (i < in_coded_size) ? (in_coded_data[i] >> j) & 0x1 : 0;
+			std::cout << bitIdx << " ";
 			entropy_decoder->decode(bit);
+			std::cout << std::endl;
 		}
 	}
 
-	for (size_t i = 2; i < in_raw_size; i++)
+	for (size_t i = 2; i < in_raw_size - 2; i++)
 	{
 		for (size_t j = 0; j < 8; j++)
 		{
 			size_t	bitIdx = i * 8 + j;
 			uint8_t bit = (i < in_coded_size) ? (in_coded_data[i] >> j) & 0x1 : 0;
+			std::cout << "(" << bitIdx << "," << (bit ? "1" : "0") << ") ";
 			entropy_decoder->decode(bit);
+			std::cout << std::endl;
 		}
 	}
 

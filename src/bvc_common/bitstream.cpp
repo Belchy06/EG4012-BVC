@@ -3,6 +3,7 @@
 #include <memory>
 #include <stdint.h>
 
+#include <iostream>
 #include "bitstream.h"
 
 bitstream::bitstream()
@@ -15,6 +16,9 @@ bitstream::bitstream()
 
 void bitstream::write_bit(uint8_t in_bit)
 {
+	in_bit = in_bit & 0x1;
+	std::cout << "(W" << (in_bit ? "1" : "0") << ")";
+
 	if (write_idx + 1 > stream.size() << 3)
 	{
 		// Add a new empty element to the end of the vector

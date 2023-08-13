@@ -9,11 +9,10 @@
             "request": "launch",
             "program": "${workspaceFolder}\\build\\test\\Debug\\bvc_test.exe",
             "preLaunchTask": "",
-            "args": [
-            ],
+            "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "type": "cppvsdbg",
         },
     ]

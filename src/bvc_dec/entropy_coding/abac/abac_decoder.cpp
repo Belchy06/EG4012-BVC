@@ -44,17 +44,18 @@ bool abac_decoder::decode_internal(uint8_t in_symbol, bool in_skip_update)
 		return true;
 	}
 
+	bool utilised = false;
 	if (!in_skip_update)
 	{
 		update();
 
-		if (encoded >= low && encoded < mid)
+		if (encoded >= low && encoded <= mid)
 		{
 			high = mid;
 			history[0]++;
 			stream->write_bit(0);
 		}
-		else if (encoded >= mid && encoded < high)
+		else if (encoded > mid && encoded <= high)
 		{
 			low = mid + 1;
 			history[1]++;
@@ -67,9 +68,10 @@ bool abac_decoder::decode_internal(uint8_t in_symbol, bool in_skip_update)
 		low = ((low << 0x1) & entropy_precision_max) | 0x0;
 		encoded = ((encoded << 0x1) & entropy_precision_max) | in_symbol;
 		skip_update = false;
+		utilised = true;
 	}
 
-	bool utilised = false;
+	bool second = false;
 	while (true)
 	{
 		if (high <= entropy_half_range)
@@ -95,8 +97,9 @@ bool abac_decoder::decode_internal(uint8_t in_symbol, bool in_skip_update)
 			break;
 		}
 
-		if (utilised)
+		if (second || utilised)
 		{
+			std::cout << (second ? "T" : "F") << encoded << " ";
 			skip_update = true;
 			return true;
 		}
@@ -104,12 +107,12 @@ bool abac_decoder::decode_internal(uint8_t in_symbol, bool in_skip_update)
 		high = ((high << 0x1) & entropy_precision_max) | 0x1;
 		low = ((low << 0x1) & entropy_precision_max) | 0x0;
 		encoded = ((encoded << 0x1) & entropy_precision_max) | in_symbol;
-		utilised = true;
+		second = true;
 	}
 
-	std::cout << loop_count << ": " << encoded << std::endl;
+	std::cout << (second || utilised ? "T" : "F") << encoded << " ";
 	loop_count++;
-	return utilised;
+	return second || utilised;
 }
 
 void abac_decoder::flush(uint8_t** out_bits, uint32_t* out_size)
