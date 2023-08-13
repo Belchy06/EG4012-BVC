@@ -55,6 +55,8 @@
         "xloctime": "cpp",
         "xstddef": "cpp",
         "xtr1common": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "queue": "cpp",
+        "deque": "cpp"
     }
 }

@@ -39,16 +39,10 @@ bvc_enc_result bvc_encoder::encode(const uint8_t* in_picture_bytes, bvc_enc_nal*
 
 	// Entropy coding
 	int pic_bytes_size = get_size_in_bytes(config.format);
+
 	if (entropy_coder != nullptr)
 	{
-		for (int i = 0; i < pic_bytes_size; i++)
-		{
-			for (int j = 7; j >= 0; j--)
-			{
-				entropy_coder->encode_symbol(in_picture_bytes[i] & ((1 >> j) & 0x1));
-			}
-		}
-
+		entropy_coder->encode(in_picture_bytes, pic_bytes_size);
 		entropy_coder->flush(&nal.bytes, &nal.size);
 	}
 	else

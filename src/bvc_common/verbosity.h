@@ -1,0 +1,9 @@
+#pragma once
+
+typedef enum
+{
+	BVC_VERBOSITY_SILENT,
+	BVC_VERBOSITY_LOG,
+	BVC_VERBOSITY_VERBOSE,
+	BVC_VERBOSITY_VERY_VERBOSE
+} bvc_verbosity;

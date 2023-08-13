@@ -9,7 +9,7 @@ abac_encoder::abac_encoder()
 	, mid(high >> 1)
 	, underflow_count(0)
 {
-	history = new uint32_t[]{ 1, 1 };
+	history[0] = history[1] = 1;
 	stream = new bitstream();
 
 	entropy_precision = 16;
@@ -20,17 +20,63 @@ abac_encoder::abac_encoder()
 	entropy_msb_mask = (uint64_t(0x1) << (entropy_precision - 1));
 }
 
-void abac_encoder::encode_symbol(uint8_t in_symbol)
+void abac_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 {
-	// Zero out the 7 MSBs, leaving just the LSB
-	in_symbol = in_symbol & 0b1;
-
-	// We only encode the first 2^31 instances of a symbol
-	if (history[in_symbol] >= (uint32_t)2 * (uint32_t)1024 * (uint32_t)1024 * (uint32_t)1024)
+	for (size_t i = 0; i < in_size; i++)
 	{
-		return;
+		for (size_t j = 0; j < 8; j++)
+		{
+			encode_internal((in_bytes[i] >> j) & 0x1);
+		}
+	}
+}
+
+void abac_encoder::flush(uint8_t** out_bits, size_t* out_size)
+{
+	underflow_count++;
+
+	uint8_t val = (low < ((uint32_t(0x1) << 16) - 1) >> 2) ? 0 : 1;
+	stream->write_bit(val);
+	flush_inverse_bits(val);
+
+	*out_bits = new uint8_t[stream->occupancy()];
+	memcpy(*out_bits, stream->data(), stream->occupancy());
+	*out_size = stream->occupancy();
+
+	clear();
+}
+
+void abac_encoder::clear()
+{
+	low = 0;
+	underflow_count = 0;
+
+	history[0] = history[1] = 1;
+	high = (uint32_t(0x1) << 16) - 1;
+	mid = high >> 1;
+}
+
+void abac_encoder::update()
+{
+	uint32_t range = high - low;
+	uint64_t mid_range = range * history[0] / (history[0] + history[1]);
+
+	mid = low + (uint32_t)mid_range;
+}
+
+void abac_encoder::flush_inverse_bits(uint8_t in_symbol)
+{
+	in_symbol = !in_symbol;
+	for (uint32_t i = 0; i < underflow_count; i++)
+	{
+		stream->write_bit(in_symbol);
 	}
 
+	underflow_count = 0;
+}
+
+void abac_encoder::encode_internal(uint8_t in_symbol)
+{
 	update();
 
 	// Update bounds based on new information
@@ -75,48 +121,4 @@ void abac_encoder::encode_symbol(uint8_t in_symbol)
 		high = ((high << 0x1) & entropy_precision_max) | 0x1;
 		low = ((low << 0x1) & entropy_precision_max) | 0x0;
 	}
-}
-
-void abac_encoder::flush(uint8_t** out_bits, uint32_t* out_size)
-{
-	underflow_count++;
-
-	uint8_t val = (low < ((uint32_t(0x1) << 16) - 1) >> 2) ? 0 : 1;
-	stream->write_bit(val);
-	flush_inverse_bits(val);
-
-	*out_bits = new uint8_t[stream->occupancy()];
-	memcpy(*out_bits, stream->data(), stream->occupancy());
-	*out_size = stream->occupancy();
-
-	clear();
-}
-
-void abac_encoder::clear()
-{
-	low = 0;
-	underflow_count = 0;
-
-	history[0] = history[1] = 1;
-	high = (uint32_t(0x1) << 16) - 1;
-	mid = high >> 1;
-}
-
-void abac_encoder::update()
-{
-	uint32_t range = high - low;
-	uint64_t mid_range = range * history[0] / (history[0] + history[1]);
-
-	mid = low + (uint32_t)mid_range;
-}
-
-void abac_encoder::flush_inverse_bits(uint8_t in_symbol)
-{
-	in_symbol = !in_symbol;
-	for (uint32_t i = 0; i < underflow_count; i++)
-	{
-		stream->write_bit(in_symbol);
-	}
-
-	underflow_count = 0;
 }

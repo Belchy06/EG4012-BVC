@@ -23,15 +23,7 @@ bvc_dec_result bvc_decoder::decode_nal(bvc_dec_nal* in_nal_unit)
 		// Parse first 4 bytes out of nal unit for num symbols
 		// TODO (belchy06): Using 16bits for num symbols is excessive (num symbols in bytes)
 		uint32_t num_bytes = (uint32_t)(in_nal_unit->bytes[1] << 8 | in_nal_unit->bytes[0] << 0);
-		for (size_t i = 0; i < num_bytes; i++)
-		{
-			for (size_t j = 0; j < 8; j++)
-			{
-				// Only read data out of the nal if it's there, otherwise feed in 1's
-				uint8_t bit = (i < in_nal_unit->size) ? (in_nal_unit->bytes[i + 2] >> j) & 0x1 : 1;
-				entropy_decoder->decode(bit);
-			}
-		}
+		entropy_decoder->decode(in_nal_unit->bytes, in_nal_unit->size, num_bytes);
 
 		output_picture_bytes = new uint8_t();
 		entropy_decoder->flush(&output_picture_bytes, &output_picture_size);

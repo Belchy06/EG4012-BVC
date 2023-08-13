@@ -8,20 +8,18 @@ class abac_decoder : public bvc_entropy_decoder
 public:
 	abac_decoder();
 
-	virtual void decode(uint8_t in_symbol) override;
+	virtual void decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbols) override;
 
-	virtual void flush(uint8_t** out_bits, uint32_t* out_size) override;
+	virtual void flush(uint8_t** out_bits, size_t* out_size) override;
 
 private:
-	bool decode_internal(uint8_t in_symbol, bool in_skip_update);
+	void decode_internal();
 	void clear();
 	void update();
 
 private:
-	bool	  skip_update;
-	uint8_t	  bits_needed;
-	uint32_t  encoded;
-	uint32_t* history;
+	uint32_t encoded;
+	uint32_t history[2];
 
 	uint32_t low;
 	uint32_t mid;
@@ -32,6 +30,4 @@ private:
 	uint32_t entropy_half_range;
 	uint32_t entropy_qtr_range;
 	uint32_t entropy_3qtr_range;
-
-	uint32_t loop_count = 0;
 };
