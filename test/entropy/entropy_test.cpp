@@ -10,7 +10,7 @@
 
 #include "entropy_test.h"
 
-bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosity in_verbosity)
+bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, bvc_verbosity in_verbosity)
 {
 	// Construct raw data container
 	size_t	 raw_size = in_raw_size / 8;
@@ -39,7 +39,7 @@ bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosit
 
 	uint8_t* coded_data = new uint8_t();
 	size_t	 coded_size = 0;
-	encode(in_entropy, raw_data, raw_size, &coded_data, &coded_size);
+	encode(in_entropy_coder, raw_data, raw_size, &coded_data, &coded_size);
 
 	// Print coded data info
 	if (in_verbosity > BVC_VERBOSITY_VERBOSE)
@@ -58,7 +58,7 @@ bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosit
 	// Decode
 	uint8_t* decoded_data = new uint8_t();
 	size_t	 decoded_size = 0;
-	decode(in_entropy, coded_data, coded_size, raw_size, &decoded_data, &decoded_size);
+	decode(in_entropy_coder, coded_data, coded_size, raw_size, &decoded_data, &decoded_size);
 
 	// Print coded data info
 	if (in_verbosity > BVC_VERBOSITY_VERBOSE)
@@ -88,9 +88,9 @@ bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosit
 	return success;
 }
 
-void entropy_test::encode(bvc_entropy in_entropy, uint8_t* in_raw_data, size_t in_raw_size, uint8_t** out_coded_data, size_t* out_coded_size)
+void entropy_test::encode(bvc_entropy_coder in_entropy_coder, uint8_t* in_raw_data, size_t in_raw_size, uint8_t** out_coded_data, size_t* out_coded_size)
 {
-	std::shared_ptr<bvc_entropy_encoder> entropy_encoder = bvc_entropy_encoder_factory::create_entropy_encoder(in_entropy);
+	std::shared_ptr<bvc_entropy_encoder> entropy_encoder = bvc_entropy_encoder_factory::create_entropy_encoder(in_entropy_coder);
 
 	entropy_encoder->encode(in_raw_data, in_raw_size);
 
@@ -98,9 +98,9 @@ void entropy_test::encode(bvc_entropy in_entropy, uint8_t* in_raw_data, size_t i
 	entropy_encoder->flush(out_coded_data, out_coded_size);
 }
 
-void entropy_test::decode(bvc_entropy in_entropy, uint8_t* in_coded_data, size_t in_coded_size, size_t in_raw_size, uint8_t** out_decoded_data, size_t* out_decoded_size)
+void entropy_test::decode(bvc_entropy_coder in_entropy_coder, uint8_t* in_coded_data, size_t in_coded_size, size_t in_raw_size, uint8_t** out_decoded_data, size_t* out_decoded_size)
 {
-	std::shared_ptr<bvc_entropy_decoder> entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(in_entropy);
+	std::shared_ptr<bvc_entropy_decoder> entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(in_entropy_coder);
 
 	// decode, informing the decoder of the data, the number of bytes of raw data, and the number of symbols (bits) we wish to extract
 	entropy_decoder->decode(in_coded_data, in_coded_size, in_raw_size << 3);

@@ -11,6 +11,6 @@ public:
 	size_t			  width;
 	size_t			  height;
 	bvc_chroma_format format;
-	bvc_entropy		  entropy_coder;
+	bvc_entropy_coder entropy_coder;
 	double			  framerate;
 };

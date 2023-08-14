@@ -6,4 +6,4 @@ typedef enum
 	BVC_ENTROPY_CODER_ABAC,
 	BVC_ENTROPY_CODER_CABAC,
 	BVC_ENTROPY_CODER_HUFFMAN
-} bvc_entropy;
+} bvc_entropy_coder;

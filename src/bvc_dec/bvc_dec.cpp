@@ -8,7 +8,7 @@ bvc_decoder::bvc_decoder()
 
 bvc_dec_result bvc_decoder::init()
 {
-	entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(bvc_entropy::BVC_ENTROPY_CODER_CABAC);
+	entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(bvc_entropy_coder::BVC_ENTROPY_CODER_CABAC);
 
 	return bvc_dec_result::BVC_DEC_OK;
 }

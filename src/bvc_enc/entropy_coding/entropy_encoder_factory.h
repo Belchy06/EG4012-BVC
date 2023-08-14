@@ -8,5 +8,5 @@
 class bvc_entropy_encoder_factory
 {
 public:
-	static std::shared_ptr<bvc_entropy_encoder> create_entropy_encoder(bvc_entropy in_coder);
+	static std::shared_ptr<bvc_entropy_encoder> create_entropy_encoder(bvc_entropy_coder in_coder);
 };

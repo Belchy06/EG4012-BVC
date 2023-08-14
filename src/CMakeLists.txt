@@ -13,11 +13,11 @@ set(BVC_COMMON_SOURCES
     "bvc_common/huffman/linked_list.h"
     "bvc_common/huffman/huffman_node.h"
     "bvc_common/huffman/huffman_node.cpp"
-    "bvc_common/vector.h"
-    "bvc_common/matrix.h"
-    "bvc_common/matrix.cpp"
-    "bvc_common/wavelet.h"
-    "bvc_common/wavelet.cpp")
+    "bvc_common/wavelet/vector.h"
+    "bvc_common/wavelet/matrix.h"
+    "bvc_common/wavelet/matrix.cpp"
+    "bvc_common/wavelet/wavelet.h"
+    "bvc_common/wavelet/wavelet.cpp")
 
 set(BVC_DEC_SOURCES
     "bvc_dec/entropy_coding/abac/abac_decoder.h"
