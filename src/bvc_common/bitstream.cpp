@@ -40,9 +40,24 @@ void bitstream::write_byte(uint8_t in_byte)
 		stream.push_back(0);
 	}
 
-	for (int i = 7; i >= 0; i--)
+	/* Determine the current byte to write. */
+	uint32_t dest_byte = write_idx >> 3;
+	uint8_t	 dest_bit = write_idx % 8;
+
+	if (dest_bit == 0)
 	{
-		write_bit((in_byte >> i) & 0x1);
+		/* This is a byte aligned write, so we perform it at byte level. */
+		uint8_t* data = &(stream[dest_byte]);
+		*data = in_byte;
+		write_idx += 8;
+	}
+	else
+	{
+		/* Slower byte unaligned write. */
+		for (uint8_t i = 0; i < 8; ++i)
+		{
+			write_bit((in_byte >> i) & 0x1);
+		}
 	}
 }
 

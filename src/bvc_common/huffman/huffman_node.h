@@ -18,16 +18,16 @@ public:
 	huffman_node* go_via(uint8_t in_bit);
 	bitstream*	  get_code();
 
+	bool is_internal() const;
+	bool is_leaf() const;
+	bool is_nyt() const;
+
 	bool operator>(const huffman_node& rhs) const;
 	bool operator<(const huffman_node& rhs) const { return rhs > *this; }
 	bool operator>=(const huffman_node& rhs) const { return !(rhs > *this); }
 	bool operator<=(const huffman_node& rhs) const { return !(rhs < *this); }
 
 private:
-	bool is_internal() const;
-	bool is_leaf() const;
-	bool is_nyt() const;
-
 	huffman_node* find_successor();
 	void		  swap_with(huffman_node* in_other);
 	void		  adjust_code_to_parent(uint8_t bit);

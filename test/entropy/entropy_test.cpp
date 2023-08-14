@@ -17,14 +17,10 @@ bool entropy_test::test(bvc_entropy in_entropy, size_t in_raw_size, bvc_verbosit
 	uint8_t* raw_data = new uint8_t[raw_size];
 
 	// Populate raw data
-	// for (size_t i = 0; i < raw_size; i++)
-	// {
-	// 	raw_data[i] = 1;
-	// }
-	raw_data[0] = static_cast<uint8_t>('a');
-	raw_data[1] = static_cast<uint8_t>('b');
-	raw_data[2] = static_cast<uint8_t>('c');
-	raw_data[3] = static_cast<uint8_t>('b');
+	for (size_t i = 0; i < raw_size; i++)
+	{
+		raw_data[i] = 1;
+	}
 
 	// Print raw data info
 	if (in_verbosity > BVC_VERBOSITY_VERBOSE)

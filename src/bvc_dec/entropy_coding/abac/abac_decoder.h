@@ -13,8 +13,9 @@ public:
 	virtual void flush(uint8_t** out_bits, size_t* out_size) override;
 
 private:
+	virtual void clear() override;
+
 	void decode_internal();
-	void clear();
 	void update();
 
 private:

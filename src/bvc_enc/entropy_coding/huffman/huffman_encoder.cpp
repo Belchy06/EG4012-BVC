@@ -27,8 +27,6 @@ void huffman_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 	{
 		encode_internal(in_bytes[i]);
 	}
-	// terminating bytes
-	encode_internal(0);
 }
 
 void huffman_encoder::flush(uint8_t** out_bits, size_t* out_size)

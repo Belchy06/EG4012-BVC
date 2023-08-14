@@ -3,10 +3,10 @@
 #include "abac_decoder.h"
 
 abac_decoder::abac_decoder()
-	: low(0)
 	// 16 bit precision
-	, high((uint32_t(0x1) << 16) - 1)
+	: high((uint32_t(0x1) << 16) - 1)
 	, mid(high >> 1)
+	, low(0)
 	, encoded(0)
 {
 	history[0] = history[1] = 1;
@@ -107,11 +107,17 @@ void abac_decoder::flush(uint8_t** out_bits, size_t* out_size)
 
 void abac_decoder::clear()
 {
-	low = 0;
+	// Cleanup
+	delete stream;
 
-	history[0] = history[1] = 1;
+	// Re-initialisation
 	high = (uint32_t(0x1) << 16) - 1;
 	mid = high >> 1;
+	low = 0;
+	encoded = 0;
+	history[0] = history[1] = 1;
+
+	stream = new bitstream();
 }
 
 void abac_decoder::update()
