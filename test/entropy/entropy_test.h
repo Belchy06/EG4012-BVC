@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "bvc_common/entropy.h"
+#include "bvc_common/entropy/entropy.h"
 #include "bvc_common/verbosity.h"
 
 class entropy_test

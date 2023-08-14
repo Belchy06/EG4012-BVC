@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../wavelet_decomposer.h"
+#include "bvc_enc/wavelet/wavelet_decomposer.h"
 
 template <typename T>
 class haar_decomposer : public bvc_wavelet_decomposer<T>

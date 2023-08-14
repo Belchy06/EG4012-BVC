@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "bvc_common/format.h"
-#include "bvc_common/entropy.h"
+#include "bvc_common/entropy/entropy.h"
 
 class bvc_enc_config
 {

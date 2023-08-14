@@ -1,10 +1,16 @@
 #pragma once
 
 #include <array>
-#include <vector>
 #include <stdexcept>
+#include <vector>
 
 #include "matrix.h"
+
+typedef enum
+{
+	BVC_WAVELET_NONE,
+	BVC_WAVELET_HAAR,
+} bvc_wavelet;
 
 typedef enum
 {

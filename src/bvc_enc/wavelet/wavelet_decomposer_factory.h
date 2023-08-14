@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "bvc_common/wavelet.h"
+#include "bvc_common/wavelet/wavelet.h"
 #include "wavelet_decomposer.h"
 
 template <typename T>

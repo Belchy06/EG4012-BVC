@@ -3,8 +3,8 @@
 #include <stdint.h>
 
 #include "bvc_common/bitstream.h"
-#include "bvc_common/huffman/huffman.h"
-#include "bvc_common/huffman/linked_list.h"
+#include "bvc_common/entropy/huffman/huffman.h"
+#include "bvc_common/entropy/huffman/linked_list.h"
 
 class huffman_node
 {

@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "entropy_decoder.h"
-#include "bvc_common/entropy.h"
+#include "bvc_common/entropy/entropy.h"
 
 class bvc_entropy_decoder_factory
 {

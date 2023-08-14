@@ -1,7 +1,8 @@
 #pragma once
 
 #include "bvc_common/bitstream.h"
-#include "../entropy_encoder.h"
+
+#include "bvc_enc/entropy_coding/entropy_encoder.h"
 
 class abac_encoder : public bvc_entropy_encoder
 {

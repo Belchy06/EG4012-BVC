@@ -1,4 +1,4 @@
-#include "bvc_common/wavelet/haar.h"
+#include "bvc_common/wavelet/haar/haar.h"
 #include "haar_decomposer.h"
 
 template <typename T>
