@@ -5,7 +5,6 @@
 huffman_node::huffman_node(int64_t in_symbol, size_t in_count, node<huffman_node*>* in_list_node)
 	: symbol(in_symbol)
 	, count(in_count)
-	, code(new bitstream())
 	, left(nullptr)
 	, right(nullptr)
 	, parent(nullptr)
@@ -114,7 +113,7 @@ huffman_node* huffman_node::go_via(uint8_t in_bit)
 
 bitstream* huffman_node::get_code()
 {
-	return code;
+	return &code;
 }
 
 bool huffman_node::operator>(const huffman_node& rhs) const
@@ -178,7 +177,7 @@ void huffman_node::adjust_code_to_parent(uint8_t bit)
 {
 	code = parent->code;
 
-	code->write_bit(bit);
+	code.write_bit(bit);
 
 	if (left)
 	{

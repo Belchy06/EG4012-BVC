@@ -2,6 +2,11 @@
 
 #include "huffman_encoder.h"
 
+/**
+ * The vitter-huffman encoder is able to encode a byte at a time
+ *
+ *
+ */
 huffman_encoder::huffman_encoder()
 {
 	nyt = new huffman_node(BVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
@@ -38,19 +43,13 @@ void huffman_encoder::encode_internal(uint8_t in_symbol)
 	if (nodes.count(in_symbol))
 	{
 		huffman_node* node = nodes[in_symbol];
-		bitstream*	  code = node->get_code();
-		uint8_t*	  data = code->data();
-		size_t		  num_bits = code->size();
 
-		size_t bit_idx = 0;
-		while (bit_idx < num_bits)
+		uint8_t	   bit = 0;
+		bitstream* code = node->get_code();
+		code->read_idx = 0;
+		while (code->read_bit(&bit))
 		{
-			size_t byte = bit_idx / 8;
-			size_t bit = bit_idx % 8;
-
-			uint8_t temp = (data[byte] >> bit) & 0x1;
-			stream->write_bit(temp);
-			bit_idx++;
+			stream->write_bit(bit);
 		}
 
 		node->increment();
@@ -60,10 +59,12 @@ void huffman_encoder::encode_internal(uint8_t in_symbol)
 		// not yet transferred
 		uint8_t	   bit = 0;
 		bitstream* code = nyt->get_code();
+		code->read_idx = 0;
 		while (code->read_bit(&bit))
 		{
 			stream->write_bit(bit);
 		}
+		stream->write_byte(in_symbol);
 
 		expand_nyt(in_symbol);
 	}

@@ -8,7 +8,7 @@
             "name": "Launch Test (Debug)",
             "request": "launch",
             "program": "${workspaceFolder}\\build\\test\\Debug\\bvc_test.exe",
-            "preLaunchTask": "Build Test",
+            // "preLaunchTask": "Build Test",
             "args": [
                 "-verbosity",
                 "veryverbose"

@@ -41,5 +41,5 @@ private:
 	huffman_node* right;
 	huffman_node* parent;
 
-	bitstream* code;
+	bitstream code;
 };

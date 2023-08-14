@@ -1,5 +1,3 @@
-#pragma once
-
 #include <memory>
 #include <stdint.h>
 
@@ -36,6 +34,16 @@ void bitstream::write_bit(uint8_t in_bit)
 
 void bitstream::write_byte(uint8_t in_byte)
 {
+	if (write_idx + 8 > stream.size() << 3)
+	{
+		// Add a new empty element to the end of the vector
+		stream.push_back(0);
+	}
+
+	for (int i = 7; i >= 0; i--)
+	{
+		write_bit((in_byte >> i) & 0x1);
+	}
 }
 
 bool bitstream::read_bit(uint8_t* out_bit)
@@ -48,12 +56,12 @@ bool bitstream::read_bit(uint8_t* out_bit)
 	/* Determine the current byte to read from. */
 	uint32_t src_byte = read_idx >> 3;
 	uint8_t	 src_bit = read_idx % 8;
-	uint8_t* dest = stream.data();
 
 	/* Pull the correct byte from our stream store. Note that we
 	   preserve the high bits of *dest. */
-	*dest &= 0xFE;
-	*dest |= ((stream[src_byte]) >> src_bit) & 0x1;
+	*out_bit &= 0xFE;
+	uint8_t bit = ((stream[src_byte]) >> src_bit) & 0x1;
+	*out_bit |= bit;
 	read_idx++;
 
 	return true;

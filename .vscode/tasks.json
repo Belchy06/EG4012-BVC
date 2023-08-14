@@ -2,59 +2,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Common",
-            "command": "",
-            "args": [
-                "cmake --build . --target bvc_common",
-            ],
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}\\build"
-            }
-        },
-        {
-            "label": "Build Encoder",
-            "command": "",
-            "args": [
-                "cmake --build . --target bvc_enc",
-            ],
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}\\build"
-            }
-        },
-        {
-            "label": "Build Decoder",
-            "command": "",
-            "args": [
-                "cmake --build . --target bvc_dec",
-            ],
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}\\build"
-            }
-        },
-        {
+            "type": "cmake",
             "label": "Build Test",
-            "command": "",
-            "args": [
-                "cmake --build . --target bvc_test",
+            "command": "build",
+            "targets": [
+                "bvc_test"
             ],
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}\\build"
-            }
-        },
-        {
-            "label": "Build Entropy Test",
-            "command": "",
-            "args": [
-                "cmake --build . --target bvc_test",
-            ],
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}\\build"
-            }
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake template build task"
         }
     ]
 }
