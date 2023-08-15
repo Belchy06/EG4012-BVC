@@ -88,6 +88,17 @@ int main(int argc, const char* argv[])
 	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_BIORTHOGONAL, { .biorthogonal_config = { bvc_wavelet_biorthogonal_config::BVC_WAVELET_BIORTHOGONAL_5p5 } }, 64, 64, 4, verbosity);
 	LOG(BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_BIORTHOGONAL_6p8");
 	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_BIORTHOGONAL, { .biorthogonal_config = { bvc_wavelet_biorthogonal_config::BVC_WAVELET_BIORTHOGONAL_6p8 } }, 64, 64, 4, verbosity);
+	// Coiflets
+	LOG(BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_COIFLETS_1");
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_1 } }, 64, 64, 4, verbosity);
+	LOG(BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_COIFLETS_2");
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_2 } }, 64, 64, 4, verbosity);
+	LOG(BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_COIFLETS_3");
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_3 } }, 64, 64, 4, verbosity);
+	LOG(BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_COIFLETS_4");
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_4 } }, 64, 64, 4, verbosity);
+	LOG(BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_COIFLETS_5");
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_5 } }, 64, 64, 4, verbosity);
 
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 
