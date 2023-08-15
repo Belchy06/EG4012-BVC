@@ -42,7 +42,7 @@ bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, 
 	encode(in_entropy_coder, raw_data, raw_size, &coded_data, &coded_size);
 
 	// Print coded data info
-	if (in_verbosity > BVC_VERBOSITY_VERBOSE)
+	if (in_verbosity >= BVC_VERBOSITY_VERY_VERBOSE)
 	{
 		std::cout << "Compressed Data: " << std::endl;
 		std::cout << "[ ";
@@ -83,6 +83,13 @@ bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, 
 		{
 			success &= (decoded_data[i] == raw_data[i]);
 		}
+	}
+
+	if (in_verbosity >= BVC_VERBOSITY_VERBOSE)
+	{
+		std::cout << "Raw size: " << raw_size << "bytes" << std::endl;
+		std::cout << "Compressed size: " << coded_size << "bytes" << std::endl;
+		std::cout << (success ? "Success" : "Fail") << std::endl;
 	}
 
 	return success;

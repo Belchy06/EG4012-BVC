@@ -17,5 +17,4 @@ typedef enum
 	BVC_WAVELET_BIORTHOGONAL_4p4,
 	BVC_WAVELET_BIORTHOGONAL_5p5,
 	BVC_WAVELET_BIORTHOGONAL_6p8,
-
 } bvc_wavelet_biorthogonal_config;

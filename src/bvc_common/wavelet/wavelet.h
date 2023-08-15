@@ -21,15 +21,6 @@ typedef enum
 	BVC_WAVELET_SUBBAND_HORIZONTAL
 } bvc_wavelet_subbdand;
 
-class bvc_wavelet_filters
-{
-public:
-	static std::vector<double> lo_d;
-	static std::vector<double> hi_d;
-	static std::vector<double> lo_r;
-	static std::vector<double> hi_r;
-};
-
 template <typename T>
 class bvc_wavelet_decomposition_1d : public std::vector<std::vector<T>>
 {
