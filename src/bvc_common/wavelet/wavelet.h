@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "matrix.h"
+#include "bvc_common/util/matrix.h"
 
 typedef enum
 {
@@ -61,7 +61,7 @@ class wavelet
 {
 public:
 	// Constructor requires the decomposition/reconstruction filters
-	explicit wavelet(const std::vector<T>& in_lo_d, const std::vector<T>& in_hi_d, const std::vector<T>& in_lo_r, const std::vector<T>& in_hi_r);
+	explicit wavelet(const std::vector<T> in_lo_d, const std::vector<T> in_hi_d, const std::vector<T> in_lo_r, const std::vector<T> in_hi_r);
 	~wavelet();
 
 public:

@@ -13,13 +13,13 @@ set(BVC_COMMON_SOURCES
     "bvc_common/entropy/huffman/linked_list.h"
     "bvc_common/entropy/huffman/huffman_node.h"
     "bvc_common/entropy/huffman/huffman_node.cpp"
-    "bvc_common/wavelet/haar/haar.h"
-    "bvc_common/wavelet/haar/haar.cpp"
-    "bvc_common/wavelet/vector.h"
-    "bvc_common/wavelet/matrix.h"
-    "bvc_common/wavelet/matrix.cpp"
+    "bvc_common/util/vector.h"
+    "bvc_common/util/matrix.h"
+    "bvc_common/util/matrix.cpp"
     "bvc_common/wavelet/wavelet.h"
-    "bvc_common/wavelet/wavelet.cpp")
+    "bvc_common/wavelet/wavelet.cpp"
+    "bvc_common/wavelet/haar/haar.h"
+    "bvc_common/wavelet/haar/haar.cpp")
 
 set(BVC_DEC_SOURCES
     "bvc_dec/entropy_coding/abac/abac_decoder.h"
@@ -29,6 +29,11 @@ set(BVC_DEC_SOURCES
     "bvc_dec/entropy_coding/entropy_decoder.h"
     "bvc_dec/entropy_coding/entropy_decoder_factory.h"
     "bvc_dec/entropy_coding/entropy_decoder_factory.cpp"
+    "bvc_dec/wavelet/haar/haar_reconstructor.h"
+    "bvc_dec/wavelet/haar/haar_reconstructor.cpp"
+    "bvc_dec/wavelet/wavelet_reconstructor.h"
+    "bvc_dec/wavelet/wavelet_reconstructor_factory.h"
+    "bvc_dec/wavelet/wavelet_reconstructor_factory.cpp"
     "bvc_dec/result.h"
     "bvc_dec/picture.h"
     "bvc_dec/nal.h"

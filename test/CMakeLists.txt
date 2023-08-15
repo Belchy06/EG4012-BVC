@@ -6,6 +6,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 set(BVC_TEST_SOURCES
     "entropy/entropy_test.h"
     "entropy/entropy_test.cpp"
+    "wavelet/wavelet_test.h"
+    "wavelet/wavelet_test.cpp"
     "main.cpp")
 
 if(MSVC)

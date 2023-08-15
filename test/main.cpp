@@ -2,6 +2,7 @@
 
 #include "bvc_common/verbosity.h"
 #include "entropy/entropy_test.h"
+#include "wavelet/wavelet_test.h"
 
 int main(int argc, const char* argv[])
 {
@@ -35,6 +36,9 @@ int main(int argc, const char* argv[])
 	bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_HUFFMAN, 32, verbosity);
 	bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_HUFFMAN, 64, verbosity);
 	bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_HUFFMAN, 128, verbosity);
+
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_HAAR, 64, 64, 4, verbosity);
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_HAAR, 1366, 768, 3, verbosity);
 
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 

@@ -23,7 +23,7 @@ bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, 
 	}
 
 	// Print raw data info
-	if (in_verbosity > BVC_VERBOSITY_VERBOSE)
+	if (in_verbosity >= BVC_VERBOSITY_VERY_VERBOSE)
 	{
 		std::cout << "=============================" << std::endl;
 		std::cout << "Raw Data: " << std::endl;

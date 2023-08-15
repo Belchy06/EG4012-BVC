@@ -1,4 +1,4 @@
-#include "vector.h"
+#include "bvc_common/util/vector.h"
 #include "wavelet.h"
 
 using namespace bvc_vector;
@@ -125,12 +125,12 @@ void bvc_wavelet_decomposition_2d<T>::set_det_coefficients(const matrix<T>& in_d
 //=============================================================================
 
 template <typename T>
-wavelet<T>::wavelet(const std::vector<T>& in_lo_d, const std::vector<T>& in_hi_d, const std::vector<T>& in_lo_r, const std::vector<T>& in_hi_r)
+wavelet<T>::wavelet(const std::vector<T> in_lo_d, const std::vector<T> in_hi_d, const std::vector<T> in_lo_r, const std::vector<T> in_hi_r)
 {
 	lo_d = in_lo_d;
-	hi_d = in_lo_d;
-	lo_r = in_lo_d;
-	hi_r = in_lo_d;
+	hi_d = in_hi_d;
+	lo_r = in_lo_r;
+	hi_r = in_hi_r;
 	half_length_filter = lo_d.size() / 2;
 }
 

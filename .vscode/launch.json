@@ -11,7 +11,7 @@
             // "preLaunchTask": "Build Test",
             "args": [
                 "-verbosity",
-                "veryverbose"
+                "verbose"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
