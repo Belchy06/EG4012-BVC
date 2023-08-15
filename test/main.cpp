@@ -40,6 +40,9 @@ int main(int argc, const char* argv[])
 	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_HAAR, 64, 64, 4, verbosity);
 	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_HAAR, 1366, 768, 3, verbosity);
 
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_BIORTHOGONAL, 64, 64, 4, verbosity);
+	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_BIORTHOGONAL, 1366, 768, 3, verbosity);
+
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 
 	return bSuccess ? 0 : -1;

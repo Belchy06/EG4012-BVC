@@ -19,7 +19,9 @@ set(BVC_COMMON_SOURCES
     "bvc_common/wavelet/wavelet.h"
     "bvc_common/wavelet/wavelet.cpp"
     "bvc_common/wavelet/haar/haar.h"
-    "bvc_common/wavelet/haar/haar.cpp")
+    "bvc_common/wavelet/haar/haar.cpp"
+    "bvc_common/wavelet/biorthogonal/biorthogonal.h"
+    "bvc_common/wavelet/biorthogonal/biorthogonal.cpp")
 
 set(BVC_DEC_SOURCES
     "bvc_dec/entropy_coding/abac/abac_decoder.h"
@@ -31,6 +33,8 @@ set(BVC_DEC_SOURCES
     "bvc_dec/entropy_coding/entropy_decoder_factory.cpp"
     "bvc_dec/wavelet/haar/haar_reconstructor.h"
     "bvc_dec/wavelet/haar/haar_reconstructor.cpp"
+    "bvc_dec/wavelet/biorthogonal/biorthogonal_reconstructor.h"
+    "bvc_dec/wavelet/biorthogonal/biorthogonal_reconstructor.cpp"
     "bvc_dec/wavelet/wavelet_reconstructor.h"
     "bvc_dec/wavelet/wavelet_reconstructor_factory.h"
     "bvc_dec/wavelet/wavelet_reconstructor_factory.cpp"
@@ -51,6 +55,8 @@ set(BVC_ENC_SOURCES
     "bvc_enc/entropy_coding/entropy_encoder_factory.cpp"
     "bvc_enc/wavelet/haar/haar_decomposer.h"
     "bvc_enc/wavelet/haar/haar_decomposer.cpp"
+    "bvc_enc/wavelet/biorthogonal/biorthogonal_decomposer.h"
+    "bvc_enc/wavelet/biorthogonal/biorthogonal_decomposer.cpp"
     "bvc_enc/wavelet/wavelet_decomposer.h"
     "bvc_enc/wavelet/wavelet_decomposer_factory.h"
     "bvc_enc/wavelet/wavelet_decomposer_factory.cpp"
