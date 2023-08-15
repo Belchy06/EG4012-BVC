@@ -8,7 +8,7 @@
 class entropy_test
 {
 public:
-	static bool test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, bvc_verbosity in_verbosity);
+	static bool test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size);
 
 private:
 	static void encode(bvc_entropy_coder in_entropy_coder, uint8_t* in_raw_data, size_t in_raw_size, uint8_t** out_coded_data, size_t* out_coded_size);

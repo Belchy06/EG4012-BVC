@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <vector>
 
+#include "bvc_common/log.h"
 #include "bvc_dec/entropy_coding/entropy_decoder.h"
 #include "bvc_dec/entropy_coding/entropy_decoder_factory.h"
 #include "bvc_enc/entropy_coding/entropy_encoder.h"
@@ -10,7 +11,9 @@
 
 #include "entropy_test.h"
 
-bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, bvc_verbosity in_verbosity)
+#define LogEntropyTest "LogEntropyTest"
+
+bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size)
 {
 	// Construct raw data container
 	size_t	 raw_size = in_raw_size / 8;
@@ -23,37 +26,28 @@ bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, 
 	}
 
 	// Print raw data info
-	if (in_verbosity >= BVC_VERBOSITY_VERY_VERBOSE)
+	std::string raw_string = "";
+	for (size_t i = 0; i < raw_size; i++)
 	{
-		std::cout << "=============================" << std::endl;
-		std::cout << "Raw Data: " << std::endl;
-		std::cout << "[ ";
-		for (size_t i = 0; i < raw_size; i++)
-		{
-			std::bitset<8> x(raw_data[i]);
-			std::cout << x << " ";
-		}
-		std::cout << "] " << std::endl;
-		std::cout << std::endl;
+		std::bitset<8> x(raw_data[i]);
+		raw_string += x.to_string();
+		raw_string += " ";
 	}
+	LOG(LogEntropyTest, BVC_VERBOSITY_VERY_VERBOSE, "Raw data: [ {} ]", raw_string);
 
 	uint8_t* coded_data = new uint8_t();
 	size_t	 coded_size = 0;
 	encode(in_entropy_coder, raw_data, raw_size, &coded_data, &coded_size);
 
 	// Print coded data info
-	if (in_verbosity >= BVC_VERBOSITY_VERY_VERBOSE)
+	std::string coded_string = "";
+	for (size_t i = 0; i < coded_size; i++)
 	{
-		std::cout << "Compressed Data: " << std::endl;
-		std::cout << "[ ";
-		for (size_t i = 0; i < coded_size; i++)
-		{
-			std::bitset<8> x(coded_data[i]);
-			std::cout << x << " ";
-		}
-		std::cout << "] " << std::endl;
-		std::cout << std::endl;
+		std::bitset<8> x(coded_data[i]);
+		coded_string += x.to_string();
+		coded_string += " ";
 	}
+	LOG(LogEntropyTest, BVC_VERBOSITY_VERY_VERBOSE, "Coded data: [ {} ]", coded_string);
 
 	// Decode
 	uint8_t* decoded_data = new uint8_t();
@@ -61,19 +55,14 @@ bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, 
 	decode(in_entropy_coder, coded_data, coded_size, raw_size, &decoded_data, &decoded_size);
 
 	// Print coded data info
-	if (in_verbosity > BVC_VERBOSITY_VERBOSE)
+	std::string decoded_string = "";
+	for (size_t i = 0; i < decoded_size; i++)
 	{
-		std::cout << std::endl
-				  << "Decoded Data: " << std::endl;
-		std::cout << "[ ";
-		for (size_t i = 0; i < decoded_size; i++)
-		{
-			std::bitset<8> x(decoded_data[i]);
-			std::cout << x << " ";
-		}
-		std::cout << "] " << std::endl;
-		std::cout << std::endl;
+		std::bitset<8> x(decoded_data[i]);
+		decoded_string += x.to_string();
+		decoded_string += " ";
 	}
+	LOG(LogEntropyTest, BVC_VERBOSITY_VERY_VERBOSE, "Decoded data: [ {} ]", decoded_string);
 
 	bool success = true;
 	success &= (decoded_size == raw_size);
@@ -85,12 +74,9 @@ bool entropy_test::test(bvc_entropy_coder in_entropy_coder, size_t in_raw_size, 
 		}
 	}
 
-	if (in_verbosity >= BVC_VERBOSITY_VERBOSE)
-	{
-		std::cout << "Raw size: " << raw_size << "bytes" << std::endl;
-		std::cout << "Compressed size: " << coded_size << "bytes" << std::endl;
-		std::cout << (success ? "Success" : "Fail") << std::endl;
-	}
+	LOG(LogEntropyTest, BVC_VERBOSITY_VERBOSE, "Raw size: {} bytes", raw_size);
+	LOG(LogEntropyTest, BVC_VERBOSITY_VERBOSE, "Compressed size: {} bytes", coded_size);
+	LOG(LogEntropyTest, BVC_VERBOSITY_VERBOSE, "{}", (success ? "Success" : "Fail"));
 
 	return success;
 }

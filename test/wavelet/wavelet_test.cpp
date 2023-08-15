@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "bvc_common/log.h"
 #include "bvc_enc/wavelet/wavelet_decomposer.h"
 #include "bvc_enc/wavelet/wavelet_decomposer_factory.h"
 #include "bvc_dec/wavelet/wavelet_reconstructor.h"
@@ -7,7 +8,9 @@
 
 #include "wavelet_test.h"
 
-bool wavelet_test::test(bvc_wavelet in_wavelet, bvc_wavelet_config in_config, size_t in_x, size_t in_y, size_t in_num_levels, bvc_verbosity in_verbosity)
+#define LogWaveletTest "LogWaveletTest"
+
+bool wavelet_test::test(bvc_wavelet in_wavelet, bvc_wavelet_config in_config, size_t in_x, size_t in_y, size_t in_num_levels)
 {
 	matrix<double> raw(in_x, in_y);
 	raw.rand(0);
@@ -18,11 +21,7 @@ bool wavelet_test::test(bvc_wavelet in_wavelet, bvc_wavelet_config in_config, si
 
 	double norm = bvc_vector::norm((raw - reconstruction).get_data());
 
-	if (in_verbosity >= BVC_VERBOSITY_VERBOSE)
-	{
-		std::cout << "l2-norm: " << norm << std::endl;
-	}
-
+	LOG(LogWaveletTest, BVC_VERBOSITY_VERBOSE, "l2-norm: {}", norm);
 	return trunc(norm) == 0;
 }
 
