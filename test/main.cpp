@@ -115,8 +115,10 @@ int main(int argc, const char* argv[])
 	/**
 	 * WAVELET TEST
 	 */
-	LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_PARTITION_5");
-	bSuccess = partition_test::test(64, 64);
+	LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_PARTITION_OFFSET_ZEROTREE");
+	bSuccess = partition_test::test(bvc_partition::BVC_PARTITION_OFFSET_ZEROTREE, 64, 64);
+	LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_PARTITION_ZEROTREE_PRESERVING");
+	bSuccess = partition_test::test(bvc_partition::BVC_PARTITION_ZEROTREE_PRESERVING, 64, 64);
 
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 
