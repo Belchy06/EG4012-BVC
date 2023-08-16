@@ -5,8 +5,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(BVC_COMMON_SOURCES
     "bvc_common/format.h"
-    "bvc_common/bitstream.h"
-    "bvc_common/bitstream.cpp"
+    "bvc_common/bitstream/bitstream.h"
+    "bvc_common/bitstream/bitstream.cpp"
     "bvc_common/entropy/entropy.h"
     "bvc_common/entropy/huffman/huffman.h"
     "bvc_common/entropy/huffman/node.h"

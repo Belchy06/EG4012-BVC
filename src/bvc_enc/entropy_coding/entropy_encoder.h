@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "bvc_common/bitstream.h"
+#include "bvc_common/bitstream/bitstream.h"
 
 class bvc_entropy_encoder
 {

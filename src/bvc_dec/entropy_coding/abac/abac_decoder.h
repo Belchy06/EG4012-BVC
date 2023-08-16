@@ -1,6 +1,5 @@
 #pragma once
 
-#include "bvc_common/bitstream.h"
 #include "bvc_dec/entropy_coding/entropy_decoder.h"
 
 class abac_decoder : public bvc_entropy_decoder

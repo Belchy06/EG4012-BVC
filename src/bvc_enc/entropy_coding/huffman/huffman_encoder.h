@@ -3,7 +3,6 @@
 #include <map>
 #include <set>
 
-#include "bvc_common/bitstream.h"
 #include "bvc_common/entropy/huffman/huffman_node.h"
 #include "bvc_common/entropy/huffman/linked_list.h"
 #include "bvc_common/entropy/huffman/node.h"
