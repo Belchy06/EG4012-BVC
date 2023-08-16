@@ -29,13 +29,13 @@ set(BVC_COMMON_SOURCES
     "bvc_common/wavelet/coiflets/coiflets.cpp")
 
 set(BVC_DEC_SOURCES
-    "bvc_dec/entropy_coding/abac/decoder.h"
-    "bvc_dec/entropy_coding/abac/decoder.cpp"
-    "bvc_dec/entropy_coding/huffman/decoder.h"
-    "bvc_dec/entropy_coding/huffman/decoder.cpp"
-    "bvc_dec/entropy_coding/entropy_decoder.h"
-    "bvc_dec/entropy_coding/entropy_decoder_factory.h"
-    "bvc_dec/entropy_coding/entropy_decoder_factory.cpp"
+    "bvc_dec/entropy/abac/decoder.h"
+    "bvc_dec/entropy/abac/decoder.cpp"
+    "bvc_dec/entropy/huffman/decoder.h"
+    "bvc_dec/entropy/huffman/decoder.cpp"
+    "bvc_dec/entropy/entropy_decoder.h"
+    "bvc_dec/entropy/entropy_decoder_factory.h"
+    "bvc_dec/entropy/entropy_decoder_factory.cpp"
     "bvc_dec/wavelet/haar/reconstructor.h"
     "bvc_dec/wavelet/haar/reconstructor.cpp"
     "bvc_dec/wavelet/biorthogonal/reconstructor.h"
@@ -53,13 +53,13 @@ set(BVC_DEC_SOURCES
     "bvc_dec/bvc_dec.cpp")
 
 set(BVC_ENC_SOURCES
-    "bvc_enc/entropy_coding/abac/encoder.h"
-    "bvc_enc/entropy_coding/abac/encoder.cpp"
-    "bvc_enc/entropy_coding/huffman/encoder.h"
-    "bvc_enc/entropy_coding/huffman/encoder.cpp"
-    "bvc_enc/entropy_coding/entropy_encoder.h"
-    "bvc_enc/entropy_coding/entropy_encoder_factory.h"
-    "bvc_enc/entropy_coding/entropy_encoder_factory.cpp"
+    "bvc_enc/entropy/abac/encoder.h"
+    "bvc_enc/entropy/abac/encoder.cpp"
+    "bvc_enc/entropy/huffman/encoder.h"
+    "bvc_enc/entropy/huffman/encoder.cpp"
+    "bvc_enc/entropy/entropy_encoder.h"
+    "bvc_enc/entropy/entropy_encoder_factory.h"
+    "bvc_enc/entropy/entropy_encoder_factory.cpp"
     "bvc_enc/wavelet/haar/decomposer.h"
     "bvc_enc/wavelet/haar/decomposer.cpp"
     "bvc_enc/wavelet/biorthogonal/decomposer.h"

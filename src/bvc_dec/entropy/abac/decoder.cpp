@@ -1,6 +1,6 @@
 #include <cstring>
 #include <iostream>
-#include "bvc_dec/entropy_coding/abac/decoder.h"
+#include "bvc_dec/entropy/abac/decoder.h"
 
 abac_decoder::abac_decoder()
 	// 16 bit precision

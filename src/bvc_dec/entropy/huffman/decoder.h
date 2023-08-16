@@ -6,7 +6,7 @@
 #include "bvc_common/entropy/huffman/huffman_node.h"
 #include "bvc_common/linked_list/node.h"
 #include "bvc_common/linked_list/linked_list.h"
-#include "bvc_dec/entropy_coding/entropy_decoder.h"
+#include "bvc_dec/entropy/entropy_decoder.h"
 
 class huffman_decoder : public bvc_entropy_decoder
 {

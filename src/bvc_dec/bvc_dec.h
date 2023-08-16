@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "entropy_coding/entropy_decoder.h"
-#include "entropy_coding/entropy_decoder_factory.h"
+#include "entropy/entropy_decoder.h"
+#include "entropy/entropy_decoder_factory.h"
 #include "nal.h"
 #include "picture.h"
 #include "result.h"

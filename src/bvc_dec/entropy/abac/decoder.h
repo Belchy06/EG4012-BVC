@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bvc_dec/entropy_coding/entropy_decoder.h"
+#include "bvc_dec/entropy/entropy_decoder.h"
 
 class abac_decoder : public bvc_entropy_decoder
 {
