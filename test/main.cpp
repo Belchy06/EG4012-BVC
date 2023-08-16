@@ -3,6 +3,7 @@
 #include "bvc_common/log.h"
 #include "bvc_common/verbosity.h"
 #include "entropy/entropy_test.h"
+#include "partition/partition_test.h"
 #include "wavelet/wavelet_test.h"
 
 #define LogTest "LogTest"
@@ -110,6 +111,12 @@ int main(int argc, const char* argv[])
 	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_4 } }, 64, 64, 4);
 	LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_WAVELET_COIFLETS_5");
 	bSuccess = wavelet_test::test(bvc_wavelet::BVC_WAVELET_COIFLETS, { .coiflets_config = { bvc_wavelet_coiflets_config::BVC_WAVELET_COIFLETS_5 } }, 64, 64, 4);
+
+	/**
+	 * WAVELET TEST
+	 */
+	LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_PARTITION_5");
+	bSuccess = partition_test::test(64, 64);
 
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 

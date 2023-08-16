@@ -8,6 +8,8 @@ set(BVC_TEST_SOURCES
     "entropy/entropy_test.cpp"
     "wavelet/wavelet_test.h"
     "wavelet/wavelet_test.cpp"
+    "partition/partition_test.h"
+    "partition/partition_test.cpp"
     "main.cpp")
 
 if(MSVC)
