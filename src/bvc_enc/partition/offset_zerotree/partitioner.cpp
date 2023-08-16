@@ -1,5 +1,5 @@
 #include "bvc_common/log.h"
-#include "offset_zerotree_partitioner.h"
+#include "bvc_enc/partition/offset_zerotree/partitioner.h"
 
 #define LogOffsetZerotreePartitioner "LogOffsetZerotreePartitioner"
 

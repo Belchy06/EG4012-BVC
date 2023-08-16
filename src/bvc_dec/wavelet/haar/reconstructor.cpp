@@ -1,5 +1,5 @@
 #include "bvc_common/wavelet/haar/haar.h"
-#include "haar_reconstructor.h"
+#include "bvc_dec/wavelet/haar/reconstructor.h"
 
 haar_reconstructor::haar_reconstructor(bvc_wavelet_config in_config)
 {

@@ -1,7 +1,7 @@
-#include "offset_zerotree/offset_zerotree_partitioner.h"
-#include "zerotree_preserving/zerotree_preserving_partitioner.h"
+#include "bvc_enc/partition/offset_zerotree/partitioner.h"
+#include "bvc_enc/partition/zerotree_preserving/partitioner.h"
 
-#include "partitioner_factory.h"
+#include "bvc_enc/partition/partitioner_factory.h"
 
 std::shared_ptr<bvc_partitioner> bvc_partitioner_factory::create_partitioner(bvc_partition in_partition)
 {

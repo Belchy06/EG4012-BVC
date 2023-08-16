@@ -1,5 +1,5 @@
 #include "bvc_common/wavelet/haar/haar.h"
-#include "haar_decomposer.h"
+#include "bvc_enc/wavelet/haar/decomposer.h"
 
 haar_decomposer::haar_decomposer(bvc_wavelet_config in_config)
 {

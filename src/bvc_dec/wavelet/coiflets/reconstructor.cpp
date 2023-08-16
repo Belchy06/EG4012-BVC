@@ -1,5 +1,5 @@
-#include "coiflets_reconstructor.h"
 #include "bvc_common/wavelet/coiflets/coiflets.h"
+#include "bvc_dec/wavelet/coiflets/reconstructor.h"
 
 coiflets_reconstructor::coiflets_reconstructor(bvc_wavelet_config in_config)
 {

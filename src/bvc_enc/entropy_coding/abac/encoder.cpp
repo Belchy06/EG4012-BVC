@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "abac_encoder.h"
+#include "bvc_enc/entropy_coding/abac/encoder.h"
 
 abac_encoder::abac_encoder()
 	: low(0)

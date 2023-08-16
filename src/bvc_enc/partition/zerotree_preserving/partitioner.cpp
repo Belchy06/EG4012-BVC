@@ -1,5 +1,5 @@
 #include "bvc_common/log.h"
-#include "zerotree_preserving_partitioner.h"
+#include "bvc_enc/partition/zerotree_preserving/partitioner.h"
 
 #define LogZerotreePreservingPartitioner "LogZerotreePreservingPartitioner"
 

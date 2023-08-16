@@ -5,7 +5,7 @@
 #include "bvc_common/wavelet/wavelet.h"
 #include "bvc_common/wavelet/wavelet_config.h"
 
-#include "wavelet_decomposer.h"
+#include "bvc_enc/wavelet/wavelet_decomposer.h"
 
 class bvc_wavelet_decomposer_factory
 {

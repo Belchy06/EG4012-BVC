@@ -1,6 +1,7 @@
-#include "entropy_encoder_factory.h"
-#include "abac/abac_encoder.h"
-#include "huffman/huffman_encoder.h"
+#include "bvc_enc/entropy_coding/abac/encoder.h"
+#include "bvc_enc/entropy_coding/huffman/encoder.h"
+
+#include "bvc_enc/entropy_coding/entropy_encoder_factory.h"
 
 std::shared_ptr<bvc_entropy_encoder> bvc_entropy_encoder_factory::create_entropy_encoder(bvc_entropy_coder in_coder)
 {

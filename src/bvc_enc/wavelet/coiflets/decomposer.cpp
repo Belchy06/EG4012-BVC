@@ -1,5 +1,5 @@
 #include "bvc_common/wavelet/coiflets/coiflets.h"
-#include "coiflets_decomposer.h"
+#include "bvc_enc/wavelet/coiflets/decomposer.h"
 
 coiflets_decomposer::coiflets_decomposer(bvc_wavelet_config in_config)
 {

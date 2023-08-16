@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "huffman_encoder.h"
+#include "bvc_enc/entropy_coding/huffman/encoder.h"
 
 /**
  * The vitter-huffman encoder is able to encode a byte at a time

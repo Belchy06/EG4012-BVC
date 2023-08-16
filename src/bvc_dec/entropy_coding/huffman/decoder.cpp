@@ -1,7 +1,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "huffman_decoder.h"
+#include "bvc_dec/entropy_coding/huffman/decoder.h"
 
 /**
  * The vitter-huffman encoder is able to decode a byte at a time

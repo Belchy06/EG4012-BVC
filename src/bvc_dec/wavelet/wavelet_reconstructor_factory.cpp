@@ -1,7 +1,7 @@
-#include "biorthogonal/biorthogonal_reconstructor.h"
-#include "coiflets/coiflets_reconstructor.h"
-#include "haar/haar_reconstructor.h"
-#include "wavelet_reconstructor_factory.h"
+#include "bvc_dec/wavelet/biorthogonal/reconstructor.h"
+#include "bvc_dec/wavelet/coiflets/reconstructor.h"
+#include "bvc_dec/wavelet/haar/reconstructor.h"
+#include "bvc_dec/wavelet/wavelet_reconstructor_factory.h"
 
 std::shared_ptr<bvc_wavelet_reconstructor> bvc_wavelet_reconstructor_factory::create_wavelet_reconstructor(bvc_wavelet in_wavelet, bvc_wavelet_config in_config)
 {

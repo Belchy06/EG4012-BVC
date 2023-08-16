@@ -1,8 +1,7 @@
-#include "biorthogonal/biorthogonal_decomposer.h"
-#include "coiflets/coiflets_decomposer.h"
-#include "haar/haar_decomposer.h"
-
-#include "wavelet_decomposer_factory.h"
+#include "bvc_enc/wavelet/biorthogonal/decomposer.h"
+#include "bvc_enc/wavelet/coiflets/decomposer.h"
+#include "bvc_enc/wavelet/haar/decomposer.h"
+#include "bvc_enc/wavelet/wavelet_decomposer_factory.h"
 
 std::shared_ptr<bvc_wavelet_decomposer> bvc_wavelet_decomposer_factory::create_wavelet_decomposer(bvc_wavelet in_wavelet, bvc_wavelet_config in_config)
 {
