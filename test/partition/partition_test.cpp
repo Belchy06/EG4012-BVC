@@ -48,9 +48,9 @@ std::vector<matrix<double>> partition_test::partition(matrix<double>& in_matrix,
 			size_t step_x = mat_x / x_samples_per_level;
 			size_t step_y = mat_y / y_samples_per_level;
 
-			for (size_t y = 0; y * step_y < mat_y; y++)
+			for (size_t y = 0; y < y_samples_per_level; y++)
 			{
-				for (size_t x = 0; x * step_x < mat_x; x++)
+				for (size_t x = 0; x < x_samples_per_level; x++)
 				{
 					stream(x, y) = in_matrix(x * step_x + i, y * step_y + i);
 					LOG(LogPartitionTest, BVC_VERBOSITY_VERBOSE, "downsampled {}, {}", x, y);
