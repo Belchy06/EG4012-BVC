@@ -151,7 +151,7 @@ inline std::ostream& operator<<(std::ostream& out, const matrix<T>& matrix)
 {
 	for (size_t i = 0, endI = matrix.get_num_rows(); i < endI; i++)
 	{
-		out << matrix.GetRow(i) << std::endl;
+		out << matrix.get_row(i) << std::endl;
 	}
 	return out;
 }

@@ -17,6 +17,8 @@ bool partition_test::test(size_t in_x, size_t in_y)
 
 	mat.set_data(data);
 
+	std::cout << mat << std::endl;
+
 	std::vector<matrix<double>> streams = partition_test::partition(mat, 5);
 
 	return true;
@@ -57,6 +59,7 @@ std::vector<matrix<double>> partition_test::partition(matrix<double>& in_matrix,
 			}
 		}
 
+		std::cout << stream << std::endl;
 		streams.push_back(stream);
 	}
 
