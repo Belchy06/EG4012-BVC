@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "bvc_common/util/matrix.h"
+#include "bvc_common/math/matrix.h"
 
 class bvc_partitioner
 {

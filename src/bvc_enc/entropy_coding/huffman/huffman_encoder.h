@@ -4,9 +4,8 @@
 #include <set>
 
 #include "bvc_common/entropy/huffman/huffman_node.h"
-#include "bvc_common/entropy/huffman/linked_list.h"
-#include "bvc_common/entropy/huffman/node.h"
-
+#include "bvc_common/linked_list/linked_list.h"
+#include "bvc_common/linked_list/node.h"
 #include "bvc_enc/entropy_coding/entropy_encoder.h"
 
 class huffman_encoder : public bvc_entropy_encoder

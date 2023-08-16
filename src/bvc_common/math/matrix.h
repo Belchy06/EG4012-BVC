@@ -6,7 +6,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "vector.h"
+#include "bvc_common/math/vector.h"
 
 //=============================================================================
 // matrix_size

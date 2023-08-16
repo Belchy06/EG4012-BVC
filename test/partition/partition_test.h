@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "bvc_common/partition/partition.h"
-#include "bvc_common/util/matrix.h"
+#include "bvc_common/math/matrix.h"
 #include "bvc_common/verbosity.h"
 
 class partition_test

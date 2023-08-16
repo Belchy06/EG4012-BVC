@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include <iostream>
-#include "bitstream.h"
+#include "bvc_common/bitstream/bitstream.h"
 
 bitstream::bitstream()
 	: read_idx(0)

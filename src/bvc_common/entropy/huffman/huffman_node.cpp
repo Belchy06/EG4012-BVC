@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "huffman_node.h"
+#include "bvc_common/entropy/huffman/huffman_node.h"
 
 huffman_node::huffman_node(int64_t in_symbol, size_t in_count, node<huffman_node*>* in_list_node)
 	: symbol(in_symbol)

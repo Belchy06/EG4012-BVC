@@ -4,7 +4,7 @@
 
 #include "bvc_common/bitstream/bitstream.h"
 #include "bvc_common/entropy/huffman/huffman.h"
-#include "bvc_common/entropy/huffman/linked_list.h"
+#include "bvc_common/linked_list/linked_list.h"
 
 class huffman_node
 {

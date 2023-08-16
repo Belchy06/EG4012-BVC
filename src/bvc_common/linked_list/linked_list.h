@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <iterator>
 
-#include "node.h"
+#include "bvc_common/linked_list/node.h"
 
 template <class T>
 class linked_list

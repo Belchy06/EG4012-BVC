@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <random>
 
-#include "matrix.h"
+#include "bvc_common/math/matrix.h"
 
 using namespace bvc_vector;
 
