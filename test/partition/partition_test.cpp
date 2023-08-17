@@ -21,6 +21,7 @@ bool partition_test::test(bvc_partition in_partition, size_t in_x, size_t in_y)
 
 	std::cout << mat << std::endl;
 
+	// TODO (belchy06): num levels should depend on image size?
 	std::vector<matrix<double>> streams = partition_test::partition(in_partition, mat, 5);
 
 	return true;

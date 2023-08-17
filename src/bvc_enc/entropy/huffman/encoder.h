@@ -18,6 +18,7 @@ public:
 	virtual void flush(uint8_t** out_bits, size_t* out_size) override;
 
 private:
+	void clear();
 	void encode_internal(uint8_t in_symbol);
 	void expand_nyt(int64_t in_symbol);
 

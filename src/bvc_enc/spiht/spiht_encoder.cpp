@@ -3,6 +3,7 @@
 #include <cmath>
 
 bvc_spiht_encoder::bvc_spiht_encoder()
+	: bitstream(new bvc_bitstream())
 {
 	clear();
 }
@@ -19,7 +20,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 	{
 		for (size_t x = 0; x < width; x++)
 		{
-			double pixel = in_matrix(x, y);
+			double pixel = in_matrix(y, x);
 			if (std::abs(pixel) > max)
 			{
 				max = (int)std::abs(pixel);
@@ -28,9 +29,9 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 	}
 
 	step = (int)floor(log((float)max) / log(2.f));
-	for (size_t y = 0; y < height / (1 << in_num_levels); y++)
+	for (size_t y = 0; y <= height / (1 << in_num_levels); y++)
 	{
-		for (size_t x = 0; x < width / (1 << in_num_levels); x++)
+		for (size_t x = 0; x <= width / (1 << in_num_levels); x++)
 		{
 			lip.push_back(bvc_spiht_pixel(x, y));
 			if ((x % 2 != 0) || (y % 2 != 0))
@@ -56,7 +57,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 			if (significant)
 			{
 				lsp.push_back(bvc_spiht_pixel(lip[i].x, lip[i].y));
-				bitstream->write_bit(((int)in_matrix(lip[i].x, lip[i].y)) > 0 ? 0 : 1);
+				bitstream->write_bit(((int)in_matrix(lip[i].y, lip[i].x)) > 0 ? 0 : 1);
 				if (++bit_cnt > bit_allocation)
 				{
 					return;
@@ -81,7 +82,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					int sx, sy;
 					get_successor(in_matrix, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					/* process the four offsprings */
-					significant = is_significant_pixel(in_matrix, sx, sy);
+					significant = is_significant_pixel(in_matrix, sy, sx);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
 					{
@@ -91,7 +92,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					if (significant)
 					{
 						lsp.push_back(bvc_spiht_pixel(sx, sy));
-						bitstream->write_bit(((int)in_matrix(sx, sy)) > 0 ? 0 : 1);
+						bitstream->write_bit(((int)in_matrix(sy, sx)) > 0 ? 0 : 1);
 						if (++bit_cnt > bit_allocation)
 						{
 							return;
@@ -110,7 +111,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					if (significant)
 					{
 						lsp.push_back(bvc_spiht_pixel(sx + 1, sy));
-						bitstream->write_bit(((int)in_matrix(sx + 1, sy)) > 0 ? 0 : 1);
+						bitstream->write_bit(((int)in_matrix(sy, sx + 1)) > 0 ? 0 : 1);
 						if (++bit_cnt > bit_allocation)
 						{
 							return;
@@ -129,7 +130,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					if (significant)
 					{
 						lsp.push_back(bvc_spiht_pixel(sx, sy + 1));
-						bitstream->write_bit(((int)in_matrix(sx, sy + 1)) > 0 ? 0 : 1);
+						bitstream->write_bit(((int)in_matrix(sy + 1, sx)) > 0 ? 0 : 1);
 						if (++bit_cnt > bit_allocation)
 						{
 							return;
@@ -148,7 +149,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					if (significant)
 					{
 						lsp.push_back(bvc_spiht_pixel(sx + 1, sy + 1));
-						bitstream->write_bit(((int)in_matrix(sx + 1, sy + 1)) > 0 ? 0 : 1);
+						bitstream->write_bit(((int)in_matrix(sy + 1, sx + 1)) > 0 ? 0 : 1);
 						if (++bit_cnt > bit_allocation)
 						{
 							return;
@@ -187,6 +188,20 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 				}
 			}
 		}
+		// Refinement pass
+		for (int i = 0; i < lsp.size(); i++)
+		{
+			if (std::abs((int)in_matrix(lsp[i].y, lsp[i].x)) >= (1 << (step + 1)))
+			{
+				bitstream->write_bit((((int)std::abs((int)in_matrix(lsp[i].y, lsp[i].x))) >> step) & 1);
+				if (++bit_cnt > bit_allocation)
+				{
+					return;
+				}
+			}
+		}
+		// Quantization step update
+		step--;
 	}
 }
 
@@ -201,11 +216,13 @@ void bvc_spiht_encoder::flush(uint8_t** out_bits, size_t* out_size)
 
 void bvc_spiht_encoder::clear()
 {
+	delete bitstream;
 	lip.clear();
 	lsp.clear();
 	lis.clear();
 
 	step = 0;
+	bitstream = new bvc_bitstream();
 }
 
 void bvc_spiht_encoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy)
@@ -242,7 +259,7 @@ void bvc_spiht_encoder::get_successor(matrix<double>& in_matrix, size_t in_num_l
 
 bool bvc_spiht_encoder::is_significant_pixel(matrix<double>& in_matrix, int in_x, int in_y)
 {
-	return std::abs((int)in_matrix(in_x, in_y)) >= (1 << step);
+	return std::abs((int)in_matrix(in_y, in_x)) >= (1 << step);
 }
 
 bool bvc_spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count)
@@ -253,13 +270,13 @@ bool bvc_spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t i
 	get_successor(in_matrix, in_num_levels, in_x, in_y, &sx, &sy);
 	if (sx == -1 || sy == -1)
 		return false;
-	if (is_significant_set_A(in_matrix, sx, sy, in_count + 1))
+	if (is_significant_set_A(in_matrix, in_num_levels, sx, sy, in_count + 1))
 		return true;
-	else if (is_significant_set_A(in_matrix, sx + 1, sy, in_count + 1))
+	else if (is_significant_set_A(in_matrix, in_num_levels, sx + 1, sy, in_count + 1))
 		return true;
-	else if (is_significant_set_A(in_matrix, sx, sy + 1, in_count + 1))
+	else if (is_significant_set_A(in_matrix, in_num_levels, sx, sy + 1, in_count + 1))
 		return true;
-	else if (is_significant_set_A(in_matrix, sx + 1, sy + 1, in_count + 1))
+	else if (is_significant_set_A(in_matrix, in_num_levels, sx + 1, sy + 1, in_count + 1))
 		return true;
 	return false;
 }
@@ -272,13 +289,13 @@ bool bvc_spiht_encoder::is_significant_set_B(matrix<double>& in_matrix, size_t i
 	get_successor(in_matrix, in_num_levels, in_x, in_y, &sx, &sy);
 	if (sx == -1 || sy == -1)
 		return false;
-	if (is_significant_set_B(in_matrix, sx, sy, in_count + 1))
+	if (is_significant_set_B(in_matrix, in_num_levels, sx, sy, in_count + 1))
 		return true;
-	else if (is_significant_set_B(in_matrix, sx + 1, sy, in_count + 1))
+	else if (is_significant_set_B(in_matrix, in_num_levels, sx + 1, sy, in_count + 1))
 		return true;
-	else if (is_significant_set_B(in_matrix, sx, sy + 1, in_count + 1))
+	else if (is_significant_set_B(in_matrix, in_num_levels, sx, sy + 1, in_count + 1))
 		return true;
-	else if (is_significant_set_B(in_matrix, sx + 1, sy + 1, in_count + 1))
+	else if (is_significant_set_B(in_matrix, in_num_levels, sx + 1, sy + 1, in_count + 1))
 		return true;
 	return false;
 }

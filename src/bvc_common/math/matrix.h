@@ -69,9 +69,9 @@ public:
 	// Accessors
 	//===========================================================================
 
-	void set_row(const std::vector<T>& in_row, size_t in_i);
-	void set_column(const std::vector<T>& in_column, size_t in_j);
-	void set_data(const std::vector<T>& in_data);
+	void set_row(const std::vector<T> in_row, size_t in_i);
+	void set_column(const std::vector<T> in_column, size_t in_j);
+	void set_data(const std::vector<T> in_data);
 
 	std::vector<T>		  get_row(size_t in_i) const;
 	std::vector<T>		  get_column(size_t in_j) const;

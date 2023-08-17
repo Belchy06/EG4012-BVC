@@ -4,13 +4,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(BVC_COMMON_SOURCES
-    "bvc_common/format.h"
     "bvc_common/bitstream/bitstream.h"
     "bvc_common/bitstream/bitstream.cpp"
     "bvc_common/linked_list/node.h"
     "bvc_common/linked_list/linked_list.h"
-    "bvc_common/entropy/entropy.h"
-    "bvc_common/entropy/huffman/huffman.h"
     "bvc_common/entropy/huffman/huffman_node.h"
     "bvc_common/entropy/huffman/huffman_node.cpp"
     "bvc_common/math/vector.h"
@@ -20,13 +17,10 @@ set(BVC_COMMON_SOURCES
     "bvc_common/spiht/spiht.cpp"
     "bvc_common/wavelet/wavelet.h"
     "bvc_common/wavelet/wavelet.cpp"
-    "bvc_common/wavelet/haar/haar_config.h"
     "bvc_common/wavelet/haar/haar.h"
     "bvc_common/wavelet/haar/haar.cpp"
-    "bvc_common/wavelet/biorthogonal/biorthogonal_config.h"
     "bvc_common/wavelet/biorthogonal/biorthogonal.h"
     "bvc_common/wavelet/biorthogonal/biorthogonal.cpp"
-    "bvc_common/wavelet/coiflets/coiflets_config.h"
     "bvc_common/wavelet/coiflets/coiflets.h"
     "bvc_common/wavelet/coiflets/coiflets.cpp")
 
@@ -47,10 +41,6 @@ set(BVC_DEC_SOURCES
     "bvc_dec/wavelet/wavelet_reconstructor.h"
     "bvc_dec/wavelet/wavelet_reconstructor_factory.h"
     "bvc_dec/wavelet/wavelet_reconstructor_factory.cpp"
-    "bvc_dec/result.h"
-    "bvc_dec/picture.h"
-    "bvc_dec/nal.h"
-    "bvc_dec/config.h"
     "bvc_dec/bvc_dec.h"
     "bvc_dec/bvc_dec.cpp")
 

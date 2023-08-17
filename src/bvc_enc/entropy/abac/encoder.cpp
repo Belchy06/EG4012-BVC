@@ -53,6 +53,9 @@ void abac_encoder::clear()
 	history[0] = history[1] = 1;
 	high = (uint32_t(0x1) << 16) - 1;
 	mid = high >> 1;
+
+	delete bitstream;
+	bitstream = new bvc_bitstream();
 }
 
 void abac_encoder::update()

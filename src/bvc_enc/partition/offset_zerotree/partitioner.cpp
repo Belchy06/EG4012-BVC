@@ -17,7 +17,7 @@ std::vector<matrix<double>> offset_zerotree_partitioner::partition(const matrix<
 	// smallest size, split into num_streams, that's step size
 	for (size_t i = 0; i < (size_t)num_streams; i++)
 	{
-		matrix<double> stream = matrix<double>((size_t)(in_matrix.get_num_rows() / num_streams), (size_t)(in_matrix.get_num_columns() / num_streams));
+		matrix<double> stream = matrix<double>((size_t)(2 * in_matrix.get_num_rows() / num_streams), (size_t)(2 * in_matrix.get_num_columns() / num_streams));
 
 		for (int l = in_num_levels - 1; l >= 0; l--)
 		{
@@ -25,8 +25,8 @@ std::vector<matrix<double>> offset_zerotree_partitioner::partition(const matrix<
 			size_t mat_x = raw_x >> l;
 			size_t mat_y = raw_y >> l;
 			// How many coefficients should we be taking from this level?
-			size_t x_samples_per_level = mat_x / (size_t)num_streams;
-			size_t y_samples_per_level = mat_y / (size_t)num_streams;
+			size_t x_samples_per_level = 2 * mat_x / (size_t)num_streams;
+			size_t y_samples_per_level = 2 * mat_y / (size_t)num_streams;
 			// How many coefficients should we be stepping over from one to the next?
 			size_t step_x = mat_x / x_samples_per_level;
 			size_t step_y = mat_y / y_samples_per_level;
@@ -35,14 +35,15 @@ std::vector<matrix<double>> offset_zerotree_partitioner::partition(const matrix<
 			{
 				for (size_t x = 0; x < x_samples_per_level; x++)
 				{
-					stream(x, y) = in_matrix(x * step_x + i, y * step_y + i);
+					size_t offset_x = i % step_x;
+					size_t offset_y = i / step_y;
+					stream(y, x) = in_matrix(y * step_y + offset_y, x * step_x + offset_x);
 					LOG(LogOffsetZerotreePartitioner, BVC_VERBOSITY_VERY_VERBOSE, "downsampled {}, {}", x, y);
-					LOG(LogOffsetZerotreePartitioner, BVC_VERBOSITY_VERY_VERBOSE, "original {}, {}", x * step_x, y * step_y);
+					LOG(LogOffsetZerotreePartitioner, BVC_VERBOSITY_VERY_VERBOSE, "original {}, {}", x * step_x + offset_x, y * step_y + offset_y);
 				}
 			}
 		}
 
-		std::cout << stream << std::endl;
 		streams.push_back(stream);
 	}
 

@@ -11,7 +11,9 @@
             // "preLaunchTask": "Build Test",
             "args": [
                 "-verbosity",
-                "veryverbose"
+                "veryverbose",
+                "-tests",
+                "encode"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

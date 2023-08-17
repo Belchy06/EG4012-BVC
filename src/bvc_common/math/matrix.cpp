@@ -139,7 +139,7 @@ const T& matrix<T>::operator()(size_t in_idx) const
 //=============================================================================
 
 template <typename T>
-void matrix<T>::set_row(const std::vector<T>& in_row, size_t in_i)
+void matrix<T>::set_row(const std::vector<T> in_row, size_t in_i)
 {
 	if (in_i >= num_rows || num_cols != in_row.size())
 	{
@@ -152,7 +152,7 @@ void matrix<T>::set_row(const std::vector<T>& in_row, size_t in_i)
 }
 
 template <typename T>
-void matrix<T>::set_column(const std::vector<T>& in_column, size_t in_j)
+void matrix<T>::set_column(const std::vector<T> in_column, size_t in_j)
 {
 	if (in_j >= num_cols || num_rows != in_column.size())
 	{
@@ -163,7 +163,7 @@ void matrix<T>::set_column(const std::vector<T>& in_column, size_t in_j)
 }
 
 template <typename T>
-void matrix<T>::set_data(const std::vector<T>& in_data)
+void matrix<T>::set_data(const std::vector<T> in_data)
 {
 	if (num_elements() != in_data.size())
 	{

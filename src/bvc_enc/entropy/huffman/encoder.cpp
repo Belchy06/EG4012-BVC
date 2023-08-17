@@ -9,8 +9,7 @@
  */
 huffman_encoder::huffman_encoder()
 {
-	nyt = new huffman_node(BVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
-	nodes[BVC_HUFFMAN_NODE_NYT] = nyt;
+	clear();
 }
 
 huffman_encoder::~huffman_encoder()
@@ -34,6 +33,17 @@ void huffman_encoder::flush(uint8_t** out_bits, size_t* out_size)
 	*out_bits = new uint8_t[bitstream->occupancy()];
 	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
 	*out_size = bitstream->occupancy();
+
+	clear();
+}
+
+void huffman_encoder::clear()
+{
+	delete bitstream;
+	bitstream = new bvc_bitstream();
+
+	nyt = new huffman_node(BVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
+	nodes[BVC_HUFFMAN_NODE_NYT] = nyt;
 }
 
 void huffman_encoder::encode_internal(uint8_t in_symbol)

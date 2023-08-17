@@ -1,5 +1,6 @@
 #include "bvc_enc.h"
 
+#include <iostream>
 #include <vector>
 
 bvc_encoder::bvc_encoder()
@@ -51,7 +52,7 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 	return bvc_enc_result::BVC_ENC_OK;
 }
 
-bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_enc_nal** out_nal_units, int* out_num_nal_units)
+bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_enc_nal** out_nal_units, size_t* out_num_nal_units)
 {
 	std::vector<bvc_enc_nal> output_nals;
 
@@ -62,7 +63,7 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_enc_nal** out_na
 	{
 		for (size_t y = 0; y < config.height; y++)
 		{
-			y_data.push_back((double)in_picture->Y[x * config.width + y]);
+			y_data.push_back((double)in_picture->Y[x + y * config.width]);
 		}
 	}
 
@@ -75,6 +76,8 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_enc_nal** out_na
 	// TODO (belchy06): Parallelize
 	for (matrix<double> stream : streams)
 	{
+		std::cout << stream << std::endl;
+
 		spiht_encoder->encode(stream, config.num_levels, { .bpp = config.bits_per_pixel });
 		uint8_t* spiht_bitstream = new uint8_t();
 		size_t	 spiht_byte_length = 0;
