@@ -111,7 +111,7 @@ huffman_node* huffman_node::go_via(uint8_t in_bit)
 	}
 }
 
-bitstream* huffman_node::get_code()
+bvc_bitstream* huffman_node::get_code()
 {
 	return &code;
 }

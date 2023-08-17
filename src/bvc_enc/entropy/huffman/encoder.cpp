@@ -31,9 +31,9 @@ void huffman_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 
 void huffman_encoder::flush(uint8_t** out_bits, size_t* out_size)
 {
-	*out_bits = new uint8_t[stream->occupancy()];
-	memcpy(*out_bits, stream->data(), stream->occupancy());
-	*out_size = stream->occupancy();
+	*out_bits = new uint8_t[bitstream->occupancy()];
+	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
+	*out_size = bitstream->occupancy();
 }
 
 void huffman_encoder::encode_internal(uint8_t in_symbol)
@@ -42,12 +42,12 @@ void huffman_encoder::encode_internal(uint8_t in_symbol)
 	{
 		huffman_node* node = nodes[in_symbol];
 
-		uint8_t	   bit = 0;
-		bitstream* code = node->get_code();
+		uint8_t		   bit = 0;
+		bvc_bitstream* code = node->get_code();
 		code->read_idx = 0;
 		while (code->read_bit(&bit))
 		{
-			stream->write_bit(bit);
+			bitstream->write_bit(bit);
 		}
 
 		node->increment();
@@ -55,14 +55,14 @@ void huffman_encoder::encode_internal(uint8_t in_symbol)
 	else
 	{
 		// not yet transferred
-		uint8_t	   bit = 0;
-		bitstream* code = nyt->get_code();
+		uint8_t		   bit = 0;
+		bvc_bitstream* code = nyt->get_code();
 		code->read_idx = 0;
 		while (code->read_bit(&bit))
 		{
-			stream->write_bit(bit);
+			bitstream->write_bit(bit);
 		}
-		stream->write_byte(in_symbol);
+		bitstream->write_byte(in_symbol);
 
 		expand_nyt(in_symbol);
 	}

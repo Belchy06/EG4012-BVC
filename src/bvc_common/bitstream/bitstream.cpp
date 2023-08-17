@@ -4,7 +4,7 @@
 #include <iostream>
 #include "bvc_common/bitstream/bitstream.h"
 
-bitstream::bitstream()
+bvc_bitstream::bvc_bitstream()
 	: read_idx(0)
 	, write_idx(0)
 	, capacity(0)
@@ -12,7 +12,7 @@ bitstream::bitstream()
 	stream.resize(capacity);
 }
 
-void bitstream::write_bit(uint8_t in_bit)
+void bvc_bitstream::write_bit(uint8_t in_bit)
 {
 	in_bit = in_bit & 0x1;
 
@@ -32,7 +32,7 @@ void bitstream::write_bit(uint8_t in_bit)
 	return;
 }
 
-void bitstream::write_byte(uint8_t in_byte)
+void bvc_bitstream::write_byte(uint8_t in_byte)
 {
 	if (write_idx + 8 > stream.size() << 3)
 	{
@@ -61,7 +61,7 @@ void bitstream::write_byte(uint8_t in_byte)
 	}
 }
 
-bool bitstream::read_bit(uint8_t* out_bit)
+bool bvc_bitstream::read_bit(uint8_t* out_bit)
 {
 	if (read_idx >= write_idx)
 	{
@@ -82,27 +82,27 @@ bool bitstream::read_bit(uint8_t* out_bit)
 	return true;
 }
 
-bool bitstream::read_byte(uint8_t* out_byte)
+bool bvc_bitstream::read_byte(uint8_t* out_byte)
 {
 	return true;
 }
 
-uint8_t* bitstream::data()
+uint8_t* bvc_bitstream::data()
 {
 	return stream.data();
 }
 
-uint32_t bitstream::size()
+uint32_t bvc_bitstream::size()
 {
 	return write_idx - read_idx;
 }
 
-uint32_t bitstream::occupancy()
+uint32_t bvc_bitstream::occupancy()
 {
 	return align(write_idx - read_idx, 8) >> 3;
 }
 
-void bitstream::clear()
+void bvc_bitstream::clear()
 {
 	write_idx = 0;
 	read_idx = 0;
@@ -112,7 +112,7 @@ void bitstream::clear()
 	capacity = 0;
 }
 
-uint32_t bitstream::align(uint32_t in_value, uint32_t in_alignment)
+uint32_t bvc_bitstream::align(uint32_t in_value, uint32_t in_alignment)
 {
 	uint32_t mod = in_value % in_alignment;
 

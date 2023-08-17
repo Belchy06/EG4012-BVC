@@ -1,4 +1,4 @@
-#include "bvc_common/util/vector.h"
+#include "bvc_common/math/vector.h"
 #include "wavelet.h"
 
 using namespace bvc_vector;
@@ -118,6 +118,48 @@ void bvc_wavelet_decomposition_2d<T>::set_det_coefficients(const matrix<T>& in_d
 	}
 	const size_t idx = static_cast<size_t>(in_subband);
 	this->at(3 * in_n + idx) = in_d;
+}
+
+template <typename T>
+matrix<T> bvc_wavelet_decomposition_2d<T>::get_matrix()
+{
+	matrix_size size = this->at(0).size();
+	matrix<T>	full;
+	//(size_level_0.get_num_rows() * 2, size_level_0.get_num_columns() * 2);
+
+	for (int n = num_levels() - 1; n >= 0; n--)
+	{
+		matrix<T> l = this->back();
+		this->pop_back();
+		matrix<T> r = this->back();
+		this->pop_back();
+
+		full = matrix<T>(l.get_num_rows() * 2, l.get_num_columns() * 2);
+
+		for (size_t row = 0; row < l.get_num_rows(); row++)
+		{
+			std::vector<T> fr;
+			fr.insert(fr.end(), l.get_row(row).begin(), l.get_row(row).end());
+			fr.insert(fr.end(), r.get_row(row).begin(), r.get_row(row).end());
+			full.set_row(fr, row);
+		}
+
+		l = this->back();
+		this->pop_back();
+		r = this->back();
+		this->pop_back();
+
+		for (size_t row = 0; row < l.get_num_rows(); row++)
+		{
+			std::vector<T> fr;
+			fr.insert(fr.end(), l.get_row(row).begin(), l.get_row(row).end());
+			fr.insert(fr.end(), r.get_row(row).begin(), r.get_row(row).end());
+			full.set_row(fr, row + l.get_num_rows());
+		}
+
+		this->push_back(full);
+	}
+	return this->back();
 }
 
 //=============================================================================

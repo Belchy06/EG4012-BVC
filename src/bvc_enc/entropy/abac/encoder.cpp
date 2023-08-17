@@ -35,12 +35,12 @@ void abac_encoder::flush(uint8_t** out_bits, size_t* out_size)
 	underflow_count++;
 
 	uint8_t val = (low < ((uint32_t(0x1) << 16) - 1) >> 2) ? 0 : 1;
-	stream->write_bit(val);
+	bitstream->write_bit(val);
 	flush_inverse_bits(val);
 
-	*out_bits = new uint8_t[stream->occupancy()];
-	memcpy(*out_bits, stream->data(), stream->occupancy());
-	*out_size = stream->occupancy();
+	*out_bits = new uint8_t[bitstream->occupancy()];
+	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
+	*out_size = bitstream->occupancy();
 
 	clear();
 }
@@ -68,7 +68,7 @@ void abac_encoder::flush_inverse_bits(uint8_t in_symbol)
 	in_symbol = !in_symbol;
 	for (uint32_t i = 0; i < underflow_count; i++)
 	{
-		stream->write_bit(in_symbol);
+		bitstream->write_bit(in_symbol);
 	}
 
 	underflow_count = 0;
@@ -100,7 +100,7 @@ void abac_encoder::encode_internal(uint8_t in_symbol)
 			low -= entropy_half_range * msb + msb;
 			high -= entropy_half_range * msb + msb;
 
-			stream->write_bit(msb);
+			bitstream->write_bit(msb);
 			flush_inverse_bits(msb);
 		}
 		else if (high <= entropy_3qtr_range && low > entropy_qtr_range)

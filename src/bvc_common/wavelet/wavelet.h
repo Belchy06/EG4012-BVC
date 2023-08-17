@@ -49,6 +49,7 @@ public:
 
 	const matrix<T>& get_app_coefficients() const;
 	const matrix<T>& get_det_coefficients(bvc_wavelet_subbdand in_subband, size_t in_level) const;
+	matrix<T>		 get_matrix();
 
 	void set_det_coefficients(const matrix<T>& in_d, bvc_wavelet_subbdand in_subband, size_t in_level);
 	void set_app_coefficients(const matrix<T>& in_a);

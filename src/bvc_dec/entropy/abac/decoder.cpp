@@ -50,13 +50,13 @@ void abac_decoder::decode_internal()
 	{
 		high = mid;
 		history[0]++;
-		stream->write_bit(0);
+		bitstream->write_bit(0);
 	}
 	else if (encoded > mid && encoded <= high)
 	{
 		low = mid + 1;
 		history[1]++;
-		stream->write_bit(1);
+		bitstream->write_bit(1);
 	}
 
 	while (true)
@@ -98,9 +98,9 @@ void abac_decoder::decode_internal()
 
 void abac_decoder::flush(uint8_t** out_bits, size_t* out_size)
 {
-	*out_bits = new uint8_t[stream->occupancy()];
-	memcpy(*out_bits, stream->data(), stream->occupancy());
-	*out_size = stream->occupancy();
+	*out_bits = new uint8_t[bitstream->occupancy()];
+	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
+	*out_size = bitstream->occupancy();
 
 	clear();
 }
@@ -108,7 +108,7 @@ void abac_decoder::flush(uint8_t** out_bits, size_t* out_size)
 void abac_decoder::clear()
 {
 	// Cleanup
-	delete stream;
+	delete bitstream;
 
 	// Re-initialisation
 	high = (uint32_t(0x1) << 16) - 1;
@@ -117,7 +117,7 @@ void abac_decoder::clear()
 	encoded = 0;
 	history[0] = history[1] = 1;
 
-	stream = new bitstream();
+	bitstream = new bvc_bitstream();
 }
 
 void abac_decoder::update()

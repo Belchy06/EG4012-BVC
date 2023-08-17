@@ -1,0 +1,1 @@
+C. D. Creusere, "A new method of robust image compression based on the embedded zerotree wavelet algorithm," in IEEE Transactions on Image Processing, vol. 6, no. 10, pp. 1436-1442, Oct. 1997, doi: 10.1109/83.624967.

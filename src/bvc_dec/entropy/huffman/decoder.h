@@ -25,8 +25,8 @@ private:
 	huffman_node* traverse_tree(huffman_node* in_node);
 
 private:
-	bitstream*	  output;
-	huffman_node* nyt;
+	bvc_bitstream* output;
+	huffman_node*  nyt;
 
 	std::map<int64_t, huffman_node*> nodes;
 	linked_list<huffman_node*>		 node_list;

@@ -9,7 +9,7 @@
  *
  */
 huffman_decoder::huffman_decoder()
-	: output(new bitstream())
+	: output(new bvc_bitstream())
 {
 	nyt = new huffman_node(BVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
 	nodes[BVC_HUFFMAN_NODE_NYT] = nyt;
@@ -24,7 +24,7 @@ void huffman_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_sy
 {
 	for (size_t i = 0; i < in_size; i++)
 	{
-		stream->write_byte(in_bytes[i]);
+		bitstream->write_byte(in_bytes[i]);
 	}
 
 	size_t		  out_num_symbols = 0;
@@ -44,7 +44,7 @@ void huffman_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_sy
 			for (size_t i = 0; i < 8; i++)
 			{
 				uint8_t bit = 0;
-				stream->read_bit(&bit);
+				bitstream->read_bit(&bit);
 
 				b_in |= (bit << i);
 			}
@@ -80,13 +80,13 @@ void huffman_decoder::clear()
 		delete node;
 	}
 
-	delete stream;
+	delete bitstream;
 	delete output;
 	nodes.clear();
 
 	// Initialisation
-	stream = new bitstream();
-	output = new bitstream();
+	bitstream = new bvc_bitstream();
+	output = new bvc_bitstream();
 
 	node_list = linked_list<huffman_node*>();
 	nyt = new huffman_node(BVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
@@ -95,10 +95,10 @@ void huffman_decoder::clear()
 
 huffman_node* huffman_decoder::traverse_tree(huffman_node* in_node)
 {
-	while (!(stream->occupancy() == 0) && !in_node->is_leaf())
+	while (!(bitstream->occupancy() == 0) && !in_node->is_leaf())
 	{
 		uint8_t bit = 0;
-		stream->read_bit(&bit);
+		bitstream->read_bit(&bit);
 		in_node = in_node->go_via(bit);
 	}
 

@@ -3,10 +3,10 @@
 #include <stdint.h>
 #include <vector>
 
-class bitstream
+class bvc_bitstream
 {
 public:
-	bitstream();
+	bvc_bitstream();
 
 	void write_bit(uint8_t in_bit);
 	void write_byte(uint8_t in_byte);
