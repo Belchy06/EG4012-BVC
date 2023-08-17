@@ -13,7 +13,7 @@
                 "-verbosity",
                 "veryverbose",
                 "-tests",
-                "encode"
+                "encode,decode"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

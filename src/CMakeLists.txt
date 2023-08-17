@@ -41,6 +41,12 @@ set(BVC_DEC_SOURCES
     "bvc_dec/wavelet/wavelet_recomposer.h"
     "bvc_dec/wavelet/wavelet_recomposer_factory.h"
     "bvc_dec/wavelet/wavelet_recomposer_factory.cpp"
+    "bvc_dec/partition/offset_zerotree/departitioner.h"
+    "bvc_dec/partition/offset_zerotree/departitioner.cpp"
+    "bvc_dec/partition/zerotree_preserving/departitioner.h"
+    "bvc_dec/partition/zerotree_preserving/departitioner.cpp"
+    "bvc_dec/partition/departitioner_factory.h"
+    "bvc_dec/partition/departitioner_factory.cpp"
     "bvc_dec/bvc_dec.h"
     "bvc_dec/bvc_dec.cpp")
 

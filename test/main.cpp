@@ -4,6 +4,7 @@
 
 #include "bvc_common/log.h"
 #include "bvc_common/verbosity.h"
+#include "decode/decode_test.h"
 #include "entropy/entropy_test.h"
 #include "encode/encode_test.h"
 #include "partition/partition_test.h"
@@ -19,6 +20,7 @@ int main(int argc, const char* argv[])
 	bool wavelet = true;
 	bool partition = true;
 	bool encode = true;
+	bool decode = true;
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -57,6 +59,8 @@ int main(int argc, const char* argv[])
                     partition = true;
                 } else if(test == "encode") {
                     encode = true;
+                } else if(test == "decode") {
+                    decode = true;
                 }
             }
         }
@@ -168,6 +172,15 @@ int main(int argc, const char* argv[])
 		 */
 		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENCODE");
 		bSuccess = encode_test::test();
+	}
+
+	if (decode)
+	{
+		/**
+		 * DECODE TEST
+		 */
+		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_DECODE");
+		bSuccess = decode_test::test();
 	}
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 

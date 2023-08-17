@@ -14,6 +14,8 @@ set(BVC_TEST_SOURCES
     "partition/partition_test.cpp"
     "encode/encode_test.h"
     "encode/encode_test.cpp"
+    "decode/decode_test.h"
+    "decode/decode_test.cpp"
     "main.cpp")
 
 if(MSVC)

@@ -1,3 +1,4 @@
+#include <bitset>
 #include <memory>
 
 #include "bvc_enc/bvc_enc.h"
@@ -34,11 +35,26 @@ bool encode_test::test()
 
 	// Construct image
 	bvc_picture picture;
-	picture.Y = test::lenna_gray_64;
+	picture.Y = test::lenna_gray_64_raw;
 
 	bvc_enc_nal* nals;
 	size_t		 num_nals;
 	res = encoder->encode(&picture, &nals, &num_nals);
 
-	return res;
+	for (size_t i = 0; i < num_nals; i++)
+	{
+		uint8_t* nal_data = nals[i].bytes;
+		size_t	 nal_size = nals[i].size;
+
+		// std::string raw_string = "";
+		for (size_t i = 0; i < nal_size; i++)
+		{
+			// std::bitset<8> x(nal_data[i]);
+			int t = nal_data[i];
+			std::cout << "0x" << std::hex << t << std::dec << ", ";
+		}
+		std::cout << std::endl;
+	}
+
+	return res == BVC_ENC_OK;
 }
