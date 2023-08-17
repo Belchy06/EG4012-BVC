@@ -82,7 +82,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					int sx, sy;
 					get_successor(in_matrix, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					/* process the four offsprings */
-					significant = is_significant_pixel(in_matrix, sy, sx);
+					significant = is_significant_pixel(in_matrix, sx, sy);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
 					{

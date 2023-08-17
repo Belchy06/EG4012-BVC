@@ -1,6 +1,7 @@
 #include "bvc_enc.h"
 
 #include <iostream>
+#include <bitset>
 #include <vector>
 
 bvc_encoder::bvc_encoder()
@@ -80,6 +81,16 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_enc_nal** out_na
 		uint8_t* spiht_bitstream = new uint8_t();
 		size_t	 spiht_byte_length = 0;
 		spiht_encoder->flush(&spiht_bitstream, &spiht_byte_length);
+
+		// TODO (belchy06): Print bytes
+		std::string raw_string = "";
+		for (size_t i = 0; i < spiht_byte_length; i++)
+		{
+			std::bitset<8> x(spiht_bitstream[i]);
+			raw_string += x.to_string();
+			raw_string += " ";
+		}
+		std::cout << "[" << raw_string << "]" << std::endl;
 
 		entropy_coder->encode(spiht_bitstream, spiht_byte_length);
 		uint8_t* entropy_bitstream = new uint8_t();
