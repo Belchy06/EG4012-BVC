@@ -13,8 +13,6 @@ std::shared_ptr<bvc_wavelet_decomposer> bvc_wavelet_decomposer_factory::create_w
 			return std::make_shared<biorthogonal_decomposer>(in_config);
 		case bvc_wavelet::BVC_WAVELET_COIFLETS:
 			return std::make_shared<coiflets_decomposer>(in_config);
-		case bvc_wavelet::BVC_WAVELET_NONE:
-			return nullptr;
 		default:
 			return nullptr;
 	}

@@ -27,7 +27,7 @@ private:
 	uint8_t* output_picture_bytes;
 	size_t	 output_picture_size;
 
-	std::shared_ptr<bvc_wavelet_recomposer> wavelet_decomposer;
+	std::shared_ptr<bvc_wavelet_recomposer> wavelet_recomposer;
 	std::shared_ptr<bvc_departitioner>		departitioner;
 	std::shared_ptr<bvc_spiht_decoder>		spiht_decoder;
 	std::shared_ptr<bvc_entropy_decoder>	entropy_decoder;

@@ -11,8 +11,6 @@ std::shared_ptr<bvc_entropy_encoder> bvc_entropy_encoder_factory::create_entropy
 			return std::make_shared<arithmetic_encoder>();
 		case bvc_entropy_coder::BVC_ENTROPY_CODER_HUFFMAN:
 			return std::make_shared<huffman_encoder>();
-		case bvc_entropy_coder::BVC_ENTROPY_CODER_NONE:
-			return nullptr;
 		default:
 			return nullptr;
 	}

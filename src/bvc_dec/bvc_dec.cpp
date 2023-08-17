@@ -9,32 +9,37 @@ bvc_decoder::bvc_decoder()
 bvc_dec_result bvc_decoder::init()
 {
 	entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(bvc_entropy_coder::BVC_ENTROPY_CODER_ARITHMETIC);
+	spiht_decoder = std::make_shared<bvc_spiht_decoder>();
+	departitioner = bvc_departitioner_factory::create_departitioner(BVC_PARTITION_OFFSET_ZEROTREE);
+	wavelet_recomposer = bvc_wavelet_recomposer_factory::create_wavelet_recomposer(BVC_WAVELET_BIORTHOGONAL, { .biorthogonal_config = BVC_WAVELET_BIORTHOGONAL_3p9 });
 
 	return bvc_dec_result::BVC_DEC_OK;
 }
 
 bvc_dec_result bvc_decoder::decode_nal(bvc_dec_nal* in_nal_unit)
 {
-	if (entropy_decoder != nullptr)
-	{
 
-		// TODO: Parse nal header for raw byte length
+	/*
+	 if (entropy_decoder != nullptr)
+	 {
 
-		// Parse first 4 bytes out of nal unit for num symbols
-		// TODO (belchy06): Using 16bits for num symbols is excessive (num symbols in bytes)
-		uint32_t num_bytes = (uint32_t)(in_nal_unit->bytes[1] << 8 | in_nal_unit->bytes[0] << 0);
-		entropy_decoder->decode(in_nal_unit->bytes, in_nal_unit->size, num_bytes);
+		 // TODO: Parse nal header for raw byte length
 
-		output_picture_bytes = new uint8_t();
-		entropy_decoder->flush(&output_picture_bytes, &output_picture_size);
-	}
-	else
-	{
-		output_picture_size = in_nal_unit->size;
-		output_picture_bytes = new uint8_t[output_picture_size];
-		memcpy(output_picture_bytes, in_nal_unit->bytes, output_picture_size);
-	}
+		 // Parse first 4 bytes out of nal unit for num symbols
+		 // TODO (belchy06): Using 16bits for num symbols is excessive (num symbols in bytes)
+		 uint32_t num_bytes = (uint32_t)(in_nal_unit->bytes[1] << 8 | in_nal_unit->bytes[0] << 0);
+		 entropy_decoder->decode(in_nal_unit->bytes, in_nal_unit->size, num_bytes);
 
+		 output_picture_bytes = new uint8_t();
+		 entropy_decoder->flush(&output_picture_bytes, &output_picture_size);
+	 }
+	 else
+	 {
+		 output_picture_size = in_nal_unit->size;
+		 output_picture_bytes = new uint8_t[output_picture_size];
+		 memcpy(output_picture_bytes, in_nal_unit->bytes, output_picture_size);
+	 }
+ */
 	return bvc_dec_result::BVC_DEC_OK;
 }
 
