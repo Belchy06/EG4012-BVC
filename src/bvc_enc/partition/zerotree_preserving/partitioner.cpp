@@ -44,7 +44,6 @@ std::vector<matrix<double>> zerotree_preserving_partitioner::partition(const mat
 			}
 		}
 
-		std::cout << stream << std::endl;
 		streams.push_back(stream);
 	}
 

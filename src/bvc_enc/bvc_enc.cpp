@@ -76,8 +76,6 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_enc_nal** out_na
 	// TODO (belchy06): Parallelize
 	for (matrix<double> stream : streams)
 	{
-		std::cout << stream << std::endl;
-
 		spiht_encoder->encode(stream, config.num_levels, { .bpp = config.bits_per_pixel });
 		uint8_t* spiht_bitstream = new uint8_t();
 		size_t	 spiht_byte_length = 0;
