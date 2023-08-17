@@ -30,7 +30,7 @@ bool decode_test::test()
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		bvc_dec_nal nal;
+		bvc_nal nal;
 		nal.bytes = data[i];
 		nal.size = size_arr[i];
 

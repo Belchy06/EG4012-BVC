@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bvc_common/nal.h"
 #include "bvc_common/picture.h"
 #include "bvc_enc/config.h"
 #include "bvc_enc/entropy/entropy_encoder_factory.h"
@@ -7,7 +8,6 @@
 #include "bvc_enc/wavelet/wavelet_decomposer_factory.h"
 #include "bvc_enc/spiht/encoder.h"
 #include "bvc_enc/result.h"
-#include "bvc_enc/nal.h"
 
 class bvc_encoder
 {
@@ -15,7 +15,7 @@ public:
 	bvc_encoder();
 
 	bvc_enc_result init(bvc_enc_config* in_config);
-	bvc_enc_result encode(bvc_picture* in_picture, bvc_enc_nal** out_nal_units, size_t* out_num_nal_units);
+	bvc_enc_result encode(bvc_picture* in_picture, bvc_nal** out_nal_units, size_t* out_num_nal_units);
 
 private:
 	int get_size_in_bytes(bvc_chroma_format in_format);

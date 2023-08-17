@@ -16,7 +16,7 @@ bvc_dec_result bvc_decoder::init()
 	return bvc_dec_result::BVC_DEC_OK;
 }
 
-bvc_dec_result bvc_decoder::decode_nal(bvc_dec_nal* in_nal_unit)
+bvc_dec_result bvc_decoder::decode_nal(bvc_nal* in_nal_unit)
 {
 
 	/*

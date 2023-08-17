@@ -78,7 +78,6 @@ set(BVC_ENC_SOURCES
     "bvc_enc/spiht/encoder.h"
     "bvc_enc/spiht/encoder.cpp"
     "bvc_enc/result.h"
-    "bvc_enc/nal.h"
     "bvc_enc/config.h"
     "bvc_enc/bvc_enc.h"
     "bvc_enc/bvc_enc.cpp")

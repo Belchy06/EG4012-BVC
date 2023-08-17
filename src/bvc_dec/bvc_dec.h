@@ -6,7 +6,7 @@
 #include "wavelet/wavelet_recomposer_factory.h"
 #include "partition/departitioner_factory.h"
 #include "spiht/decoder.h"
-#include "nal.h"
+#include "bvc_common/nal.h"
 #include "bvc_common/picture.h"
 #include "result.h"
 #include "config.h"
@@ -17,7 +17,7 @@ public:
 	bvc_decoder();
 
 	bvc_dec_result init();
-	bvc_dec_result decode_nal(bvc_dec_nal* in_nal_unit);
+	bvc_dec_result decode_nal(bvc_nal* in_nal_unit);
 	bvc_dec_result get_picture(bvc_picture* out_picture);
 
 private:

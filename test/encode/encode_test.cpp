@@ -37,8 +37,8 @@ bool encode_test::test()
 	bvc_picture picture;
 	picture.Y = test::lenna_gray_64_raw;
 
-	bvc_enc_nal* nals;
-	size_t		 num_nals;
+	bvc_nal* nals;
+	size_t	 num_nals;
 	res = encoder->encode(&picture, &nals, &num_nals);
 
 	for (size_t i = 0; i < num_nals; i++)
