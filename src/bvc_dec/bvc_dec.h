@@ -5,7 +5,7 @@
 #include "entropy/entropy_decoder_factory.h"
 #include "wavelet/wavelet_recomposer_factory.h"
 #include "partition/departitioner_factory.h"
-
+#include "spiht/decoder.h"
 #include "nal.h"
 #include "bvc_common/picture.h"
 #include "result.h"
@@ -29,6 +29,6 @@ private:
 
 	std::shared_ptr<bvc_wavelet_recomposer> wavelet_decomposer;
 	std::shared_ptr<bvc_departitioner>		departitioner;
-	// std::shared_ptr<bvc_spiht_decoder>		spiht_decoder;
-	std::shared_ptr<bvc_entropy_decoder> entropy_decoder;
+	std::shared_ptr<bvc_spiht_decoder>		spiht_decoder;
+	std::shared_ptr<bvc_entropy_decoder>	entropy_decoder;
 };

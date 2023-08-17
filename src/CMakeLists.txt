@@ -47,6 +47,8 @@ set(BVC_DEC_SOURCES
     "bvc_dec/partition/zerotree_preserving/departitioner.cpp"
     "bvc_dec/partition/departitioner_factory.h"
     "bvc_dec/partition/departitioner_factory.cpp"
+    "bvc_dec/spiht/decoder.h"
+    "bvc_dec/spiht/decoder.cpp"
     "bvc_dec/bvc_dec.h"
     "bvc_dec/bvc_dec.cpp")
 
