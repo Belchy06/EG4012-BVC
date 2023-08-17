@@ -2,10 +2,10 @@
 
 #include "bvc_enc/entropy/entropy_encoder.h"
 
-class abac_encoder : public bvc_entropy_encoder
+class arithmetic_encoder : public bvc_entropy_encoder
 {
 public:
-	abac_encoder();
+	arithmetic_encoder();
 
 	virtual void encode(const uint8_t* in_bytes, size_t in_size) override;
 

@@ -1,8 +1,8 @@
 #include <cstring>
 
-#include "bvc_enc/entropy/abac/encoder.h"
+#include "bvc_enc/entropy/arithmetic/encoder.h"
 
-abac_encoder::abac_encoder()
+arithmetic_encoder::arithmetic_encoder()
 	: low(0)
 	// 16 bit precision
 	, high((uint32_t(0x1) << 16) - 1)
@@ -19,7 +19,7 @@ abac_encoder::abac_encoder()
 	entropy_msb_mask = (uint64_t(0x1) << (entropy_precision - 1));
 }
 
-void abac_encoder::encode(const uint8_t* in_bytes, size_t in_size)
+void arithmetic_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 {
 	for (size_t i = 0; i < in_size; i++)
 	{
@@ -30,7 +30,7 @@ void abac_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 	}
 }
 
-void abac_encoder::flush(uint8_t** out_bits, size_t* out_size)
+void arithmetic_encoder::flush(uint8_t** out_bits, size_t* out_size)
 {
 	underflow_count++;
 
@@ -45,7 +45,7 @@ void abac_encoder::flush(uint8_t** out_bits, size_t* out_size)
 	clear();
 }
 
-void abac_encoder::clear()
+void arithmetic_encoder::clear()
 {
 	low = 0;
 	underflow_count = 0;
@@ -58,7 +58,7 @@ void abac_encoder::clear()
 	bitstream = new bvc_bitstream();
 }
 
-void abac_encoder::update()
+void arithmetic_encoder::update()
 {
 	uint32_t range = high - low;
 	uint64_t mid_range = range * history[0] / (history[0] + history[1]);
@@ -66,7 +66,7 @@ void abac_encoder::update()
 	mid = low + (uint32_t)mid_range;
 }
 
-void abac_encoder::flush_inverse_bits(uint8_t in_symbol)
+void arithmetic_encoder::flush_inverse_bits(uint8_t in_symbol)
 {
 	in_symbol = !in_symbol;
 	for (uint32_t i = 0; i < underflow_count; i++)
@@ -77,7 +77,7 @@ void abac_encoder::flush_inverse_bits(uint8_t in_symbol)
 	underflow_count = 0;
 }
 
-void abac_encoder::encode_internal(uint8_t in_symbol)
+void arithmetic_encoder::encode_internal(uint8_t in_symbol)
 {
 	update();
 

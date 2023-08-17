@@ -1,8 +1,8 @@
 #include <cstring>
 #include <iostream>
-#include "bvc_dec/entropy/abac/decoder.h"
+#include "bvc_dec/entropy/arithmetic/decoder.h"
 
-abac_decoder::abac_decoder()
+arithmetic_decoder::arithmetic_decoder()
 	// 16 bit precision
 	: high((uint32_t(0x1) << 16) - 1)
 	, mid(high >> 1)
@@ -18,7 +18,7 @@ abac_decoder::abac_decoder()
 	entropy_3qtr_range = 3 * entropy_qtr_range;
 }
 
-void abac_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbols)
+void arithmetic_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbols)
 {
 	for (size_t i = 0; i < in_size; i++)
 	{
@@ -42,7 +42,7 @@ void abac_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbo
 	}
 }
 
-void abac_decoder::decode_internal()
+void arithmetic_decoder::decode_internal()
 {
 	update();
 
@@ -96,7 +96,7 @@ void abac_decoder::decode_internal()
 	}
 }
 
-void abac_decoder::flush(uint8_t** out_bits, size_t* out_size)
+void arithmetic_decoder::flush(uint8_t** out_bits, size_t* out_size)
 {
 	*out_bits = new uint8_t[bitstream->occupancy()];
 	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
@@ -105,7 +105,7 @@ void abac_decoder::flush(uint8_t** out_bits, size_t* out_size)
 	clear();
 }
 
-void abac_decoder::clear()
+void arithmetic_decoder::clear()
 {
 	// Cleanup
 	delete bitstream;
@@ -120,7 +120,7 @@ void abac_decoder::clear()
 	bitstream = new bvc_bitstream();
 }
 
-void abac_decoder::update()
+void arithmetic_decoder::update()
 {
 	uint32_t range = high - low;
 	uint64_t mid_range = range * history[0] / (history[0] + history[1]);

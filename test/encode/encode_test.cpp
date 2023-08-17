@@ -28,7 +28,7 @@ bool encode_test::test()
 	config.bits_per_pixel = 0.5f;
 
 	// Entropy coding settings
-	config.entropy_coder = BVC_ENTROPY_CODER_ABAC;
+	config.entropy_coder = BVC_ENTROPY_CODER_ARITHMETIC;
 
 	res = encoder->init(&config);
 

@@ -69,11 +69,11 @@ int main(int argc, const char* argv[])
 		/**
 		 * ENTROPY TEST
 		 */
-		// ABAC
-		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENTROPY_CODER_ABAC");
-		bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_ABAC, 32);
-		bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_ABAC, 64);
-		bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_ABAC, 128);
+		// ARITHMETIC
+		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENTROPY_CODER_ARITHMETIC");
+		bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_ARITHMETIC, 32);
+		bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_ARITHMETIC, 64);
+		bSuccess = entropy_test::test(bvc_entropy_coder::BVC_ENTROPY_CODER_ARITHMETIC, 128);
 
 		// HUFFMAN
 		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENTROPY_CODER_HUFFMAN");

@@ -25,8 +25,8 @@ set(BVC_COMMON_SOURCES
     "bvc_common/wavelet/coiflets/coiflets.cpp")
 
 set(BVC_DEC_SOURCES
-    "bvc_dec/entropy/abac/decoder.h"
-    "bvc_dec/entropy/abac/decoder.cpp"
+    "bvc_dec/entropy/arithmetic/decoder.h"
+    "bvc_dec/entropy/arithmetic/decoder.cpp"
     "bvc_dec/entropy/huffman/decoder.h"
     "bvc_dec/entropy/huffman/decoder.cpp"
     "bvc_dec/entropy/entropy_decoder.h"
@@ -45,8 +45,8 @@ set(BVC_DEC_SOURCES
     "bvc_dec/bvc_dec.cpp")
 
 set(BVC_ENC_SOURCES
-    "bvc_enc/entropy/abac/encoder.h"
-    "bvc_enc/entropy/abac/encoder.cpp"
+    "bvc_enc/entropy/arithmetic/encoder.h"
+    "bvc_enc/entropy/arithmetic/encoder.cpp"
     "bvc_enc/entropy/huffman/encoder.h"
     "bvc_enc/entropy/huffman/encoder.cpp"
     "bvc_enc/entropy/entropy_encoder.h"
