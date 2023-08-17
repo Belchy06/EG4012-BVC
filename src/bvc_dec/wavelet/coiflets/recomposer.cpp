@@ -1,7 +1,7 @@
 #include "bvc_common/wavelet/coiflets/coiflets.h"
-#include "bvc_dec/wavelet/coiflets/reconstructor.h"
+#include "bvc_dec/wavelet/coiflets/recomposer.h"
 
-coiflets_reconstructor::coiflets_reconstructor(bvc_wavelet_config in_config)
+coiflets_recomposer::coiflets_recomposer(bvc_wavelet_config in_config)
 {
 	switch (in_config.coiflets_config)
 	{
@@ -26,7 +26,7 @@ coiflets_reconstructor::coiflets_reconstructor(bvc_wavelet_config in_config)
 	}
 }
 
-matrix<double> coiflets_reconstructor::reconstruct(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
+matrix<double> coiflets_recomposer::recompose(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
 {
 	return wave->reconstruct(in_decomposition, in_size_rec);
 }

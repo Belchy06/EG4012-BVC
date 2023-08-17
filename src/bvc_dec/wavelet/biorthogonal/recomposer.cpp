@@ -1,7 +1,7 @@
 #include "bvc_common/wavelet/biorthogonal/biorthogonal.h"
-#include "bvc_dec/wavelet/biorthogonal/reconstructor.h"
+#include "bvc_dec/wavelet/biorthogonal/recomposer.h"
 
-biorthogonal_reconstructor::biorthogonal_reconstructor(bvc_wavelet_config in_config)
+biorthogonal_recomposer::biorthogonal_recomposer(bvc_wavelet_config in_config)
 {
 	switch (in_config.biorthogonal_config)
 	{
@@ -56,7 +56,7 @@ biorthogonal_reconstructor::biorthogonal_reconstructor(bvc_wavelet_config in_con
 	}
 }
 
-matrix<double> biorthogonal_reconstructor::reconstruct(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
+matrix<double> biorthogonal_recomposer::recompose(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
 {
 	return wave->reconstruct(in_decomposition, in_size_rec);
 }

@@ -1,7 +1,7 @@
 #include "bvc_common/wavelet/haar/haar.h"
-#include "bvc_dec/wavelet/haar/reconstructor.h"
+#include "bvc_dec/wavelet/haar/recomposer.h"
 
-haar_reconstructor::haar_reconstructor(bvc_wavelet_config in_config)
+haar_recomposer::haar_recomposer(bvc_wavelet_config in_config)
 {
 	switch (in_config.haar_config)
 	{
@@ -14,7 +14,7 @@ haar_reconstructor::haar_reconstructor(bvc_wavelet_config in_config)
 	}
 }
 
-matrix<double> haar_reconstructor::reconstruct(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
+matrix<double> haar_recomposer::recompose(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
 {
 	return wave->reconstruct(in_decomposition, in_size_rec);
 }
