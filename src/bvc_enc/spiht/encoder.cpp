@@ -1,4 +1,4 @@
-#include "bvc_enc/spiht/spiht_encoder.h"
+#include "bvc_enc/spiht/encoder.h"
 
 #include <cmath>
 
