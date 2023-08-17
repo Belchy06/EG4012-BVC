@@ -7,10 +7,8 @@ bvc_spiht_encoder::bvc_spiht_encoder()
 	clear();
 }
 
-void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, bvc_spiht_config in_config)
+void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, bvc_spiht_config in_config)
 {
-	clear();
-
 	size_t width = in_matrix.get_num_columns();
 	size_t height = in_matrix.get_num_rows();
 	// TODO (belchy06): This should update based on the component
@@ -30,9 +28,9 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 	}
 
 	step = (int)floor(log((float)max) / log(2.f));
-	for (size_t y = 0; y < height / (1 << in_num_stages); y++)
+	for (size_t y = 0; y < height / (1 << in_num_levels); y++)
 	{
-		for (size_t x = 0; x < width / (1 << in_num_stages); x++)
+		for (size_t x = 0; x < width / (1 << in_num_levels); x++)
 		{
 			lip.push_back(bvc_spiht_pixel(x, y));
 			if ((x % 2 != 0) || (y % 2 != 0))
@@ -72,7 +70,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 		{
 			if (lis[i].type == BVC_SPIHT_TYPE_A)
 			{
-				bool significant = is_significant_set_A(in_matrix, in_num_stages, lis[i].x, lis[i].y);
+				bool significant = is_significant_set_A(in_matrix, in_num_levels, lis[i].x, lis[i].y);
 				bitstream->write_bit((uint8_t)significant);
 				if (++bit_cnt > bit_allocation)
 				{
@@ -81,7 +79,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 				if (significant)
 				{
 					int sx, sy;
-					get_successor(in_matrix, in_num_stages, lis[i].x, lis[i].y, &sx, &sy);
+					get_successor(in_matrix, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					/* process the four offsprings */
 					significant = is_significant_pixel(in_matrix, sx, sy);
 					bitstream->write_bit((uint8_t)significant);
@@ -161,7 +159,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 						lip.push_back(bvc_spiht_pixel(sx + 1, sy + 1));
 					}
 					/* test if L(i, j) != 0 */
-					get_successor(in_matrix, in_num_stages, sx, sy, &sx, &sy);
+					get_successor(in_matrix, in_num_levels, sx, sy, &sx, &sy);
 					if (sx != -1)
 						lis.push_back(bvc_spiht_set(lis[i].x, lis[i].y, BVC_SPIHT_TYPE_B));
 					lis.erase(lis.begin() + i);
@@ -170,7 +168,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 			}
 			else
 			{
-				bool significant = is_significant_set_B(in_matrix, in_num_stages, lis[i].x, lis[i].y);
+				bool significant = is_significant_set_B(in_matrix, in_num_levels, lis[i].x, lis[i].y);
 				bitstream->write_bit((uint8_t)significant);
 				if (++bit_cnt > bit_allocation)
 				{
@@ -179,7 +177,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 				if (significant)
 				{
 					int sx, sy;
-					get_successor(in_matrix, in_num_stages, lis[i].x, lis[i].y, &sx, &sy);
+					get_successor(in_matrix, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					lis.push_back(bvc_spiht_set(sx, sy, BVC_SPIHT_TYPE_A));
 					lis.push_back(bvc_spiht_set(sx + 1, sy, BVC_SPIHT_TYPE_A));
 					lis.push_back(bvc_spiht_set(sx, sy + 1, BVC_SPIHT_TYPE_A));
@@ -194,6 +192,11 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_stages, b
 
 void bvc_spiht_encoder::flush(uint8_t** out_bits, size_t* out_size)
 {
+	*out_bits = new uint8_t[bitstream->occupancy()];
+	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
+	*out_size = bitstream->occupancy();
+
+	clear();
 }
 
 void bvc_spiht_encoder::clear()
@@ -205,10 +208,10 @@ void bvc_spiht_encoder::clear()
 	step = 0;
 }
 
-void bvc_spiht_encoder::get_successor(matrix<double>& in_matrix, size_t in_num_stages, int in_x, int in_y, int* out_sx, int* out_sy)
+void bvc_spiht_encoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy)
 {
-	int lx = (in_matrix.get_num_columns()) / (1 << in_num_stages);
-	int ly = (in_matrix.get_num_rows()) / (1 << in_num_stages);
+	int lx = (in_matrix.get_num_columns()) / (1 << in_num_levels);
+	int ly = (in_matrix.get_num_rows()) / (1 << in_num_levels);
 	if (in_x < lx && in_y < ly)
 	{
 		if (in_x % 2 == 1)
@@ -242,12 +245,12 @@ bool bvc_spiht_encoder::is_significant_pixel(matrix<double>& in_matrix, int in_x
 	return std::abs((int)in_matrix(in_x, in_y)) >= (1 << step);
 }
 
-bool bvc_spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t in_num_stages, int in_x, int in_y, int in_count)
+bool bvc_spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count)
 {
 	if (in_count > 1 && is_significant_pixel(in_matrix, in_x, in_y))
 		return true;
 	int sx, sy;
-	get_successor(in_matrix, in_num_stages, in_x, in_y, &sx, &sy);
+	get_successor(in_matrix, in_num_levels, in_x, in_y, &sx, &sy);
 	if (sx == -1 || sy == -1)
 		return false;
 	if (is_significant_set_A(in_matrix, sx, sy, in_count + 1))
@@ -261,12 +264,12 @@ bool bvc_spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t i
 	return false;
 }
 
-bool bvc_spiht_encoder::is_significant_set_B(matrix<double>& in_matrix, size_t in_num_stages, int in_x, int in_y, int in_count)
+bool bvc_spiht_encoder::is_significant_set_B(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count)
 {
 	if (in_count > 2 && is_significant_pixel(in_matrix, in_x, in_y))
 		return true;
 	int sx, sy;
-	get_successor(in_matrix, in_num_stages, in_x, in_y, &sx, &sy);
+	get_successor(in_matrix, in_num_levels, in_x, in_y, &sx, &sy);
 	if (sx == -1 || sy == -1)
 		return false;
 	if (is_significant_set_B(in_matrix, sx, sy, in_count + 1))

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "bvc_common/math/matrix.h"
+#include "bvc_common/wavelet/wavelet_config.h"
 
 typedef enum
 {

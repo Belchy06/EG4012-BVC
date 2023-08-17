@@ -12,15 +12,15 @@ class bvc_spiht_encoder
 public:
 	bvc_spiht_encoder();
 
-	void encode(matrix<double> in_matrix, size_t in_num_stages, bvc_spiht_config in_config);
+	void encode(matrix<double> in_matrix, size_t in_num_levels, bvc_spiht_config in_config);
 	void flush(uint8_t** out_bits, size_t* out_size);
 
 private:
 	void clear();
-	void get_successor(matrix<double>& in_matrix, size_t in_num_stages, int in_x, int in_y, int* out_sx, int* out_sy);
+	void get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy);
 	bool is_significant_pixel(matrix<double>& in_matrix, int in_x, int in_y);
-	bool is_significant_set_A(matrix<double>& in_matrix, size_t in_num_stages, int in_x, int in_y, int in_count = 1);
-	bool is_significant_set_B(matrix<double>& in_matrix, size_t in_num_stages, int in_x, int in_y, int in_count = 1);
+	bool is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count = 1);
+	bool is_significant_set_B(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count = 1);
 
 private:
 	bvc_bitstream* bitstream;

@@ -4,7 +4,7 @@
 
 #include "bvc_common/format.h"
 
-class bvc_image_info
+class bvc_picture_info
 {
 public:
 	size_t			  width;

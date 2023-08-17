@@ -38,16 +38,16 @@ bvc_dec_result bvc_decoder::decode_nal(bvc_dec_nal* in_nal_unit)
 	return bvc_dec_result::BVC_DEC_OK;
 }
 
-bvc_dec_result bvc_decoder::get_picture(bvc_decoded_picture* out_picture)
+bvc_dec_result bvc_decoder::get_picture(bvc_picture* out_picture)
 {
-	out_picture->bytes = output_picture_bytes;
+	out_picture->Y = output_picture_bytes;
 	// TODO (belchy06): Parse headers
 	out_picture->info.framerate = 29.97f;
 	out_picture->info.width = 176;
 	out_picture->info.height = 144;
 	out_picture->info.bit_depth = 8;
 	out_picture->info.format = bvc_chroma_format::BVC_CHROMA_FORMAT_420;
-	out_picture->size = get_size_in_bytes(out_picture->info.format);
+	// out_picture->size = get_size_in_bytes(out_picture->info.format);
 
 	return bvc_dec_result::BVC_DEC_OK;
 }
