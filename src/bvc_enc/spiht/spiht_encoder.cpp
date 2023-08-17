@@ -12,7 +12,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 {
 	size_t width = in_matrix.get_num_columns();
 	size_t height = in_matrix.get_num_rows();
-	// TODO (belchy06): This should update based on the component
+	// TODO (belchy06): This should update based on the plane
 	size_t bit_allocation = (size_t)ceil(width * height * in_config.bpp);
 
 	int max = INT_MIN;
@@ -44,8 +44,8 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 	size_t bit_cnt = 0;
 	while (step >= 0)
 	{
-		// Sorting pass
-		// First process LIP
+		// sorting pass
+		// process LIP
 		for (size_t i = 0; i < lip.size(); i++)
 		{
 			bool significant = is_significant_pixel(in_matrix, lip[i].x, lip[i].y);
@@ -66,7 +66,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 				i--;
 			}
 		}
-		// now process LIS
+		// process LIS
 		for (size_t i = 0; i < lis.size(); i++)
 		{
 			if (lis[i].type == BVC_SPIHT_TYPE_A)
@@ -81,7 +81,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 				{
 					int sx, sy;
 					get_successor(in_matrix, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
-					/* process the four offsprings */
+					// process the four offsprings
 					significant = is_significant_pixel(in_matrix, sx, sy);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
@@ -159,10 +159,12 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 					{
 						lip.push_back(bvc_spiht_pixel(sx + 1, sy + 1));
 					}
-					/* test if L(i, j) != 0 */
+					// test if L(i, j) != 0
 					get_successor(in_matrix, in_num_levels, sx, sy, &sx, &sy);
 					if (sx != -1)
+					{
 						lis.push_back(bvc_spiht_set(lis[i].x, lis[i].y, BVC_SPIHT_TYPE_B));
+					}
 					lis.erase(lis.begin() + i);
 					i--;
 				}
@@ -188,7 +190,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 				}
 			}
 		}
-		// Refinement pass
+		// refinement pass
 		for (int i = 0; i < lsp.size(); i++)
 		{
 			if (std::abs((int)in_matrix(lsp[i].y, lsp[i].x)) >= (1 << (step + 1)))
@@ -200,7 +202,7 @@ void bvc_spiht_encoder::encode(matrix<double> in_matrix, size_t in_num_levels, b
 				}
 			}
 		}
-		// Quantization step update
+		// update quantization step
 		step--;
 	}
 }
