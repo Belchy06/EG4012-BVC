@@ -1,6 +1,8 @@
 #pragma once
 
-typedef enum
+#include <stdint.h>
+
+typedef enum : uint8_t
 {
 	BVC_WAVELET_COIFLETS_1,
 	BVC_WAVELET_COIFLETS_2,

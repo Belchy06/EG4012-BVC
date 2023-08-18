@@ -3,5 +3,7 @@
 class bvc_spiht_config
 {
 public:
-	double bpp;
+	float  bpp;
+	size_t num_levels;
+	int	   step;
 };

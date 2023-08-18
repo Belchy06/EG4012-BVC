@@ -13,8 +13,8 @@ public:
 	size_t			  width;
 	size_t			  height;
 	bvc_chroma_format format;
-	double			  framerate;
-	double			  bits_per_pixel;
+	float			  framerate;
+	float			  bits_per_pixel;
 
 	size_t num_streams;
 	size_t num_levels;

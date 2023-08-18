@@ -8,5 +8,5 @@
 class bvc_departitioner
 {
 public:
-	virtual matrix<double> departition(const std::vector<matrix<double>>& in_x, size_t in_num_levels) = 0;
+	virtual matrix<double> departition(std::vector<matrix<double>>& in_streams, size_t in_num_levels) = 0;
 };

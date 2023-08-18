@@ -9,10 +9,12 @@
 
 typedef enum
 {
-	BVC_WAVELET_HAAR,
 	BVC_WAVELET_BIORTHOGONAL,
+	BVC_WAVELET_COIFLETS,
+	BVC_WAVELET_DAUBECHIES,
+	BVC_WAVELET_HAAR,
 	BVC_WAVELET_REVERSE_BIORTHOGONAL,
-	BVC_WAVELET_COIFLETS
+	BVC_WAVELET_SYMLETS
 } bvc_wavelet;
 
 typedef enum
@@ -47,9 +49,67 @@ public:
 
 	size_t num_levels() const;
 
-	const matrix<T>& get_app_coefficients() const;
-	const matrix<T>& get_det_coefficients(bvc_wavelet_subbdand in_subband, size_t in_level) const;
-	matrix<T>		 get_matrix();
+	const matrix<T>&					   get_app_coefficients() const;
+	const matrix<T>&					   get_det_coefficients(bvc_wavelet_subbdand in_subband, size_t in_level) const;
+	matrix<T>							   to_matrix();
+	static bvc_wavelet_decomposition_2d<T> from_matrix(matrix<T> in_x, size_t in_num_levels)
+	{
+		bvc_wavelet_decomposition_2d<T> decomposition(in_num_levels);
+		matrix<T>						a = in_x;
+		for (size_t k = 0; k < in_num_levels; k++)
+		{
+			// Compute size of subbands
+			const size_t num_rows_subband = static_cast<size_t>(std::ceil(static_cast<double>(a.get_num_rows()) / 2.0));
+			const size_t num_cols_subband = static_cast<size_t>(std::ceil(static_cast<double>(a.get_num_columns()) / 2.0));
+
+			matrix<T> ak, hk, vk, dk;
+			ak = matrix<T>(num_rows_subband, num_cols_subband);
+			hk = matrix<T>(num_rows_subband, num_cols_subband);
+			vk = matrix<T>(num_rows_subband, num_cols_subband);
+			dk = matrix<T>(num_rows_subband, num_cols_subband);
+
+			for (size_t x = 0; x < num_cols_subband; x++)
+			{
+				for (size_t y = 0; y < num_rows_subband; y++)
+				{
+					ak(y, x) = a(y, x);
+				}
+			}
+
+			for (size_t x = 0; x < num_cols_subband; x++)
+			{
+				for (size_t y = 0; y < num_rows_subband; y++)
+				{
+					hk(y, x) = a(y, x + num_cols_subband);
+				}
+			}
+
+			for (size_t x = 0; x < num_cols_subband; x++)
+			{
+				for (size_t y = 0; y < num_rows_subband; y++)
+				{
+					vk(y, x) = a(y + num_rows_subband, x);
+				}
+			}
+
+			for (size_t x = 0; x < num_cols_subband; x++)
+			{
+				for (size_t y = 0; y < num_rows_subband; y++)
+				{
+					dk(y, x) = a(y + num_rows_subband, x + num_cols_subband);
+				}
+			}
+			// Save approximation coefficients for next iteration
+			a = ak;
+			// Store subbands obtained at current level k to Decomposition object
+			decomposition.set_det_coefficients(dk, BVC_WAVELET_SUBBAND_DIAGONAL, k);
+			decomposition.set_det_coefficients(vk, BVC_WAVELET_SUBBAND_VERTICAL, k);
+			decomposition.set_det_coefficients(hk, BVC_WAVELET_SUBBAND_HORIZONTAL, k);
+		}
+		// Store final approximation
+		decomposition.set_app_coefficients(a);
+		return decomposition;
+	}
 
 	void set_det_coefficients(const matrix<T>& in_d, bvc_wavelet_subbdand in_subband, size_t in_level);
 	void set_app_coefficients(const matrix<T>& in_a);

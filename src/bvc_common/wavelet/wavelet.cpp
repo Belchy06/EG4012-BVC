@@ -122,11 +122,9 @@ void bvc_wavelet_decomposition_2d<T>::set_det_coefficients(const matrix<T>& in_d
 }
 
 template <typename T>
-matrix<T> bvc_wavelet_decomposition_2d<T>::get_matrix()
+matrix<T> bvc_wavelet_decomposition_2d<T>::to_matrix()
 {
 	matrix<T> full;
-	//(size_level_0.get_num_rows() * 2, size_level_0.get_num_columns() * 2);
-
 	for (int n = num_levels() - 1; n >= 0; n--)
 	{
 		matrix<T> l = this->back();

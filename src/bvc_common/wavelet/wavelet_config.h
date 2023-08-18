@@ -15,4 +15,5 @@ typedef union
 	bvc_wavelet_haar_config					haar_config;
 	bvc_wavelet_reverse_biorthogonal_config reverse_biorthogonal_config;
 	bvc_wavelet_symlets_config				symlets_config;
+	uint8_t									value;
 } bvc_wavelet_config;

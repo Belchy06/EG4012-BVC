@@ -12,7 +12,7 @@ class bvc_spiht_decoder
 public:
 	bvc_spiht_decoder();
 
-	void decode(uint8_t* in_bits, size_t in_num_bytes, size_t in_x, size_t in_y, size_t in_num_levels, bvc_spiht_config in_config);
+	void decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, bvc_spiht_config in_config);
 	void flush(matrix<double>& out_matrix);
 
 private:

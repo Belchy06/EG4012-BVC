@@ -13,7 +13,9 @@
                 "-verbosity",
                 "veryverbose",
                 "-tests",
-                "encode,decode"
+                "encode,decode",
+                "-output",
+                "${workspaceFolder}\\decompressed.ppm"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

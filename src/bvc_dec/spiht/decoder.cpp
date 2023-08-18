@@ -6,11 +6,11 @@ bvc_spiht_decoder::bvc_spiht_decoder()
 	clear();
 }
 
-void bvc_spiht_decoder::decode(uint8_t* in_bits, size_t in_num_bytes, size_t in_x, size_t in_y, size_t in_num_levels, bvc_spiht_config in_config)
+void bvc_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, bvc_spiht_config in_config)
 {
 	for (size_t i = 0; i < in_num_bytes; i++)
 	{
-		bitstream->write_byte(in_bits[i]);
+		bitstream->write_byte(in_bytes[i]);
 	}
 
 	output = matrix<double>(in_y, in_x);
@@ -18,12 +18,12 @@ void bvc_spiht_decoder::decode(uint8_t* in_bits, size_t in_num_bytes, size_t in_
 	size_t height = in_y;
 	// TODO (belchy06): This should update based on the plane
 	size_t bit_allocation = (size_t)ceil(width * height / in_config.bpp);
-	// TODO (belchy06): This should probably be passed in in the config
-	step = 12;
 
-	for (size_t y = 0; y <= height / (1 << in_num_levels); y++)
+	step = in_config.step;
+
+	for (size_t y = 0; y <= height / (1 << in_config.num_levels); y++)
 	{
-		for (size_t x = 0; x <= width / (1 << in_num_levels); x++)
+		for (size_t x = 0; x <= width / (1 << in_config.num_levels); x++)
 		{
 			lip.push_back(bvc_spiht_pixel(x, y));
 			if ((x % 2 != 0) || (y % 2 != 0))
@@ -74,7 +74,7 @@ void bvc_spiht_decoder::decode(uint8_t* in_bits, size_t in_num_bytes, size_t in_
 				if (sig)
 				{
 					int sx, sy;
-					get_successor(output, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
+					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					/* process the four offsprings */
 					sig = 0;
 					bitstream->read_bit(&sig);
@@ -159,7 +159,7 @@ void bvc_spiht_decoder::decode(uint8_t* in_bits, size_t in_num_bytes, size_t in_
 						lip.push_back(bvc_spiht_pixel(sx + 1, sy + 1));
 					}
 					/* test if L(i, j) != 0 */
-					get_successor(output, in_num_levels, sx, sy, &sx, &sy);
+					get_successor(output, in_config.num_levels, sx, sy, &sx, &sy);
 					if (sx != -1)
 					{
 						lis.push_back(bvc_spiht_set(lis[i].x, lis[i].y, BVC_SPIHT_TYPE_B));
@@ -179,7 +179,7 @@ void bvc_spiht_decoder::decode(uint8_t* in_bits, size_t in_num_bytes, size_t in_
 				if (sig)
 				{
 					int sx, sy;
-					get_successor(output, in_num_levels, lis[i].x, lis[i].y, &sx, &sy);
+					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					lis.push_back(bvc_spiht_set(sx, sy, BVC_SPIHT_TYPE_A));
 					lis.push_back(bvc_spiht_set(sx + 1, sy, BVC_SPIHT_TYPE_A));
 					lis.push_back(bvc_spiht_set(sx, sy + 1, BVC_SPIHT_TYPE_A));

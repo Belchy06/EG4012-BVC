@@ -5,7 +5,7 @@
 #include "encode_test.h"
 #include "../misc/lenna.h"
 
-bool encode_test::test()
+bool encode_test::test(std::string in_source_path, std::string in_output_path)
 {
 	std::shared_ptr<bvc_encoder> encoder = std::make_shared<bvc_encoder>();
 
@@ -40,21 +40,6 @@ bool encode_test::test()
 	bvc_nal* nals;
 	size_t	 num_nals;
 	res = encoder->encode(&picture, &nals, &num_nals);
-
-	for (size_t i = 0; i < num_nals; i++)
-	{
-		uint8_t* nal_data = nals[i].bytes;
-		size_t	 nal_size = nals[i].size;
-
-		// std::string raw_string = "";
-		for (size_t i = 0; i < nal_size; i++)
-		{
-			// std::bitset<8> x(nal_data[i]);
-			int t = nal_data[i];
-			std::cout << "0x" << std::hex << t << std::dec << ", ";
-		}
-		std::cout << std::endl;
-	}
 
 	return res == BVC_ENC_OK;
 }

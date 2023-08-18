@@ -22,6 +22,9 @@ int main(int argc, const char* argv[])
 	bool encode = true;
 	bool decode = true;
 
+	std::string source_path;
+	std::string output_path;
+
 	for (int i = 1; i < argc; i++)
 	{
 		std::string arg(argv[i]);
@@ -63,8 +66,22 @@ int main(int argc, const char* argv[])
                     decode = true;
                 }
             }
+        } else if(arg == "-source") {
+            source_path = std::string(argv[++i]);
+        } else if(arg == "-output") {
+            output_path = std::string(argv[++i]);
         }
 		// clang-format on
+	}
+
+	if (encode && output_path.empty())
+	{
+		std::exit(-1);
+	}
+
+	if (decode && output_path.empty())
+	{
+		std::exit(-1);
 	}
 
 	bool bSuccess = true;
@@ -171,7 +188,7 @@ int main(int argc, const char* argv[])
 		 * ENCODE TEST
 		 */
 		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENCODE");
-		bSuccess = encode_test::test();
+		bSuccess = encode_test::test(source_path, output_path);
 	}
 
 	if (decode)
@@ -180,7 +197,7 @@ int main(int argc, const char* argv[])
 		 * DECODE TEST
 		 */
 		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_DECODE");
-		bSuccess = decode_test::test();
+		bSuccess = decode_test::test(source_path, output_path);
 	}
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 

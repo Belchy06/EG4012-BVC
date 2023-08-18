@@ -12,8 +12,8 @@ class bvc_spiht_encoder
 public:
 	bvc_spiht_encoder();
 
-	void encode(matrix<double> in_matrix, size_t in_num_levels, bvc_spiht_config in_config);
-	void flush(uint8_t** out_bits, size_t* out_size);
+	void encode(matrix<double> in_matrix, bvc_spiht_config in_config);
+	void flush(uint8_t** out_bits, size_t* out_size, int* out_step);
 
 private:
 	void clear();
@@ -26,6 +26,7 @@ private:
 	bvc_bitstream* bitstream;
 	size_t		   bits;
 	int			   step;
+	int			   output_step;
 
 	std::vector<bvc_spiht_pixel> lip;
 	std::vector<bvc_spiht_pixel> lsp;

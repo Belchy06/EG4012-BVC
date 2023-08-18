@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "entropy/entropy_decoder_factory.h"
@@ -17,15 +18,17 @@ public:
 	bvc_decoder();
 
 	bvc_dec_result init();
-	bvc_dec_result decode_nal(bvc_nal* in_nal_unit);
+	bvc_dec_result decode_nal(const bvc_nal* in_nal_unit);
 	bvc_dec_result get_picture(bvc_picture* out_picture);
 
 private:
 	int get_size_in_bytes(bvc_chroma_format in_format);
 
 private:
-	uint8_t* output_picture_bytes;
-	size_t	 output_picture_size;
+	bool		picture_ready;
+	bvc_picture picture;
+
+	std::map<size_t, matrix<double>> partitions;
 
 	std::shared_ptr<bvc_wavelet_recomposer> wavelet_recomposer;
 	std::shared_ptr<bvc_departitioner>		departitioner;

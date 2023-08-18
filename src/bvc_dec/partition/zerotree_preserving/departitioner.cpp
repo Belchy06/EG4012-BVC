@@ -7,7 +7,7 @@ zerotree_preserving_departitioner::zerotree_preserving_departitioner()
 {
 }
 
-matrix<double> zerotree_preserving_departitioner::departition(const std::vector<matrix<double>>& in_matrix, size_t in_num_levels)
+matrix<double> zerotree_preserving_departitioner::departition(std::vector<matrix<double>>& in_streams, size_t in_num_levels)
 {
 	matrix<double> mat;
 	return mat;
