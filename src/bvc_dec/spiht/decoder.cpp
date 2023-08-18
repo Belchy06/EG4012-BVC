@@ -129,7 +129,7 @@ void bvc_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in
 						lsp.push_back(bvc_spiht_pixel(sx, sy + 1));
 						uint8_t bit = 0;
 						bitstream->read_bit(&bit);
-						output(sy, sx + 1) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
+						output(sy + 1, sx) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
 						if (++bit_cnt > bit_allocation)
 						{
 							return;
