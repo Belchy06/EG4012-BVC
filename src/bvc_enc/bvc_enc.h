@@ -23,6 +23,8 @@ private:
 private:
 	bvc_enc_config config;
 
+	std::vector<bvc_nal> output_nals;
+
 	std::shared_ptr<bvc_wavelet_decomposer> wavelet_decomposer;
 	std::shared_ptr<bvc_partitioner>		partitioner;
 	std::shared_ptr<bvc_spiht_encoder>		spiht_encoder;

@@ -55,7 +55,7 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 
 bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_nal** out_nal_units, size_t* out_num_nal_units)
 {
-	std::vector<bvc_nal> output_nals;
+	output_nals.clear();
 
 	// TODO (belchy06): Add support for U and V planes
 	matrix<double>		Y(config.width, config.height);

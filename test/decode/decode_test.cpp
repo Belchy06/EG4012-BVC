@@ -51,9 +51,9 @@ bool decode_test::test(std::string in_source_path, std::string in_output_path)
 		for (size_t i = 0; i < output.info.width; ++i)
 		{
 			uint8_t Y = output.Y[i + j * output.info.width];
-			uint8_t R = (uint8_t)(Y + 1.4075);
-			uint8_t G = (uint8_t)(Y - 0.3455);
-			uint8_t B = (uint8_t)(Y + 1.7790);
+			uint8_t R = (uint8_t)(Y);
+			uint8_t G = (uint8_t)(Y);
+			uint8_t B = (uint8_t)(Y);
 			output_stream << static_cast<char>(R)
 						  << static_cast<char>(G)
 						  << static_cast<char>(B);

@@ -13,7 +13,9 @@
                 "-verbosity",
                 "veryverbose",
                 "-tests",
-                "encode,decode",
+                "e2e",
+                "-source",
+                "${workspaceFolder}\\lena_gray_64.ppm",
                 "-output",
                 "${workspaceFolder}\\decompressed.ppm"
             ],

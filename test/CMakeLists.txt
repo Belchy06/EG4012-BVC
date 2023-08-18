@@ -6,6 +6,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 set(BVC_TEST_SOURCES
     "misc/lenna.h"
     "misc/lenna.cpp"
+    "util/ppm.h"
+    "util/ppm.cpp"
     "entropy/entropy_test.h"
     "entropy/entropy_test.cpp"
     "wavelet/wavelet_test.h"
@@ -16,6 +18,8 @@ set(BVC_TEST_SOURCES
     "encode/encode_test.cpp"
     "decode/decode_test.h"
     "decode/decode_test.cpp"
+    "e2e/e2e.h"
+    "e2e/e2e.cpp"
     "main.cpp")
 
 if(MSVC)

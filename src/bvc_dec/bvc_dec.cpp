@@ -162,6 +162,7 @@ bvc_dec_result bvc_decoder::decode_nal(const bvc_nal* in_nal_unit)
 
 		picture.info.height = image.get_num_rows();
 		picture.info.width = image.get_num_columns();
+		picture.info.bit_depth = 8;
 		picture.Y = new uint8_t[image.get_num_rows() * image.get_num_columns()]{ 0 };
 		memcpy(picture.Y, Y.data(), Y.size());
 
@@ -181,6 +182,8 @@ bvc_dec_result bvc_decoder::get_picture(bvc_picture* out_picture)
 
 	// TODO (belchy06): Parse headers
 	out_picture->Y = new uint8_t[picture.info.width * picture.info.height * (picture.info.bit_depth >> 3)]{ 0 };
+	out_picture->U = nullptr;
+	out_picture->V = nullptr;
 	memcpy(out_picture->Y, picture.Y, (picture.info.width * picture.info.height * (picture.info.bit_depth >> 3)));
 	out_picture->info.framerate = 29.97f;
 	out_picture->info.width = picture.info.width;

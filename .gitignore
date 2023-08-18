@@ -24,6 +24,7 @@
 *.out
 *.app
 
+*.ppm
 
 # Build results
 [Dd]ebug/
