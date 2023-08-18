@@ -17,7 +17,7 @@ void bvc_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in
 	size_t width = in_x;
 	size_t height = in_y;
 	// TODO (belchy06): This should update based on the plane
-	size_t bit_allocation = (size_t)ceil(width * height / in_config.bpp);
+	size_t bit_allocation = (size_t)ceil(width * height * in_config.bpp);
 
 	step = in_config.step;
 

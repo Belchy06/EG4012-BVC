@@ -25,7 +25,7 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	enc_config.partition_type = BVC_PARTITION_OFFSET_ZEROTREE;
 
 	// SPIHT settings
-	enc_config.bits_per_pixel = 2.f;
+	enc_config.bits_per_pixel = .01f;
 
 	// Entropy coding settings
 	enc_config.entropy_coder = BVC_ENTROPY_CODER_ARITHMETIC;
