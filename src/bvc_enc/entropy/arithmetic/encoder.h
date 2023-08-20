@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bvc_enc/entropy/entropy_encoder.h"
+#include "bvc_enc/entropy/encoder.h"
 
 class arithmetic_encoder : public bvc_entropy_encoder
 {

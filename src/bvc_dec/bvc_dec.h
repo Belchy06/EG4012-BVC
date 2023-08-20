@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include "entropy/entropy_decoder_factory.h"
+#include "entropy/decoder_factory.h"
 #include "wavelet/recomposer_factory.h"
 #include "partition/departitioner_factory.h"
 #include "spiht/decoder.h"

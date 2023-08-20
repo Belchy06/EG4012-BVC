@@ -99,7 +99,7 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_nal** out_nal_un
 		 +---------------+---------------+---------------+---------------+
 		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-		 | W F |   W C   |D|E|           |           NUM_LEVELS          |
+		 | W F |   W C   | P | E |  RES  |           NUM_LEVELS          |
 		 +---------------+---------------+---------------+---------------+
 		 |          NUM_STREAMS          |           STREAM_ID           |
 		 +---------------+---------------+---------------+---------------+
@@ -122,8 +122,8 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_nal** out_nal_un
 		header.push_back(coder_config);
 
 		coder_config = 0;
-		coder_config |= (config.partition_type << 7) & 0b10000000;
-		coder_config |= (config.entropy_coder << 6) & 0b01000000;
+		coder_config |= (config.partition_type << 6) & 0b11000000;
+		coder_config |= (config.entropy_coder << 4) & 0b00110000;
 		header.push_back(coder_config);
 
 		header.push_back((uint8_t)(config.num_levels >> 8));

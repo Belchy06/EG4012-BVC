@@ -101,6 +101,12 @@ int main(int argc, const char* argv[])
 		/**
 		 * ENTROPY TEST
 		 */
+		// SKIP
+		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENTROPY_CODER_SKIP");
+		bSuccess &= entropy_test::test(BVC_ENTROPY_CODER_SKIP, 32);
+		bSuccess &= entropy_test::test(BVC_ENTROPY_CODER_SKIP, 64);
+		bSuccess &= entropy_test::test(BVC_ENTROPY_CODER_SKIP, 128);
+
 		// ARITHMETIC
 		LOG(LogTest, BVC_VERBOSITY_VERBOSE, "BVC_ENTROPY_CODER_ARITHMETIC");
 		bSuccess &= entropy_test::test(BVC_ENTROPY_CODER_ARITHMETIC, 32);

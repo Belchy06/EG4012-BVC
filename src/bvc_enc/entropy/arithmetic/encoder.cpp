@@ -1,5 +1,3 @@
-#include <cstring>
-
 #include "bvc_enc/entropy/arithmetic/encoder.h"
 
 arithmetic_encoder::arithmetic_encoder()

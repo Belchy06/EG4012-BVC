@@ -3,7 +3,7 @@
 #include "bvc_common/nal.h"
 #include "bvc_common/picture.h"
 #include "bvc_enc/config.h"
-#include "bvc_enc/entropy/entropy_encoder_factory.h"
+#include "bvc_enc/entropy/encoder_factory.h"
 #include "bvc_enc/partition/partitioner_factory.h"
 #include "bvc_enc/wavelet/decomposer_factory.h"
 #include "bvc_enc/spiht/encoder.h"

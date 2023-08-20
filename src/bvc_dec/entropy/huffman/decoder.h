@@ -6,7 +6,7 @@
 #include "bvc_common/entropy/huffman/huffman_node.h"
 #include "bvc_common/linked_list/node.h"
 #include "bvc_common/linked_list/linked_list.h"
-#include "bvc_dec/entropy/entropy_decoder.h"
+#include "bvc_dec/entropy/decoder.h"
 
 class huffman_decoder : public bvc_entropy_decoder
 {
@@ -19,7 +19,7 @@ public:
 	virtual void flush(uint8_t** out_bits, size_t* out_size) override;
 
 private:
-	virtual void clear() override;
+	void clear();
 
 	void		  expand_nyt(int64_t in_symbol);
 	huffman_node* traverse_tree(huffman_node* in_node);

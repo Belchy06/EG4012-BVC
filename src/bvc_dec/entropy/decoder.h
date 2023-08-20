@@ -17,10 +17,6 @@ public:
 	// Each implementation is responisble for the retrieval of decoded data
 	virtual void flush(uint8_t** out_bits, size_t* out_size) = 0;
 
-private:
-	// Each implementation is responsible for cleaning up after a decode, ready for new data
-	virtual void clear() = 0;
-
 protected:
 	bvc_bitstream* bitstream;
 

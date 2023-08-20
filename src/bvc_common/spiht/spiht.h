@@ -2,6 +2,12 @@
 
 typedef enum
 {
+	BVC_SPIHT_SKIP,
+	BVC_SPIHT_ENABLE,
+} bvc_spiht;
+
+typedef enum
+{
 	BVC_SPIHT_TYPE_A,
 	BVC_SPIHT_TYPE_B
 } bvc_spiht_type;

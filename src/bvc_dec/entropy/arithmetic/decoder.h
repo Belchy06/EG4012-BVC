@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bvc_dec/entropy/entropy_decoder.h"
+#include "bvc_dec/entropy/decoder.h"
 
 class arithmetic_decoder : public bvc_entropy_decoder
 {
@@ -12,7 +12,7 @@ public:
 	virtual void flush(uint8_t** out_bits, size_t* out_size) override;
 
 private:
-	virtual void clear() override;
+	void clear();
 
 	void decode_internal();
 	void update();

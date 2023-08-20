@@ -4,10 +4,8 @@
 #include <vector>
 
 #include "bvc_common/log.h"
-#include "bvc_dec/entropy/entropy_decoder.h"
-#include "bvc_dec/entropy/entropy_decoder_factory.h"
-#include "bvc_enc/entropy/entropy_encoder.h"
-#include "bvc_enc/entropy/entropy_encoder_factory.h"
+#include "bvc_dec/entropy/decoder_factory.h"
+#include "bvc_enc/entropy/encoder_factory.h"
 
 #include "entropy_test.h"
 
