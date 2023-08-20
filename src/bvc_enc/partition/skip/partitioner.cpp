@@ -4,4 +4,5 @@ std::vector<matrix<double>> skip_partitioner::partition(const matrix<double>& in
 {
 	std::vector<matrix<double>> streams;
 	streams.push_back(in_x);
+	return streams;
 }

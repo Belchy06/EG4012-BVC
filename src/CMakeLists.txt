@@ -22,7 +22,13 @@ set(BVC_COMMON_SOURCES
     "bvc_common/wavelet/biorthogonal/biorthogonal.h"
     "bvc_common/wavelet/biorthogonal/biorthogonal.cpp"
     "bvc_common/wavelet/coiflets/coiflets.h"
-    "bvc_common/wavelet/coiflets/coiflets.cpp")
+    "bvc_common/wavelet/coiflets/coiflets.cpp"
+    "bvc_common/wavelet/symlets/symlets.h"
+    "bvc_common/wavelet/symlets/symlets.cpp"
+    "bvc_common/wavelet/daubechies/daubechies.h"
+    "bvc_common/wavelet/daubechies/daubechies.cpp"
+    "bvc_common/wavelet/reverse_biorthogonal/reverse_biorthogonal.h"
+    "bvc_common/wavelet/reverse_biorthogonal/reverse_biorthogonal.cpp")
 
 set(BVC_DEC_SOURCES
     "bvc_dec/entropy/arithmetic/decoder.h"

@@ -1,4 +1,4 @@
-#include "biorthogonal.h"
+#include "bvc_common/wavelet/biorthogonal/biorthogonal.h"
 
 std::vector<double> biorthogonal1p1::lo_d = { 0.7071067811865476, 0.7071067811865476 };
 std::vector<double> biorthogonal1p1::hi_d = { -0.7071067811865476, 0.7071067811865476 };
