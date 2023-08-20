@@ -13,17 +13,22 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 	// Validate config
 	if (in_config->width == 0)
 	{
-		return bvc_enc_result::BVC_ENC_INVALID_DIMENSIONS;
+		return BVC_ENC_INVALID_DIMENSIONS;
 	}
 
 	if (in_config->height == 0)
 	{
-		return bvc_enc_result::BVC_ENC_INVALID_DIMENSIONS;
+		return BVC_ENC_INVALID_DIMENSIONS;
 	}
 
 	if (in_config->format == bvc_chroma_format::BVC_CHROMA_FORMAT_UNDEFINED)
 	{
-		return bvc_enc_result::BVC_ENC_INVALID_FORMAT;
+		return BVC_ENC_INVALID_FORMAT;
+	}
+
+	if ((in_config->num_levels > 1 || in_config->num_streams > 1) && in_config->partition_type == BVC_PARTITION_SKIP)
+	{
+		return BVC_ENC_INVALID_PARAM;
 	}
 
 	// Calculate levels from streams or vice-versa. If user has specified both, ensure that the values are compatible
@@ -39,7 +44,7 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 	{
 		if (in_config->num_streams != in_config->width * in_config->height / pow(4, in_config->num_levels))
 		{
-			return bvc_enc_result::BVC_ENC_INVALID_PARAM;
+			return BVC_ENC_INVALID_PARAM;
 		}
 	}
 
