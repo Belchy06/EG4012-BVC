@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bvc_common/wavelet/wavelet_config.h"
-#include "bvc_enc/wavelet/wavelet_decomposer.h"
+#include "bvc_enc/wavelet/decomposer.h"
 
 class haar_decomposer : public bvc_wavelet_decomposer
 {

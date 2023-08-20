@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "entropy/entropy_decoder_factory.h"
-#include "wavelet/wavelet_recomposer_factory.h"
+#include "wavelet/recomposer_factory.h"
 #include "partition/departitioner_factory.h"
 #include "spiht/decoder.h"
 #include "bvc_common/nal.h"

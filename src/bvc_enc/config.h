@@ -21,7 +21,7 @@ public:
 
 	bvc_entropy_coder entropy_coder;
 
-	bvc_wavelet		   wavelet_family;
+	bvc_wavelet_family wavelet_family;
 	bvc_wavelet_config wavelet_config;
 
 	bvc_partition partition_type;

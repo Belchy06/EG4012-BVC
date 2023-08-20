@@ -42,14 +42,14 @@ bvc_dec_result bvc_decoder::decode_nal(const bvc_nal* in_nal_unit)
 	size_t	byte_idx = 0;
 	uint8_t config = 0;
 	config = nal_bytes[byte_idx++];
-	bvc_wavelet		   wavelet = (bvc_wavelet)((config >> 5) & 0b111);
+	bvc_wavelet_family wavelet_family = (bvc_wavelet_family)((config >> 5) & 0b111);
 	bvc_wavelet_config wavlet_config = { .value = (uint8_t)((config >> 0) & 0b11111) };
 	config = nal_bytes[byte_idx++];
 	bvc_partition	  partition_type = (bvc_partition)((config >> 7) & 0b1);
 	bvc_entropy_coder entropy_coder = (bvc_entropy_coder)((config >> 6) & 0b1);
 
 	// Intialise components based on specified config
-	wavelet_recomposer = bvc_wavelet_recomposer_factory::create_wavelet_recomposer(wavelet, wavlet_config);
+	wavelet_recomposer = bvc_wavelet_recomposer_factory::create_wavelet_recomposer(wavelet_family, wavlet_config);
 	spiht_decoder = std::make_shared<bvc_spiht_decoder>();
 	departitioner = bvc_departitioner_factory::create_departitioner(partition_type);
 	entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(entropy_coder);

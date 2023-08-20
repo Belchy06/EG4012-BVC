@@ -17,7 +17,7 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	enc_config.height = 64;
 
 	// Wavelet transform settings
-	enc_config.wavelet_family = BVC_WAVELET_BIORTHOGONAL;
+	enc_config.wavelet_family = BVC_WAVELET_FAMILY_BIORTHOGONAL;
 	enc_config.wavelet_config = { .biorthogonal_config = BVC_WAVELET_BIORTHOGONAL_3p9 };
 
 	// Partitioning settings

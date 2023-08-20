@@ -18,7 +18,7 @@ bool encode_test::test(std::string in_source_path, std::string in_output_path)
 	config.height = 64;
 
 	// Wavelet transform settings
-	config.wavelet_family = BVC_WAVELET_BIORTHOGONAL;
+	config.wavelet_family = BVC_WAVELET_FAMILY_BIORTHOGONAL;
 	config.wavelet_config = { .biorthogonal_config = BVC_WAVELET_BIORTHOGONAL_3p9 };
 
 	// Partitioning settings
