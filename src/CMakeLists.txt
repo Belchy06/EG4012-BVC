@@ -3,120 +3,120 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
-set(BVC_COMMON_SOURCES
-    "bvc_common/bitstream/bitstream.h"
-    "bvc_common/bitstream/bitstream.cpp"
-    "bvc_common/linked_list/node.h"
-    "bvc_common/linked_list/linked_list.h"
-    "bvc_common/entropy/huffman/huffman_node.h"
-    "bvc_common/entropy/huffman/huffman_node.cpp"
-    "bvc_common/math/vector.h"
-    "bvc_common/math/matrix.h"
-    "bvc_common/math/matrix.cpp"
-    "bvc_common/spiht/spiht.h"
-    "bvc_common/spiht/spiht.cpp"
-    "bvc_common/wavelet/wavelet.h"
-    "bvc_common/wavelet/wavelet.cpp"
-    "bvc_common/wavelet/haar/haar.h"
-    "bvc_common/wavelet/haar/haar.cpp"
-    "bvc_common/wavelet/biorthogonal/biorthogonal.h"
-    "bvc_common/wavelet/biorthogonal/biorthogonal.cpp"
-    "bvc_common/wavelet/coiflets/coiflets.h"
-    "bvc_common/wavelet/coiflets/coiflets.cpp"
-    "bvc_common/wavelet/symlets/symlets.h"
-    "bvc_common/wavelet/symlets/symlets.cpp"
-    "bvc_common/wavelet/daubechies/daubechies.h"
-    "bvc_common/wavelet/daubechies/daubechies.cpp"
-    "bvc_common/wavelet/reverse_biorthogonal/reverse_biorthogonal.h"
-    "bvc_common/wavelet/reverse_biorthogonal/reverse_biorthogonal.cpp")
+set(OVC_COMMON_SOURCES
+    "ovc_common/bitstream/bitstream.h"
+    "ovc_common/bitstream/bitstream.cpp"
+    "ovc_common/linked_list/node.h"
+    "ovc_common/linked_list/linked_list.h"
+    "ovc_common/entropy/huffman/huffman_node.h"
+    "ovc_common/entropy/huffman/huffman_node.cpp"
+    "ovc_common/math/vector.h"
+    "ovc_common/math/matrix.h"
+    "ovc_common/math/matrix.cpp"
+    "ovc_common/spiht/spiht.h"
+    "ovc_common/spiht/spiht.cpp"
+    "ovc_common/wavelet/wavelet.h"
+    "ovc_common/wavelet/wavelet.cpp"
+    "ovc_common/wavelet/haar/haar.h"
+    "ovc_common/wavelet/haar/haar.cpp"
+    "ovc_common/wavelet/biorthogonal/biorthogonal.h"
+    "ovc_common/wavelet/biorthogonal/biorthogonal.cpp"
+    "ovc_common/wavelet/coiflets/coiflets.h"
+    "ovc_common/wavelet/coiflets/coiflets.cpp"
+    "ovc_common/wavelet/symlets/symlets.h"
+    "ovc_common/wavelet/symlets/symlets.cpp"
+    "ovc_common/wavelet/daubechies/daubechies.h"
+    "ovc_common/wavelet/daubechies/daubechies.cpp"
+    "ovc_common/wavelet/reverse_biorthogonal/reverse_biorthogonal.h"
+    "ovc_common/wavelet/reverse_biorthogonal/reverse_biorthogonal.cpp")
 
-set(BVC_DEC_SOURCES
-    "bvc_dec/entropy/arithmetic/decoder.h"
-    "bvc_dec/entropy/arithmetic/decoder.cpp"
-    "bvc_dec/entropy/huffman/decoder.h"
-    "bvc_dec/entropy/huffman/decoder.cpp"
-    "bvc_dec/entropy/skip/decoder.h"
-    "bvc_dec/entropy/skip/decoder.cpp"
-    "bvc_dec/entropy/decoder.h"
-    "bvc_dec/entropy/decoder_factory.h"
-    "bvc_dec/entropy/decoder_factory.cpp"
-    "bvc_dec/wavelet/biorthogonal/recomposer.h"
-    "bvc_dec/wavelet/biorthogonal/recomposer.cpp"
-    "bvc_dec/wavelet/coiflets/recomposer.h"
-    "bvc_dec/wavelet/coiflets/recomposer.cpp"
-    "bvc_dec/wavelet/daubechies/recomposer.h"
-    "bvc_dec/wavelet/daubechies/recomposer.cpp"
-    "bvc_dec/wavelet/haar/recomposer.h"
-    "bvc_dec/wavelet/haar/recomposer.cpp"
-    "bvc_dec/wavelet/reverse_biorthogonal/recomposer.h"
-    "bvc_dec/wavelet/reverse_biorthogonal/recomposer.cpp"
-    "bvc_dec/wavelet/skip/recomposer.h"
-    "bvc_dec/wavelet/skip/recomposer.cpp"
-    "bvc_dec/wavelet/symlets/recomposer.h"
-    "bvc_dec/wavelet/symlets/recomposer.cpp"
-    "bvc_dec/wavelet/recomposer.h"
-    "bvc_dec/wavelet/recomposer_factory.h"
-    "bvc_dec/wavelet/recomposer_factory.cpp"
-    "bvc_dec/partition/offset_zerotree/departitioner.h"
-    "bvc_dec/partition/offset_zerotree/departitioner.cpp"
-    "bvc_dec/partition/zerotree_preserving/departitioner.h"
-    "bvc_dec/partition/zerotree_preserving/departitioner.cpp"
-    "bvc_dec/partition/skip/departitioner.h"
-    "bvc_dec/partition/skip/departitioner.cpp"
-    "bvc_dec/partition/departitioner_factory.h"
-    "bvc_dec/partition/departitioner_factory.cpp"
-    "bvc_dec/spiht/spiht/decoder.h"
-    "bvc_dec/spiht/spiht/decoder.cpp"
-    "bvc_dec/spiht/skip/decoder.h"
-    "bvc_dec/spiht/skip/decoder.cpp"
-    "bvc_dec/spiht/decoder_factory.h"
-    "bvc_dec/spiht/decoder_factory.cpp"
-    "bvc_dec/bvc_dec.h"
-    "bvc_dec/bvc_dec.cpp")
+set(OVC_DEC_SOURCES
+    "ovc_dec/entropy/arithmetic/decoder.h"
+    "ovc_dec/entropy/arithmetic/decoder.cpp"
+    "ovc_dec/entropy/huffman/decoder.h"
+    "ovc_dec/entropy/huffman/decoder.cpp"
+    "ovc_dec/entropy/skip/decoder.h"
+    "ovc_dec/entropy/skip/decoder.cpp"
+    "ovc_dec/entropy/decoder.h"
+    "ovc_dec/entropy/decoder_factory.h"
+    "ovc_dec/entropy/decoder_factory.cpp"
+    "ovc_dec/wavelet/biorthogonal/recomposer.h"
+    "ovc_dec/wavelet/biorthogonal/recomposer.cpp"
+    "ovc_dec/wavelet/coiflets/recomposer.h"
+    "ovc_dec/wavelet/coiflets/recomposer.cpp"
+    "ovc_dec/wavelet/daubechies/recomposer.h"
+    "ovc_dec/wavelet/daubechies/recomposer.cpp"
+    "ovc_dec/wavelet/haar/recomposer.h"
+    "ovc_dec/wavelet/haar/recomposer.cpp"
+    "ovc_dec/wavelet/reverse_biorthogonal/recomposer.h"
+    "ovc_dec/wavelet/reverse_biorthogonal/recomposer.cpp"
+    "ovc_dec/wavelet/skip/recomposer.h"
+    "ovc_dec/wavelet/skip/recomposer.cpp"
+    "ovc_dec/wavelet/symlets/recomposer.h"
+    "ovc_dec/wavelet/symlets/recomposer.cpp"
+    "ovc_dec/wavelet/recomposer.h"
+    "ovc_dec/wavelet/recomposer_factory.h"
+    "ovc_dec/wavelet/recomposer_factory.cpp"
+    "ovc_dec/partition/offset_zerotree/departitioner.h"
+    "ovc_dec/partition/offset_zerotree/departitioner.cpp"
+    "ovc_dec/partition/zerotree_preserving/departitioner.h"
+    "ovc_dec/partition/zerotree_preserving/departitioner.cpp"
+    "ovc_dec/partition/skip/departitioner.h"
+    "ovc_dec/partition/skip/departitioner.cpp"
+    "ovc_dec/partition/departitioner_factory.h"
+    "ovc_dec/partition/departitioner_factory.cpp"
+    "ovc_dec/spiht/spiht/decoder.h"
+    "ovc_dec/spiht/spiht/decoder.cpp"
+    "ovc_dec/spiht/skip/decoder.h"
+    "ovc_dec/spiht/skip/decoder.cpp"
+    "ovc_dec/spiht/decoder_factory.h"
+    "ovc_dec/spiht/decoder_factory.cpp"
+    "ovc_dec/ovc_dec.h"
+    "ovc_dec/ovc_dec.cpp")
 
-set(BVC_ENC_SOURCES
-    "bvc_enc/entropy/arithmetic/encoder.h"
-    "bvc_enc/entropy/arithmetic/encoder.cpp"
-    "bvc_enc/entropy/huffman/encoder.h"
-    "bvc_enc/entropy/huffman/encoder.cpp"
-    "bvc_enc/entropy/skip/encoder.h"
-    "bvc_enc/entropy/skip/encoder.cpp"
-    "bvc_enc/entropy/encoder.h"
-    "bvc_enc/entropy/encoder_factory.h"
-    "bvc_enc/entropy/encoder_factory.cpp"
-    "bvc_enc/wavelet/biorthogonal/decomposer.h"
-    "bvc_enc/wavelet/biorthogonal/decomposer.cpp"
-    "bvc_enc/wavelet/coiflets/decomposer.h"
-    "bvc_enc/wavelet/coiflets/decomposer.cpp"
-    "bvc_enc/wavelet/daubechies/decomposer.h"
-    "bvc_enc/wavelet/daubechies/decomposer.cpp"
-    "bvc_enc/wavelet/haar/decomposer.h"
-    "bvc_enc/wavelet/haar/decomposer.cpp"
-    "bvc_enc/wavelet/reverse_biorthogonal/decomposer.h"
-    "bvc_enc/wavelet/reverse_biorthogonal/decomposer.cpp"
-    "bvc_enc/wavelet/skip/decomposer.h"
-    "bvc_enc/wavelet/skip/decomposer.cpp"
-    "bvc_enc/wavelet/symlets/decomposer.h"
-    "bvc_enc/wavelet/symlets/decomposer.cpp"
-    "bvc_enc/wavelet/decomposer.h"
-    "bvc_enc/wavelet/decomposer_factory.h"
-    "bvc_enc/wavelet/decomposer_factory.cpp"
-    "bvc_enc/partition/offset_zerotree/partitioner.h"
-    "bvc_enc/partition/offset_zerotree/partitioner.cpp"
-    "bvc_enc/partition/zerotree_preserving/partitioner.h"
-    "bvc_enc/partition/zerotree_preserving/partitioner.cpp"
-    "bvc_enc/partition/skip/partitioner.h"
-    "bvc_enc/partition/skip/partitioner.cpp"
-    "bvc_enc/partition/partitioner_factory.h"
-    "bvc_enc/partition/partitioner_factory.cpp"
-    "bvc_enc/spiht/spiht/encoder.h"
-    "bvc_enc/spiht/spiht/encoder.cpp"
-    "bvc_enc/spiht/skip/encoder.h"
-    "bvc_enc/spiht/skip/encoder.cpp"
-    "bvc_enc/spiht/encoder_factory.h"
-    "bvc_enc/spiht/encoder_factory.cpp"
-    "bvc_enc/bvc_enc.h"
-    "bvc_enc/bvc_enc.cpp")
+set(OVC_ENC_SOURCES
+    "ovc_enc/entropy/arithmetic/encoder.h"
+    "ovc_enc/entropy/arithmetic/encoder.cpp"
+    "ovc_enc/entropy/huffman/encoder.h"
+    "ovc_enc/entropy/huffman/encoder.cpp"
+    "ovc_enc/entropy/skip/encoder.h"
+    "ovc_enc/entropy/skip/encoder.cpp"
+    "ovc_enc/entropy/encoder.h"
+    "ovc_enc/entropy/encoder_factory.h"
+    "ovc_enc/entropy/encoder_factory.cpp"
+    "ovc_enc/wavelet/biorthogonal/decomposer.h"
+    "ovc_enc/wavelet/biorthogonal/decomposer.cpp"
+    "ovc_enc/wavelet/coiflets/decomposer.h"
+    "ovc_enc/wavelet/coiflets/decomposer.cpp"
+    "ovc_enc/wavelet/daubechies/decomposer.h"
+    "ovc_enc/wavelet/daubechies/decomposer.cpp"
+    "ovc_enc/wavelet/haar/decomposer.h"
+    "ovc_enc/wavelet/haar/decomposer.cpp"
+    "ovc_enc/wavelet/reverse_biorthogonal/decomposer.h"
+    "ovc_enc/wavelet/reverse_biorthogonal/decomposer.cpp"
+    "ovc_enc/wavelet/skip/decomposer.h"
+    "ovc_enc/wavelet/skip/decomposer.cpp"
+    "ovc_enc/wavelet/symlets/decomposer.h"
+    "ovc_enc/wavelet/symlets/decomposer.cpp"
+    "ovc_enc/wavelet/decomposer.h"
+    "ovc_enc/wavelet/decomposer_factory.h"
+    "ovc_enc/wavelet/decomposer_factory.cpp"
+    "ovc_enc/partition/offset_zerotree/partitioner.h"
+    "ovc_enc/partition/offset_zerotree/partitioner.cpp"
+    "ovc_enc/partition/zerotree_preserving/partitioner.h"
+    "ovc_enc/partition/zerotree_preserving/partitioner.cpp"
+    "ovc_enc/partition/skip/partitioner.h"
+    "ovc_enc/partition/skip/partitioner.cpp"
+    "ovc_enc/partition/partitioner_factory.h"
+    "ovc_enc/partition/partitioner_factory.cpp"
+    "ovc_enc/spiht/spiht/encoder.h"
+    "ovc_enc/spiht/spiht/encoder.cpp"
+    "ovc_enc/spiht/skip/encoder.h"
+    "ovc_enc/spiht/skip/encoder.cpp"
+    "ovc_enc/spiht/encoder_factory.h"
+    "ovc_enc/spiht/encoder_factory.cpp"
+    "ovc_enc/ovc_enc.h"
+    "ovc_enc/ovc_enc.cpp")
 
 if(MSVC)
   set(cxx_base_flags /GS /W4 /WX /Za)
@@ -137,7 +137,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(cxx_exception_flags "-fexceptions")
   set(cxx_strict_flags -Werror -Wextra -Wunused -Wold-style-cast -Wlogical-op -Wpointer-arith
         -Wno-unused-parameter -Wno-missing-field-initializers)
-  if(BVC_TARGET_ARCH STREQUAL "x86" AND MINGW)
+  if(OVC_TARGET_ARCH STREQUAL "x86" AND MINGW)
     list(APPEND cxx_base_flags "-mxsave")
   endif()
   if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
@@ -148,7 +148,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(cxx_base_flags -Wall -Wshadow)
   set(cxx_exception_flags "-fexceptions")
   set(cxx_strict_flags -Werror -Wextra -Wno-missing-braces -Wno-unused-const-variable -Wno-unused-parameter)
-  if(BVC_TARGET_ARCH STREQUAL "x86" AND MINGW)
+  if(OVC_TARGET_ARCH STREQUAL "x86" AND MINGW)
     list(APPEND cxx_base_flags "-mxsave")
   endif()
 endif()
@@ -156,31 +156,31 @@ set(cxx_default ${cxx_base_flags} ${cxx_exception_flags})
 set(cxx_strict ${cxx_strict_flags})
 set(linker_flags "")
 
-set(bvc_dec_src_extra "")
-set(bvc_enc_src_extra "")
+set(ovc_dec_src_extra "")
+set(ovc_enc_src_extra "")
 
-# bvc_common
-add_library (bvc_common OBJECT ${BVC_COMMON_SOURCES})
-target_compile_options(bvc_common PRIVATE ${cxx_default} ${cxx_strict})
-target_include_directories(bvc_common PUBLIC .)
+# ovc_common
+add_library (ovc_common OBJECT ${OVC_COMMON_SOURCES})
+target_compile_options(ovc_common PRIVATE ${cxx_default} ${cxx_strict})
+target_include_directories(ovc_common PUBLIC .)
 
-# bvc_enc
-add_library(bvc_enc ${BVC_ENC_SOURCES} $<TARGET_OBJECTS:bvc_common> ${bvc_enc_src_extra})
-set_target_properties(bvc_enc PROPERTIES OUTPUT_NAME "bvcenc")
-target_compile_options(bvc_enc PRIVATE ${cxx_default} ${cxx_strict})
-target_include_directories (bvc_enc PUBLIC .)
-target_link_libraries(bvc_enc INTERFACE ${linker_flags} PUBLIC Threads::Threads)
+# ovc_enc
+add_library(ovc_enc ${OVC_ENC_SOURCES} $<TARGET_OBJECTS:ovc_common> ${ovc_enc_src_extra})
+set_target_properties(ovc_enc PROPERTIES OUTPUT_NAME "ovcenc")
+target_compile_options(ovc_enc PRIVATE ${cxx_default} ${cxx_strict})
+target_include_directories (ovc_enc PUBLIC .)
+target_link_libraries(ovc_enc INTERFACE ${linker_flags} PUBLIC Threads::Threads)
 
-# bvc_dec
-add_library(bvc_dec ${BVC_DEC_SOURCES} $<TARGET_OBJECTS:bvc_common> ${bvc_dec_src_extra})
-set_target_properties(bvc_dec PROPERTIES OUTPUT_NAME "bvcdec")
-target_compile_options(bvc_dec PRIVATE ${cxx_default} ${cxx_strict})
-target_include_directories (bvc_dec PUBLIC .)
-target_link_libraries(bvc_dec INTERFACE ${linker_flags} PUBLIC Threads::Threads)
+# ovc_dec
+add_library(ovc_dec ${OVC_DEC_SOURCES} $<TARGET_OBJECTS:ovc_common> ${ovc_dec_src_extra})
+set_target_properties(ovc_dec PROPERTIES OUTPUT_NAME "ovcdec")
+target_compile_options(ovc_dec PRIVATE ${cxx_default} ${cxx_strict})
+target_include_directories (ovc_dec PUBLIC .)
+target_link_libraries(ovc_dec INTERFACE ${linker_flags} PUBLIC Threads::Threads)
 
 
 install(FILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/bvc_enc/bvcenc.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/bvc_dec/bvcdec.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/ovc_enc/ovcenc.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/ovc_dec/ovcdec.h"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
-install(TARGETS bvc_enc bvc_dec DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(TARGETS ovc_enc ovc_dec DESTINATION "${CMAKE_INSTALL_LIBDIR}")

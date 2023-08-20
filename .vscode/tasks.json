@@ -6,7 +6,7 @@
             "label": "Build Test",
             "command": "build",
             "targets": [
-                "bvc_test"
+                "ovc_test"
             ],
             "group": "build",
             "problemMatcher": [],

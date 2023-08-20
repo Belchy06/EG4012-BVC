@@ -4,7 +4,7 @@
 
 #include "ppm.h"
 
-int ppm::read(std::string in_source_path, bvc_picture* out_picture)
+int ppm::read(std::string in_source_path, ovc_picture* out_picture)
 {
 	std::ifstream infile(in_source_path, std::ifstream::binary);
 	// Examine if the file could be opened successfully
@@ -84,7 +84,7 @@ int ppm::read(std::string in_source_path, bvc_picture* out_picture)
 	return 0;
 }
 
-int ppm::write(std::string in_output_path, bvc_picture* in_picture, std::string in_magic)
+int ppm::write(std::string in_output_path, ovc_picture* in_picture, std::string in_magic)
 {
 	std::ofstream outfile(in_output_path, std::ofstream::binary);
 	if (outfile.fail())

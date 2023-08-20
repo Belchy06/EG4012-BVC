@@ -1,0 +1,8 @@
+#pragma once
+
+typedef enum
+{
+	OVC_PARTITION_SKIP,
+	OVC_PARTITION_OFFSET_ZEROTREE,
+	OVC_PARTITION_ZEROTREE_PRESERVING
+} ovc_partition;

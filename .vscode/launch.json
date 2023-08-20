@@ -7,7 +7,7 @@
         {
             "name": "Launch Test (Debug)",
             "request": "launch",
-            "program": "${workspaceFolder}\\build\\test\\Debug\\bvc_test.exe",
+            "program": "${workspaceFolder}\\build\\test\\Debug\\ovc_test.exe",
             // "preLaunchTask": "Build Test",
             "args": [
                 "-verbosity",

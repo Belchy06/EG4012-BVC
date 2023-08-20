@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
-set(BVC_TEST_SOURCES
+set(OVC_TEST_SOURCES
     "misc/lenna.h"
     "misc/lenna.cpp"
     "util/ppm.h"
@@ -33,13 +33,13 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(cxx_flags -Wshadow -Werror -fexceptions)
 endif()
 
-add_library(bvc_test_lib STATIC ${BVC_TEST_SOURCES})
-target_compile_options(bvc_test_lib PRIVATE ${cxx_flags})
-target_include_directories(bvc_test_lib PUBLIC . ../src)
-target_link_libraries(bvc_test_lib PRIVATE bvc_enc bvc_dec)
+add_library(ovc_test_lib STATIC ${OVC_TEST_SOURCES})
+target_compile_options(ovc_test_lib PRIVATE ${cxx_flags})
+target_include_directories(ovc_test_lib PUBLIC . ../src)
+target_link_libraries(ovc_test_lib PRIVATE ovc_enc ovc_dec)
 
-add_executable(bvc_test ${BVC_TEST_SOURCES})
-target_compile_options(bvc_test PRIVATE ${cxx_flags})
-target_include_directories(bvc_test PUBLIC . ../src)
-target_link_libraries(bvc_test LINK_PUBLIC bvc_enc bvc_dec)
-add_test(bvc_test bvc_test)
+add_executable(ovc_test ${OVC_TEST_SOURCES})
+target_compile_options(ovc_test PRIVATE ${cxx_flags})
+target_include_directories(ovc_test PUBLIC . ../src)
+target_link_libraries(ovc_test LINK_PUBLIC ovc_enc ovc_dec)
+add_test(ovc_test ovc_test)

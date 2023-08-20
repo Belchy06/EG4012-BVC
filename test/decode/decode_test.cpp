@@ -2,17 +2,17 @@
 #include <fstream>
 #include <memory>
 
-#include "bvc_dec/bvc_dec.h"
+#include "ovc_dec/ovc_dec.h"
 #include "decode_test.h"
 #include "../misc/lenna.h"
 
 bool decode_test::test(std::string in_source_path, std::string in_output_path)
 {
-	std::shared_ptr<bvc_decoder> decoder = std::make_shared<bvc_decoder>();
+	std::shared_ptr<ovc_decoder> decoder = std::make_shared<ovc_decoder>();
 
-	bvc_dec_result res;
+	ovc_dec_result res;
 
-	bvc_dec_config config{ 0 };
+	ovc_dec_config config{ 0 };
 
 	res = decoder->init();
 
@@ -32,14 +32,14 @@ bool decode_test::test(std::string in_source_path, std::string in_output_path)
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		bvc_nal nal;
+		ovc_nal nal;
 		nal.bytes = data[i];
 		nal.size = size_arr[i];
 
 		res = decoder->decode_nal(&nal);
 	}
 
-	bvc_picture output;
+	ovc_picture output;
 	res = decoder->get_picture(&output);
 
 	std::ofstream output_stream(in_output_path, std::ios_base::out | std::ios_base::binary);
@@ -60,5 +60,5 @@ bool decode_test::test(std::string in_source_path, std::string in_output_path)
 		}
 	}
 
-	return res == bvc_dec_result::BVC_DEC_OK;
+	return res == ovc_dec_result::OVC_DEC_OK;
 }

@@ -1,0 +1,9 @@
+#pragma once
+
+typedef enum
+{
+	OVC_VERBOSITY_SILENT,
+	OVC_VERBOSITY_LOG,
+	OVC_VERBOSITY_VERBOSE,
+	OVC_VERBOSITY_VERY_VERBOSE
+} ovc_verbosity;

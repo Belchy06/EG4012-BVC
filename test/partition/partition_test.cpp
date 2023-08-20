@@ -1,13 +1,13 @@
 #include <cmath>
 
-#include "bvc_common/log.h"
+#include "ovc_common/log.h"
 #include "partition_test.h"
 
-#include "bvc_enc/partition/partitioner_factory.h"
+#include "ovc_enc/partition/partitioner_factory.h"
 
 #define LogPartitionTest "LogPartitionTest"
 
-bool partition_test::test(bvc_partition in_partition, size_t in_x, size_t in_y)
+bool partition_test::test(ovc_partition in_partition, size_t in_x, size_t in_y)
 {
 	matrix<double>		mat(in_x, in_y);
 	std::vector<double> data;
@@ -25,9 +25,9 @@ bool partition_test::test(bvc_partition in_partition, size_t in_x, size_t in_y)
 	return true;
 }
 
-std::vector<matrix<double>> partition_test::partition(bvc_partition in_partition, matrix<double>& in_matrix, size_t in_num_levels)
+std::vector<matrix<double>> partition_test::partition(ovc_partition in_partition, matrix<double>& in_matrix, size_t in_num_levels)
 {
-	std::shared_ptr<bvc_partitioner> partitioner = bvc_partitioner_factory::create_partitioner(in_partition);
+	std::shared_ptr<ovc_partitioner> partitioner = ovc_partitioner_factory::create_partitioner(in_partition);
 
 	return partitioner->partition(in_matrix, in_num_levels);
 }
