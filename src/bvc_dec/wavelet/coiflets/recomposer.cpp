@@ -26,7 +26,7 @@ coiflets_recomposer::coiflets_recomposer(bvc_wavelet_config in_config)
 	}
 }
 
-matrix<double> coiflets_recomposer::recompose(const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
+matrix<double> coiflets_recomposer::recompose(bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec) const
 {
 	return wave->reconstruct(in_decomposition, in_size_rec);
 }

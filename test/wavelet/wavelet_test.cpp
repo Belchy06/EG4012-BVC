@@ -32,7 +32,7 @@ bvc_wavelet_decomposition_2d<double> wavelet_test::decompose(bvc_wavelet_family 
 	return wavelet_decomposer->decompose(in_x, in_num_levels);
 }
 
-matrix<double> wavelet_test::recompose(bvc_wavelet_family in_wavelet_family, bvc_wavelet_config in_config, const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec)
+matrix<double> wavelet_test::recompose(bvc_wavelet_family in_wavelet_family, bvc_wavelet_config in_config, bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec)
 {
 	std::shared_ptr<bvc_wavelet_recomposer> wavelet_recomposer = bvc_wavelet_recomposer_factory::create_wavelet_recomposer(in_wavelet_family, in_config);
 

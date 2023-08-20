@@ -13,5 +13,5 @@ public:
 
 private:
 	static bvc_wavelet_decomposition_2d<double> decompose(bvc_wavelet_family in_wavelet_family, bvc_wavelet_config in_config, const matrix<double>& in_x, size_t in_num_levels);
-	static matrix<double>						recompose(bvc_wavelet_family in_wavelet_family, bvc_wavelet_config in_config, const bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec);
+	static matrix<double>						recompose(bvc_wavelet_family in_wavelet_family, bvc_wavelet_config in_config, bvc_wavelet_decomposition_2d<double>& in_decomposition, const matrix_size& in_size_rec);
 };
