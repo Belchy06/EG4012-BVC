@@ -47,7 +47,7 @@ bvc_enc_result bvc_encoder::init(bvc_enc_config* in_config)
 
 	wavelet_decomposer = bvc_wavelet_decomposer_factory::create_wavelet_decomposer(in_config->wavelet_family, in_config->wavelet_config);
 	partitioner = bvc_partitioner_factory::create_partitioner(in_config->partition_type);
-	spiht_encoder = std::make_shared<bvc_spiht_encoder>();
+	spiht_encoder = bvc_spiht_encoder_factory::create_spiht_encoder(in_config->spiht);
 	entropy_coder = bvc_entropy_encoder_factory::create_entropy_encoder(in_config->entropy_coder);
 
 	return bvc_enc_result::BVC_ENC_OK;
@@ -99,7 +99,7 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_nal** out_nal_un
 		 +---------------+---------------+---------------+---------------+
 		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-		 | W F |   W C   | P | E |  RES  |           NUM_LEVELS          |
+		 | W F |   W C   | P | E |S|     |           NUM_LEVELS          |
 		 +---------------+---------------+---------------+---------------+
 		 |          NUM_STREAMS          |           STREAM_ID           |
 		 +---------------+---------------+---------------+---------------+
@@ -124,6 +124,7 @@ bvc_enc_result bvc_encoder::encode(bvc_picture* in_picture, bvc_nal** out_nal_un
 		coder_config = 0;
 		coder_config |= (config.partition_type << 6) & 0b11000000;
 		coder_config |= (config.entropy_coder << 4) & 0b00110000;
+		coder_config |= (config.spiht << 3) & 0b00001000;
 		header.push_back(coder_config);
 
 		header.push_back((uint8_t)(config.num_levels >> 8));

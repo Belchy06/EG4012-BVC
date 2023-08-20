@@ -8,7 +8,7 @@ std::shared_ptr<bvc_entropy_decoder> bvc_entropy_decoder_factory::create_entropy
 	switch (in_coder)
 	{
 		case BVC_ENTROPY_CODER_SKIP:
-			return std::make_shared<skip_decoder>();
+			return std::make_shared<skip_entropy_decoder>();
 		case BVC_ENTROPY_CODER_ARITHMETIC:
 			return std::make_shared<arithmetic_decoder>();
 		case BVC_ENTROPY_CODER_HUFFMAN:

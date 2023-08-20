@@ -5,6 +5,7 @@
 #include "bvc_common/format.h"
 #include "bvc_common/entropy/entropy.h"
 #include "bvc_common/partition/partition.h"
+#include "bvc_common/spiht/spiht.h"
 #include "bvc_common/wavelet/wavelet.h"
 
 class bvc_enc_config
@@ -19,10 +20,9 @@ public:
 	size_t num_streams;
 	size_t num_levels;
 
-	bvc_entropy_coder entropy_coder;
-
 	bvc_wavelet_family wavelet_family;
 	bvc_wavelet_config wavelet_config;
-
-	bvc_partition partition_type;
+	bvc_partition	   partition_type;
+	bvc_spiht		   spiht;
+	bvc_entropy_coder  entropy_coder;
 };

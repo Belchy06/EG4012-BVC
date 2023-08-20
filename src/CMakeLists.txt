@@ -49,8 +49,12 @@ set(BVC_DEC_SOURCES
     "bvc_dec/partition/zerotree_preserving/departitioner.cpp"
     "bvc_dec/partition/departitioner_factory.h"
     "bvc_dec/partition/departitioner_factory.cpp"
-    "bvc_dec/spiht/decoder.h"
-    "bvc_dec/spiht/decoder.cpp"
+    "bvc_dec/spiht/spiht/decoder.h"
+    "bvc_dec/spiht/spiht/decoder.cpp"
+    "bvc_dec/spiht/skip/decoder.h"
+    "bvc_dec/spiht/skip/decoder.cpp"
+    "bvc_dec/spiht/decoder_factory.h"
+    "bvc_dec/spiht/decoder_factory.cpp"
     "bvc_dec/bvc_dec.h"
     "bvc_dec/bvc_dec.cpp")
 
@@ -79,10 +83,12 @@ set(BVC_ENC_SOURCES
     "bvc_enc/partition/zerotree_preserving/partitioner.cpp"
     "bvc_enc/partition/partitioner_factory.h"
     "bvc_enc/partition/partitioner_factory.cpp"
-    "bvc_enc/spiht/encoder.h"
-    "bvc_enc/spiht/encoder.cpp"
-    "bvc_enc/result.h"
-    "bvc_enc/config.h"
+    "bvc_enc/spiht/spiht/encoder.h"
+    "bvc_enc/spiht/spiht/encoder.cpp"
+    "bvc_enc/spiht/skip/encoder.h"
+    "bvc_enc/spiht/skip/encoder.cpp"
+    "bvc_enc/spiht/encoder_factory.h"
+    "bvc_enc/spiht/encoder_factory.cpp"
     "bvc_enc/bvc_enc.h"
     "bvc_enc/bvc_enc.cpp")
 

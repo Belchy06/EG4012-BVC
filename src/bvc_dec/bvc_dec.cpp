@@ -22,7 +22,7 @@ bvc_dec_result bvc_decoder::decode_nal(const bvc_nal* in_nal_unit)
 	 +---------------+---------------+---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 | W F |   W C   |D|E|           |           NUM_LEVELS          |
+	 | W F |   W C   | P | E |S|     |           NUM_LEVELS          |
 	 +---------------+---------------+---------------+---------------+
 	 |          NUM_STREAMS          |           STREAM_ID           |
 	 +---------------+---------------+---------------+---------------+
@@ -45,12 +45,13 @@ bvc_dec_result bvc_decoder::decode_nal(const bvc_nal* in_nal_unit)
 	bvc_wavelet_family wavelet_family = (bvc_wavelet_family)((config >> 5) & 0b111);
 	bvc_wavelet_config wavlet_config = { .value = (uint8_t)((config >> 0) & 0b11111) };
 	config = nal_bytes[byte_idx++];
-	bvc_partition	  partition_type = (bvc_partition)((config >> 7) & 0b1);
-	bvc_entropy_coder entropy_coder = (bvc_entropy_coder)((config >> 6) & 0b1);
+	bvc_partition	  partition_type = (bvc_partition)((config >> 6) & 0b11);
+	bvc_entropy_coder entropy_coder = (bvc_entropy_coder)((config >> 4) & 0b11);
+	bvc_spiht		  spiht = (bvc_spiht)((config >> 3) & 0b1);
 
 	// Intialise components based on specified config
 	wavelet_recomposer = bvc_wavelet_recomposer_factory::create_wavelet_recomposer(wavelet_family, wavlet_config);
-	spiht_decoder = std::make_shared<bvc_spiht_decoder>();
+	spiht_decoder = bvc_spiht_decoder_factory::create_spiht_decoder(spiht);
 	departitioner = bvc_departitioner_factory::create_departitioner(partition_type);
 	entropy_decoder = bvc_entropy_decoder_factory::create_entropy_decoder(entropy_coder);
 

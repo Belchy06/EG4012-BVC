@@ -13,12 +13,12 @@
                 "-verbosity",
                 "veryverbose",
                 "-tests",
-                "entropy"
-                // "e2e",
-                // "-source",
-                // "${workspaceFolder}\\lena_gray_64.ppm",
-                // "-output",
-                // "${workspaceFolder}\\decompressed.ppm"
+                // "entropy"
+                "e2e",
+                "-source",
+                "${workspaceFolder}\\lena_gray_64.ppm",
+                "-output",
+                "${workspaceFolder}\\decompressed.ppm"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bvc_common/spiht/spiht_config.h"
+
 typedef enum
 {
 	BVC_SPIHT_SKIP,

@@ -1,12 +1,12 @@
-#include "bvc_dec/spiht/decoder.h"
+#include "bvc_dec/spiht/spiht/decoder.h"
 
-bvc_spiht_decoder::bvc_spiht_decoder()
+spiht_decoder::spiht_decoder()
 	: bitstream(new bvc_bitstream())
 {
 	clear();
 }
 
-void bvc_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, bvc_spiht_config in_config)
+void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, bvc_spiht_config in_config)
 {
 	for (size_t i = 0; i < in_num_bytes; i++)
 	{
@@ -218,13 +218,13 @@ void bvc_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in
 	}
 }
 
-void bvc_spiht_decoder::flush(matrix<double>& out_matrix)
+void spiht_decoder::flush(matrix<double>& out_matrix)
 {
 	out_matrix = output;
 	clear();
 }
 
-void bvc_spiht_decoder::clear()
+void spiht_decoder::clear()
 {
 	delete bitstream;
 	lip.clear();
@@ -235,7 +235,7 @@ void bvc_spiht_decoder::clear()
 	bitstream = new bvc_bitstream();
 }
 
-void bvc_spiht_decoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy)
+void spiht_decoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy)
 {
 	int lx = (in_matrix.get_num_columns()) / (1 << in_num_levels);
 	int ly = (in_matrix.get_num_rows()) / (1 << in_num_levels);

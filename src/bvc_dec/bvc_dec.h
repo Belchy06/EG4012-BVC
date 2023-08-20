@@ -1,16 +1,15 @@
 #pragma once
 
 #include <map>
-#include <vector>
 
-#include "entropy/decoder_factory.h"
-#include "wavelet/recomposer_factory.h"
-#include "partition/departitioner_factory.h"
-#include "spiht/decoder.h"
 #include "bvc_common/nal.h"
 #include "bvc_common/picture.h"
-#include "result.h"
-#include "config.h"
+#include "bvc_dec/entropy/decoder_factory.h"
+#include "bvc_dec/partition/departitioner_factory.h"
+#include "bvc_dec/spiht/decoder_factory.h"
+#include "bvc_dec/wavelet/recomposer_factory.h"
+#include "bvc_dec/result.h"
+#include "bvc_dec/config.h"
 
 class bvc_decoder
 {
