@@ -40,7 +40,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 	{
 		// sorting pass
 		// process LIP
-		for (int i = 0; i < lip.size(); i++)
+		for (int64_t i = 0; i < lip.size(); i++)
 		{
 			uint8_t sig = 0;
 			bitstream->read_bit(&sig);
@@ -63,7 +63,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 			}
 		}
 		// process LIS
-		for (int i = 0; i < lis.size(); i++)
+		for (int64_t i = 0; i < lis.size(); i++)
 		{
 			if (lis[i].type == OVC_SPIHT_TYPE_A)
 			{
@@ -75,7 +75,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 				}
 				if (sig)
 				{
-					int sx, sy;
+					int64_t sx, sy;
 					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					/* process the four offsprings */
 					sig = 0;
@@ -180,7 +180,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 				}
 				if (sig)
 				{
-					int sx, sy;
+					int64_t sx, sy;
 					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					lis.push_back(ovc_spiht_set(sx, sy, OVC_SPIHT_TYPE_A));
 					lis.push_back(ovc_spiht_set(sx + 1, sy, OVC_SPIHT_TYPE_A));
@@ -192,22 +192,22 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 			}
 		}
 		// Refinement pass
-		for (int i = 0; i < lsp.size(); i++)
+		for (int64_t i = 0; i < lsp.size(); i++)
 		{
-			if (std::abs((int)output(lsp[i].y, lsp[i].x)) >= (1 << (step + 1)))
+			if (std::abs((int64_t)output(lsp[i].y, lsp[i].x)) >= (1 << (step + 1)))
 			{
 				uint8_t bit = 0;
 				bitstream->read_bit(&bit);
 				if (bit)
 				{
-					if ((int)output(lsp[i].y, lsp[i].x) >= 0)
-						output(lsp[i].y, lsp[i].x) = (float)(((int)output(lsp[i].y, lsp[i].x)) | (1 << step));
+					if ((int64_t)output(lsp[i].y, lsp[i].x) >= 0)
+						output(lsp[i].y, lsp[i].x) = (float)(((int64_t)output(lsp[i].y, lsp[i].x)) | (1 << step));
 					else
-						output(lsp[i].y, lsp[i].x) = (float)(-(((int)std::abs((int)output(lsp[i].y, lsp[i].x))) | (1 << step)));
+						output(lsp[i].y, lsp[i].x) = (float)(-(((int64_t)std::abs((int64_t)output(lsp[i].y, lsp[i].x))) | (1 << step)));
 				}
 				else
 				{
-					output(lsp[i].y, lsp[i].x) = (float)(((int)output(lsp[i].y, lsp[i].x)) & (~(1 << step)));
+					output(lsp[i].y, lsp[i].x) = (float)(((int64_t)output(lsp[i].y, lsp[i].x)) & (~(1 << step)));
 				}
 				if (++bit_cnt > bit_allocation)
 				{
@@ -239,10 +239,10 @@ void spiht_decoder::clear()
 	bitstream = new ovc_bitstream();
 }
 
-void spiht_decoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy)
+void spiht_decoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t* out_sx, int64_t* out_sy)
 {
-	int lx = (in_matrix.get_num_columns()) / (1 << in_num_levels);
-	int ly = (in_matrix.get_num_rows()) / (1 << in_num_levels);
+	int64_t lx = (in_matrix.get_num_columns()) / (1 << in_num_levels);
+	int64_t ly = (in_matrix.get_num_rows()) / (1 << in_num_levels);
 	if (in_x < lx && in_y < ly)
 	{
 		if (in_x % 2 == 1)

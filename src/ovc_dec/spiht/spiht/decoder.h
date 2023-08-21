@@ -17,7 +17,7 @@ public:
 
 private:
 	void clear();
-	void get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy);
+	void get_successor(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t* out_sx, int64_t* out_sy);
 
 private:
 	ovc_bitstream* bitstream;
