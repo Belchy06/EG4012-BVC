@@ -131,6 +131,7 @@ if(MSVC)
     /wd4018 # disabled: signed/unsigned mismatch
     /wd4127 # disabled: conditional expression is constant
     /wd4752 # disabled: found Intel(R) Advanced Vector Extensions; consider using /arch:AVX
+    /wd4334 # disabled: result of 32-bit shift implicitly converted to 64 bit
   )
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(cxx_base_flags -Wall -Wshadow)

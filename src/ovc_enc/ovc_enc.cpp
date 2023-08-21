@@ -185,9 +185,9 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	return ovc_enc_result::OVC_ENC_OK;
 }
 
-int ovc_encoder::get_size_in_bytes(ovc_chroma_format in_format)
+size_t ovc_encoder::get_size_in_bytes(ovc_chroma_format in_format)
 {
-	int picture_samples = 0;
+	size_t picture_samples = 0;
 	if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME)
 	{
 		picture_samples = config.width * config.height;

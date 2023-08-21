@@ -1,5 +1,7 @@
 #include "ovc_dec/spiht/spiht/decoder.h"
 
+#include <iostream>
+
 spiht_decoder::spiht_decoder()
 	: bitstream(new ovc_bitstream())
 {
@@ -215,6 +217,8 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 		}
 		// update quantization step
 		step--;
+		std::cout << output << std::endl
+				  << std::endl;
 	}
 }
 

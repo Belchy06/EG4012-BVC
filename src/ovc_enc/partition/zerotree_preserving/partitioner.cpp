@@ -19,7 +19,7 @@ std::vector<matrix<double>> zerotree_preserving_partitioner::partition(const mat
 	{
 		matrix<double> stream = matrix<double>((size_t)(2 * in_matrix.get_num_rows() / num_streams), (size_t)(2 * in_matrix.get_num_columns() / num_streams));
 
-		for (int l = in_num_levels - 1; l >= 0; l--)
+		for (int64_t l = in_num_levels - 1; l >= 0; l--)
 		{
 			// How big is this level?
 			size_t mat_x = raw_x >> l;

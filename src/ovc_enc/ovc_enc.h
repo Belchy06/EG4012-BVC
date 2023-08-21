@@ -19,7 +19,7 @@ public:
 	ovc_enc_result encode(ovc_picture* in_picture, ovc_nal** out_nal_units, size_t* out_num_nal_units);
 
 private:
-	int get_size_in_bytes(ovc_chroma_format in_format);
+	size_t get_size_in_bytes(ovc_chroma_format in_format);
 
 private:
 	ovc_enc_config config;

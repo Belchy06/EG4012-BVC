@@ -118,8 +118,8 @@ ovc_bitstream* huffman_node::get_code()
 
 bool huffman_node::operator>(const huffman_node& rhs) const
 {
-	int lcount = count * 2;
-	int rcount = rhs.count * 2;
+	size_t lcount = count * 2;
+	size_t rcount = rhs.count * 2;
 
 	if (is_internal())
 	{

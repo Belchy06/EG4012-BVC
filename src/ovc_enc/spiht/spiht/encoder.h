@@ -16,10 +16,10 @@ public:
 
 private:
 	void clear();
-	void get_successor(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int* out_sx, int* out_sy);
-	bool is_significant_pixel(matrix<double>& in_matrix, int in_x, int in_y);
-	bool is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count = 1);
-	bool is_significant_set_B(matrix<double>& in_matrix, size_t in_num_levels, int in_x, int in_y, int in_count = 1);
+	void get_successor(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t* out_sx, int64_t* out_sy);
+	bool is_significant_pixel(matrix<double>& in_matrix, int64_t in_x, int64_t in_y);
+	bool is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t in_count = 1);
+	bool is_significant_set_B(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t in_count = 1);
 
 private:
 	size_t bits;

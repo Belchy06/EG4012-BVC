@@ -125,7 +125,7 @@ template <typename T>
 matrix<T> ovc_wavelet_decomposition_2d<T>::to_matrix()
 {
 	matrix<T> full;
-	for (int n = num_levels() - 1; n >= 0; n--)
+	for (int64_t n = num_levels() - 1; n >= 0; n--)
 	{
 		matrix<T> l = this->back();
 		this->pop_back();
@@ -192,7 +192,7 @@ wavelet<T>::~wavelet()
 template <typename T>
 ovc_wavelet_decomposition_1d<T> wavelet<T>::decompose(const std::vector<T>& in_x, size_t in_num_levels) const
 {
-	if (in_x.size() < (1 << in_num_levels))
+	if (in_x.size() < (size_t)(1 << in_num_levels))
 	{
 		throw std::invalid_argument("wavelet::decompose");
 	}
@@ -238,7 +238,7 @@ std::vector<T> wavelet<T>::inverse_discrete_wavelet_transform(const std::vector<
 template <typename T>
 ovc_wavelet_decomposition_2d<T> wavelet<T>::decompose(const matrix<T>& in_x, size_t in_num_levels) const
 {
-	if (in_x.get_num_rows() < (1 << in_num_levels) || in_x.get_num_columns() < (1 << in_num_levels))
+	if (in_x.get_num_rows() < (size_t)(1 << in_num_levels) || in_x.get_num_columns() < (size_t)(1 << in_num_levels))
 	{
 		throw std::invalid_argument("wavelet::decompose");
 	}
