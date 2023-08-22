@@ -10,6 +10,10 @@ ovc_decoder::ovc_decoder()
 
 ovc_dec_result ovc_decoder::init()
 {
+	planes[0] = std::map<size_t, matrix<double>>();
+	planes[1] = std::map<size_t, matrix<double>>();
+	planes[2] = std::map<size_t, matrix<double>>();
+
 	return ovc_dec_result::OVC_DEC_OK;
 }
 
@@ -22,7 +26,7 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 	 +---------------+---------------+---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 | W F |   W C   | P | E |S|     |           NUM_LEVELS          |
+	 | W F |   W C   | P | E |S| C | |FMT|       NUM_LEVELS          |
 	 +---------------+---------------+---------------+---------------+
 	 |          NUM_STREAMS          |           STREAM_ID           |
 	 +---------------+---------------+---------------+---------------+
@@ -48,6 +52,7 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 	ovc_partition	  partition_type = (ovc_partition)((config >> 6) & 0b11);
 	ovc_entropy_coder entropy_coder = (ovc_entropy_coder)((config >> 4) & 0b11);
 	ovc_spiht		  spiht = (ovc_spiht)((config >> 3) & 0b1);
+	size_t			  component = ((config >> 1) & 0b11);
 
 	// Intialise components based on specified config
 	wavelet_recomposer = ovc_wavelet_recomposer_factory::create_wavelet_recomposer(wavelet_family, wavlet_config);
@@ -55,8 +60,11 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 	departitioner = ovc_departitioner_factory::create_departitioner(partition_type);
 	entropy_decoder = ovc_entropy_decoder_factory::create_entropy_decoder(entropy_coder);
 
+	config = nal_bytes[byte_idx++];
+	ovc_chroma_format format = (ovc_chroma_format)((config >> 6) & 0b11);
+
 	uint16_t num_levels = 0;
-	num_levels |= nal_bytes[byte_idx++] << 8;
+	num_levels |= config & 0b00111111;
 	num_levels |= nal_bytes[byte_idx++] << 0;
 
 	uint16_t num_streams = 0;
@@ -137,6 +145,8 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 			}
 		}
 	*/
+
+	std::map<size_t, matrix<double>>& partitions = planes[component];
 	partitions[stream_id] = partition;
 
 	if (partitions.size() == num_streams)
@@ -151,23 +161,35 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 		ovc_wavelet_decomposition_2d<double> decomposition = ovc_wavelet_decomposition_2d<double>::from_matrix(full, num_levels);
 		matrix<double>						 image = wavelet_recomposer->recompose(decomposition, full.size());
 
-		std::vector<uint8_t> Y;
+		std::vector<uint8_t> plane_data;
 		for (size_t y = 0; y < image.get_num_rows(); y++)
 		{
 			for (size_t x = 0; x < image.get_num_columns(); x++)
 			{
 				double pixel = trunc(image(y, x));
-				Y.push_back((uint8_t)pixel);
+				plane_data.push_back((uint8_t)pixel);
 			}
 		}
 
-		picture.info.height = image.get_num_rows();
-		picture.info.width = image.get_num_columns();
-		picture.info.bit_depth = 8;
-		picture.Y = new uint8_t[image.get_num_rows() * image.get_num_columns()]{ 0 };
-		memcpy(picture.Y, Y.data(), Y.size());
+		ovc_plane plane;
+		plane.data = new uint8_t[image.get_num_rows() * image.get_num_columns()]{ 0 };
 
-		picture_ready = true;
+		plane.height = image.get_num_rows();
+		plane.width = image.get_num_columns();
+		plane.bit_depth = 8;
+		memcpy(plane.data, plane_data.data(), plane_data.size());
+
+		picture.planes[component] = plane;
+		picture.format = format;
+	}
+
+	if (format == OVC_CHROMA_FORMAT_MONOCHROME)
+	{
+		picture_ready = picture.planes[0].width != 0;
+	}
+	else
+	{
+		picture_ready = picture.planes[0].width != 0 && picture.planes[1].width != 0 && picture.planes[2].width != 0;
 	}
 
 	return ovc_dec_result::OVC_DEC_OK;
@@ -182,37 +204,8 @@ ovc_dec_result ovc_decoder::get_picture(ovc_picture* out_picture)
 	}
 
 	// TODO (belchy06): Parse headers
-	out_picture->Y = new uint8_t[picture.info.width * picture.info.height * (picture.info.bit_depth >> 3)]{ 0 };
-	out_picture->U = nullptr;
-	out_picture->V = nullptr;
-	memcpy(out_picture->Y, picture.Y, (picture.info.width * picture.info.height * (picture.info.bit_depth >> 3)));
-	out_picture->info.framerate = 29.97f;
-	out_picture->info.width = picture.info.width;
-	out_picture->info.height = picture.info.height;
-	out_picture->info.bit_depth = 8;
-	out_picture->info.format = ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME;
+	*out_picture = std::move(picture);
+	out_picture->framerate = 29.97f;
 
 	return ovc_dec_result::OVC_DEC_OK;
-}
-
-int ovc_decoder::get_size_in_bytes(ovc_chroma_format in_format)
-{
-	int picture_samples = 0;
-	if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME)
-	{
-		picture_samples = 176 * 144;
-	}
-	else if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_420)
-	{
-		picture_samples = (3 * (176 * 144)) >> 1;
-	}
-	else if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_422)
-	{
-		picture_samples = 2 * 176 * 144;
-	}
-	else if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_444)
-	{
-		picture_samples = 3 * 176 * 144;
-	}
-	return picture_samples;
 }

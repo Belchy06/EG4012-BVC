@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 
+#include "ovc_common/util/util.h"
+
 ovc_encoder::ovc_encoder()
 {
 }
@@ -63,121 +65,136 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 {
 	output_nals.clear();
 
-	// TODO (belchy06): Add support for U and V planes
-	matrix<double>		Y(config.width, config.height);
-	std::vector<double> y_data;
-	for (size_t x = 0; x < config.width; x++)
-	{
-		for (size_t y = 0; y < config.height; y++)
-		{
-			y_data.push_back((double)in_picture->Y[x + y * config.width]);
-		}
-	}
-
-	Y.set_data(y_data);
-
-	ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(Y, config.num_levels);
-	matrix<double>						 decomp_matrix = decomposition.to_matrix();
-
-	std::vector<matrix<double>> streams = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
 	// TODO (belchy06): Parallelize
-	size_t streamId = 0;
-	for (matrix<double> stream : streams)
+	for (size_t component = 0; component < (size_t)(config.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
 	{
-		spiht_encoder->encode(stream, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
-		uint8_t* spiht_bitstream = new uint8_t();
-		size_t	 spiht_byte_length = 0;
-		int		 spiht_step_size = 0;
-		spiht_encoder->flush(&spiht_bitstream, &spiht_byte_length, &spiht_step_size);
-
-		entropy_coder->encode(spiht_bitstream, spiht_byte_length);
-		uint8_t* entropy_bitstream = new uint8_t();
-		size_t	 entropy_byte_length = 0;
-		entropy_coder->flush(&entropy_bitstream, &entropy_byte_length);
-
-		std::vector<uint8_t> bytes;
-		for (size_t i = 0; i < entropy_byte_length; i++)
+		size_t				plane_width = (component == 0 ? config.width : util::scale_x(config.width, config.format));
+		size_t				plane_height = (component == 0 ? config.height : util::scale_y(config.height, config.format));
+		matrix<double>		plane_matrix(plane_height, plane_width);
+		std::vector<double> plane_data;
+		for (size_t x = 0; x < plane_width; x++)
 		{
-			bytes.push_back(entropy_bitstream[i]);
+			for (size_t y = 0; y < plane_height; y++)
+			{
+				uint8_t* plane = in_picture->planes[component].data;
+				plane_data.push_back((double)plane[x + y * plane_width]);
+			}
 		}
 
-		/*
-		 +---------------+---------------+---------------+---------------+
-		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-		 | W F |   W C   | P | E |S|     |           NUM_LEVELS          |
-		 +---------------+---------------+---------------+---------------+
-		 |          NUM_STREAMS          |           STREAM_ID           |
-		 +---------------+---------------+---------------+---------------+
-		 |                             WIDTH                             |
-		 +---------------+---------------+---------------+---------------+
-		 |                             HEIGHT                            |
-		 +---------------+---------------+---------------+---------------+
-		 |                             NUM_SYM                           |
-		 +---------------+---------------+---------------+---------------+
-		 |                             BPP                               |
-		 +---------------+---------------+---------------+---------------+
-		 |                             STEP                              |
-		 +---------------+---------------+---------------+---------------+
-		*/
-		std::vector<uint8_t> header;
-		uint8_t				 coder_config;
-		coder_config = 0;
-		coder_config |= (config.wavelet_family << 5) & 0b11100000;
-		coder_config |= (config.wavelet_config.value << 0) & 0b11111;
-		header.push_back(coder_config);
+		plane_matrix.set_data(plane_data);
 
-		coder_config = 0;
-		coder_config |= (config.partition_type << 6) & 0b11000000;
-		coder_config |= (config.entropy_coder << 4) & 0b00110000;
-		coder_config |= (config.spiht << 3) & 0b00001000;
-		header.push_back(coder_config);
+		ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(plane_matrix, config.num_levels);
+		matrix<double>						 decomp_matrix = decomposition.to_matrix();
 
-		header.push_back((uint8_t)(config.num_levels >> 8));
-		header.push_back((uint8_t)(config.num_levels >> 0));
+		std::vector<matrix<double>> streams = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
+		// TODO (belchy06): Parallelize
+		size_t streamId = 0;
+		for (matrix<double> stream : streams)
+		{
+			spiht_encoder->encode(stream, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
+			uint8_t* spiht_bitstream = new uint8_t();
+			size_t	 spiht_byte_length = 0;
+			int		 spiht_step_size = 0;
+			spiht_encoder->flush(&spiht_bitstream, &spiht_byte_length, &spiht_step_size);
 
-		header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 8));
-		header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 0));
+			entropy_coder->encode(spiht_bitstream, spiht_byte_length);
+			uint8_t* entropy_bitstream = new uint8_t();
+			size_t	 entropy_byte_length = 0;
+			entropy_coder->flush(&entropy_bitstream, &entropy_byte_length);
 
-		header.push_back((uint8_t)(streamId >> 8));
-		header.push_back((uint8_t)(streamId >> 0));
+			std::vector<uint8_t> bytes;
+			for (size_t i = 0; i < entropy_byte_length; i++)
+			{
+				bytes.push_back(entropy_bitstream[i]);
+			}
 
-		header.push_back((uint8_t)(stream.get_num_columns() >> 24));
-		header.push_back((uint8_t)(stream.get_num_columns() >> 16));
-		header.push_back((uint8_t)(stream.get_num_columns() >> 8));
-		header.push_back((uint8_t)(stream.get_num_columns() >> 0));
+			/*
+			 +---------------+---------------+---------------+---------------+
+			 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+			 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+			 | W F |   W C   | P | E |S| C | |FMT|       NUM_LEVELS          |
+			 +---------------+---------------+---------------+---------------+
+			 |          NUM_STREAMS          |           STREAM_ID           |
+			 +---------------+---------------+---------------+---------------+
+			 |                             WIDTH                             |
+			 +---------------+---------------+---------------+---------------+
+			 |                             HEIGHT                            |
+			 +---------------+---------------+---------------+---------------+
+			 |                             NUM_SYM                           |
+			 +---------------+---------------+---------------+---------------+
+			 |                             BPP                               |
+			 +---------------+---------------+---------------+---------------+
+			 |                             STEP                              |
+			 +---------------+---------------+---------------+---------------+
+			*/
+			std::vector<uint8_t> header;
+			uint8_t				 coder_config;
+			coder_config = 0;
+			coder_config |= (config.wavelet_family << 5) & 0b11100000;
+			coder_config |= (config.wavelet_config.value << 0) & 0b11111;
+			header.push_back(coder_config);
 
-		header.push_back((uint8_t)(stream.get_num_rows() >> 24));
-		header.push_back((uint8_t)(stream.get_num_rows() >> 16));
-		header.push_back((uint8_t)(stream.get_num_rows() >> 8));
-		header.push_back((uint8_t)(stream.get_num_rows() >> 0));
+			coder_config = 0;
+			// clang-format off
+			coder_config |= (config.partition_type << 6) & 0b11000000;
+			coder_config |= (config.entropy_coder  << 4) & 0b00110000;
+			coder_config |= (config.spiht          << 3) & 0b00001000;
+			coder_config |= (component             << 1) & 0b00000110;
+			header.push_back(coder_config);
+			// clang-format on
 
-		header.push_back((uint8_t)(spiht_byte_length >> 24));
-		header.push_back((uint8_t)(spiht_byte_length >> 16));
-		header.push_back((uint8_t)(spiht_byte_length >> 8));
-		header.push_back((uint8_t)(spiht_byte_length >> 0));
+			coder_config = 0;
+			// clang-format off
+			coder_config |= (config.format << 6)     & 0b11000000;
+			coder_config |= (config.num_levels >> 8) & 0b00111111;
+			header.push_back(coder_config);
+			// clang-format on
 
-		uint8_t* bpp_arr = reinterpret_cast<uint8_t*>(&config.bits_per_pixel);
-		header.push_back(bpp_arr[3]);
-		header.push_back(bpp_arr[2]);
-		header.push_back(bpp_arr[1]);
-		header.push_back(bpp_arr[0]);
+			header.push_back((uint8_t)(config.num_levels >> 0));
 
-		header.push_back((uint8_t)(spiht_step_size >> 24));
-		header.push_back((uint8_t)(spiht_step_size >> 16));
-		header.push_back((uint8_t)(spiht_step_size >> 8));
-		header.push_back((uint8_t)(spiht_step_size >> 0));
+			header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 8));
+			header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 0));
 
-		// Append bytes to the end of header
-		header.reserve(header.size() + bytes.size());
-		header.insert(header.end(), bytes.begin(), bytes.end());
+			header.push_back((uint8_t)(streamId >> 8));
+			header.push_back((uint8_t)(streamId >> 0));
 
-		ovc_nal nal;
-		nal.bytes = new uint8_t[header.size()]{ 0 };
-		memcpy(nal.bytes, header.data(), header.size());
-		nal.size = header.size();
-		output_nals.push_back(nal);
-		streamId++;
+			header.push_back((uint8_t)(stream.get_num_columns() >> 24));
+			header.push_back((uint8_t)(stream.get_num_columns() >> 16));
+			header.push_back((uint8_t)(stream.get_num_columns() >> 8));
+			header.push_back((uint8_t)(stream.get_num_columns() >> 0));
+
+			header.push_back((uint8_t)(stream.get_num_rows() >> 24));
+			header.push_back((uint8_t)(stream.get_num_rows() >> 16));
+			header.push_back((uint8_t)(stream.get_num_rows() >> 8));
+			header.push_back((uint8_t)(stream.get_num_rows() >> 0));
+
+			header.push_back((uint8_t)(spiht_byte_length >> 24));
+			header.push_back((uint8_t)(spiht_byte_length >> 16));
+			header.push_back((uint8_t)(spiht_byte_length >> 8));
+			header.push_back((uint8_t)(spiht_byte_length >> 0));
+
+			uint8_t* bpp_arr = reinterpret_cast<uint8_t*>(&config.bits_per_pixel);
+			header.push_back(bpp_arr[3]);
+			header.push_back(bpp_arr[2]);
+			header.push_back(bpp_arr[1]);
+			header.push_back(bpp_arr[0]);
+
+			header.push_back((uint8_t)(spiht_step_size >> 24));
+			header.push_back((uint8_t)(spiht_step_size >> 16));
+			header.push_back((uint8_t)(spiht_step_size >> 8));
+			header.push_back((uint8_t)(spiht_step_size >> 0));
+
+			// Append bytes to the end of header
+			header.reserve(header.size() + bytes.size());
+			header.insert(header.end(), bytes.begin(), bytes.end());
+
+			ovc_nal nal;
+			nal.bytes = new uint8_t[header.size()]{ 0 };
+			memcpy(nal.bytes, header.data(), header.size());
+			nal.size = header.size();
+			output_nals.push_back(nal);
+			streamId++;
+		}
 	}
 
 	*out_nal_units = &output_nals[0];

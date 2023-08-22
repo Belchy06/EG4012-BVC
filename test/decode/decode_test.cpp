@@ -44,13 +44,13 @@ bool decode_test::test(std::string in_source_path, std::string in_output_path)
 
 	std::ofstream output_stream(in_output_path, std::ios_base::out | std::ios_base::binary);
 	output_stream << "P6\n"
-				  << output.info.width << ' ' << output.info.height << "\n255\n";
+				  << output.planes[0].width << ' ' << output.planes[0].height << "\n255\n";
 
-	for (size_t j = 0; j < output.info.height; ++j)
+	for (size_t j = 0; j < output.planes[0].height; ++j)
 	{
-		for (size_t i = 0; i < output.info.width; ++i)
+		for (size_t i = 0; i < output.planes[0].width; ++i)
 		{
-			uint8_t Y = output.Y[i + j * output.info.width];
+			uint8_t Y = output.planes[0].data[i + j * output.planes[0].width];
 			uint8_t R = (uint8_t)(Y);
 			uint8_t G = (uint8_t)(Y);
 			uint8_t B = (uint8_t)(Y);

@@ -76,10 +76,10 @@ int ppm::read(std::string in_source_path, ovc_picture* out_picture)
 		std::cout << "PPM magic number should be either P3 or P6" << std::endl;
 		return -1;
 	}
-	out_picture->Y = new uint8_t[width * height]{ 0 };
-	memcpy(out_picture->Y, y_buf, width * height);
-	out_picture->info.height = height;
-	out_picture->info.width = width;
+	out_picture->planes[0].data = new uint8_t[width * height]{ 0 };
+	memcpy(out_picture->planes[0].data, y_buf, width * height);
+	out_picture->planes[0].height = height;
+	out_picture->planes[0].width = width;
 
 	return 0;
 }
@@ -94,16 +94,16 @@ int ppm::write(std::string in_output_path, ovc_picture* in_picture, std::string 
 	}
 
 	outfile << in_magic << "\n"
-			<< in_picture->info.width << " " << in_picture->info.height << "\n"
+			<< in_picture->planes[0].width << " " << in_picture->planes[0].height << "\n"
 			<< 255 << "\n";
 
 	if (in_magic == "P6")
 	{
-		for (size_t j = 0; j < in_picture->info.height; ++j)
+		for (size_t j = 0; j < in_picture->planes[0].height; ++j)
 		{
-			for (size_t i = 0; i < in_picture->info.width; ++i)
+			for (size_t i = 0; i < in_picture->planes[0].width; ++i)
 			{
-				uint8_t Y = in_picture->Y[i + j * in_picture->info.width];
+				uint8_t Y = in_picture->planes[0].data[i + j * in_picture->planes[0].width];
 				uint8_t R = (uint8_t)(Y);
 				uint8_t G = (uint8_t)(Y);
 				uint8_t B = (uint8_t)(Y);

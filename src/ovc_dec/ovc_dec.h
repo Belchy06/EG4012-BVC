@@ -4,6 +4,7 @@
 
 #include "ovc_common/nal.h"
 #include "ovc_common/picture.h"
+#include "ovc_common/plane.h"
 #include "ovc_dec/entropy/decoder_factory.h"
 #include "ovc_dec/partition/departitioner_factory.h"
 #include "ovc_dec/spiht/decoder_factory.h"
@@ -21,13 +22,11 @@ public:
 	ovc_dec_result get_picture(ovc_picture* out_picture);
 
 private:
-	int get_size_in_bytes(ovc_chroma_format in_format);
-
-private:
 	bool		picture_ready;
 	ovc_picture picture;
 
-	std::map<size_t, matrix<double>> partitions;
+	//       plane            stream         data
+	std::map<size_t, std::map<size_t, matrix<double>>> planes;
 
 	std::shared_ptr<ovc_wavelet_recomposer> wavelet_recomposer;
 	std::shared_ptr<ovc_departitioner>		departitioner;

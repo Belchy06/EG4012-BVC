@@ -36,9 +36,9 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	// Construct image
 	ovc_picture input;
 	// ppm::read(in_source_path, &input);
-	input.Y = test::lenna_gray_64_raw;
-	input.info.width = 64;
-	input.info.height = 64;
+	input.planes[0].data = test::lenna_gray_64_raw;
+	input.planes[0].width = 64;
+	input.planes[0].height = 64;
 
 	ovc_nal* nals;
 	size_t	 num_nals;

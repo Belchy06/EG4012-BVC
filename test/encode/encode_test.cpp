@@ -35,7 +35,7 @@ bool encode_test::test(std::string in_source_path, std::string in_output_path)
 
 	// Construct image
 	ovc_picture picture;
-	picture.Y = test::lenna_gray_64_raw;
+	picture.planes[0].data = test::lenna_gray_64_raw;
 
 	ovc_nal* nals;
 	size_t	 num_nals;

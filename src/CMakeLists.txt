@@ -15,6 +15,8 @@ set(OVC_COMMON_SOURCES
     "ovc_common/math/matrix.cpp"
     "ovc_common/spiht/spiht.h"
     "ovc_common/spiht/spiht.cpp"
+    "ovc_common/util/util.h"
+    "ovc_common/util/util.cpp"
     "ovc_common/wavelet/wavelet.h"
     "ovc_common/wavelet/wavelet.cpp"
     "ovc_common/wavelet/haar/haar.h"
