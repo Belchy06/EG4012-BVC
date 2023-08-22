@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "ovc_common/log.h"
 #include "ovc_enc/partition/offset_zerotree/partitioner.h"
 
@@ -7,24 +9,25 @@ offset_zerotree_partitioner::offset_zerotree_partitioner()
 {
 }
 
-std::vector<matrix<double>> offset_zerotree_partitioner::partition(const matrix<double>& in_matrix, size_t in_num_levels)
+std::vector<matrix<double>> offset_zerotree_partitioner::partition(const matrix<double>& in_matrix, size_t in_num_levels, size_t in_num_streams)
 {
 	std::vector<matrix<double>> streams;
-	double						num_streams = (in_matrix.get_num_rows() * in_matrix.get_num_columns()) / pow(4, in_num_levels);
 	size_t						raw_x = in_matrix.get_num_columns();
 	size_t						raw_y = in_matrix.get_num_rows();
 
-	// smallest size, split into num_streams, that's step size
-	for (size_t i = 0; i < (size_t)num_streams; i++)
+	// smallest size, split into in_num_streams, that's step size
+	for (size_t i = 0; i < (size_t)in_num_streams; i++)
 	{
-		matrix<double> stream = matrix<double>((size_t)(2 * in_matrix.get_num_rows() / num_streams), (size_t)(2 * in_matrix.get_num_columns() / num_streams));
+		size_t		   stream_height = (size_t)(sqrt(in_num_streams) * in_matrix.get_num_rows() / in_num_streams);
+		size_t		   stream_width = (size_t)(sqrt(in_num_streams) * in_matrix.get_num_columns() / in_num_streams);
+		matrix<double> stream = matrix<double>(stream_height, stream_width);
 
 		// How big is this level?
 		size_t mat_x = raw_x;
 		size_t mat_y = raw_y;
 		// How many coefficients should we be taking from this level?
-		size_t x_samples_per_stream = 2 * mat_x / (size_t)num_streams;
-		size_t y_samples_per_stream = 2 * mat_y / (size_t)num_streams;
+		size_t x_samples_per_stream = (size_t)sqrt(in_num_streams) * mat_x / (size_t)in_num_streams;
+		size_t y_samples_per_stream = (size_t)sqrt(in_num_streams) * mat_y / (size_t)in_num_streams;
 		// How many coefficients should we be stepping over from one to the next?
 		size_t step_x = mat_x / x_samples_per_stream;
 		size_t step_y = mat_y / y_samples_per_stream;

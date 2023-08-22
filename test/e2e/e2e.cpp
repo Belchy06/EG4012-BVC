@@ -21,11 +21,12 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	enc_config.wavelet_config = { .biorthogonal_config = OVC_WAVELET_BIORTHOGONAL_3p9 };
 
 	// Partitioning settings
-	enc_config.num_streams = 4;
+	enc_config.num_streams_exp = 1;
 	enc_config.partition_type = OVC_PARTITION_OFFSET_ZEROTREE;
 
 	// SPIHT settings
-	enc_config.bits_per_pixel = .01f;
+	enc_config.spiht = OVC_SPIHT_ENABLE;
+	enc_config.bits_per_pixel = 5.f;
 
 	// Entropy coding settings
 	enc_config.entropy_coder = OVC_ENTROPY_CODER_ARITHMETIC;

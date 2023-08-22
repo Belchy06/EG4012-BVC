@@ -1,7 +1,8 @@
 #include "ovc_enc.h"
 
-#include <iostream>
 #include <bitset>
+#include <cmath>
+#include <iostream>
 #include <vector>
 
 ovc_encoder::ovc_encoder()
@@ -26,23 +27,23 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 		return OVC_ENC_INVALID_FORMAT;
 	}
 
-	if ((in_config->num_levels > 1 || in_config->num_streams > 1) && in_config->partition_type == OVC_PARTITION_SKIP)
+	if ((in_config->num_levels > 1 || in_config->num_streams_exp > 0) && in_config->partition_type == OVC_PARTITION_SKIP)
 	{
 		return OVC_ENC_INVALID_PARAM;
 	}
 
 	// Calculate levels from streams or vice-versa. If user has specified both, ensure that the values are compatible
-	if (in_config->num_levels && !in_config->num_streams)
+	if ((in_config->num_levels != -1) && (in_config->num_streams_exp == -1))
 	{
-		in_config->num_streams = (size_t)(in_config->width * in_config->height / pow(4, in_config->num_levels));
+		in_config->num_streams_exp = (int)(in_config->width * in_config->height / pow(4, in_config->num_levels));
 	}
-	else if (in_config->num_streams && !in_config->num_levels)
+	else if ((in_config->num_streams_exp != -1) && (in_config->num_levels == -1))
 	{
-		in_config->num_levels = (size_t)(log2(in_config->width * in_config->height / in_config->num_streams) / log2(4));
+		in_config->num_levels = (int)(log2(in_config->width * in_config->height / pow(4, in_config->num_streams_exp)) / log2(4));
 	}
-	else if (in_config->num_levels && in_config->num_streams)
+	else if ((in_config->num_levels != -1) && (in_config->num_streams_exp != -1))
 	{
-		if (in_config->num_streams != in_config->width * in_config->height / pow(4, in_config->num_levels))
+		if (pow(4, in_config->num_streams_exp) > in_config->width * in_config->height / pow(4, in_config->num_levels))
 		{
 			return OVC_ENC_INVALID_PARAM;
 		}
@@ -78,12 +79,12 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(Y, config.num_levels);
 	matrix<double>						 decomp_matrix = decomposition.to_matrix();
 
-	std::vector<matrix<double>> streams = partitioner->partition(decomp_matrix, config.num_levels);
+	std::vector<matrix<double>> streams = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
 	// TODO (belchy06): Parallelize
 	size_t streamId = 0;
 	for (matrix<double> stream : streams)
 	{
-		spiht_encoder->encode(stream, { .bpp = config.bits_per_pixel, .num_levels = config.num_levels });
+		spiht_encoder->encode(stream, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
 		uint8_t* spiht_bitstream = new uint8_t();
 		size_t	 spiht_byte_length = 0;
 		int		 spiht_step_size = 0;
@@ -135,8 +136,8 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 		header.push_back((uint8_t)(config.num_levels >> 8));
 		header.push_back((uint8_t)(config.num_levels >> 0));
 
-		header.push_back((uint8_t)(config.num_streams >> 8));
-		header.push_back((uint8_t)(config.num_streams >> 0));
+		header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 8));
+		header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 0));
 
 		header.push_back((uint8_t)(streamId >> 8));
 		header.push_back((uint8_t)(streamId >> 0));

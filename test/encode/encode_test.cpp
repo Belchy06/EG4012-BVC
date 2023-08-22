@@ -22,7 +22,7 @@ bool encode_test::test(std::string in_source_path, std::string in_output_path)
 	config.wavelet_config = { .biorthogonal_config = OVC_WAVELET_BIORTHOGONAL_3p9 };
 
 	// Partitioning settings
-	config.num_streams = 4;
+	config.num_streams_exp = 1;
 	config.partition_type = OVC_PARTITION_OFFSET_ZEROTREE;
 
 	// SPIHT settings

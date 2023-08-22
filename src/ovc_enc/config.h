@@ -17,8 +17,8 @@ public:
 	float			  framerate;
 	float			  bits_per_pixel;
 
-	size_t num_streams;
-	size_t num_levels;
+	int num_streams_exp = -1;
+	int num_levels = -1;
 
 	ovc_wavelet_family wavelet_family;
 	ovc_wavelet_config wavelet_config;
