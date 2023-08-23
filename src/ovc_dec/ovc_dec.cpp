@@ -207,5 +207,13 @@ ovc_dec_result ovc_decoder::get_picture(ovc_picture* out_picture)
 	*out_picture = std::move(picture);
 	out_picture->framerate = 29.97f;
 
+	planes.clear();
+	planes[0] = std::map<size_t, matrix<double>>();
+	planes[1] = std::map<size_t, matrix<double>>();
+	planes[2] = std::map<size_t, matrix<double>>();
+
+	picture_ready = false;
+	picture = ovc_picture();
+
 	return ovc_dec_result::OVC_DEC_OK;
 }
