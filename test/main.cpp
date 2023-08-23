@@ -37,12 +37,20 @@ int main(int argc, const char* argv[])
 			std::exit(1);
         } else if(arg == "-verbosity") {
             std::string LevelStr(argv[++i]);
-            if(LevelStr == "log") {
-                ovc_logging::verbosity = OVC_VERBOSITY_LOG;
+            if(LevelStr == "silent") {
+                ovc_logging::verbosity = OVC_VERBOSITY_SILENT;
+            } else if(LevelStr == "error") {
+                ovc_logging::verbosity = OVC_VERBOSITY_ERROR;
+            } else if(LevelStr == "warning") {
+                ovc_logging::verbosity = OVC_VERBOSITY_WARNING;
+            } else if(LevelStr == "info") {
+                ovc_logging::verbosity = OVC_VERBOSITY_INFO;
+            } else if(LevelStr == "notice") {
+                ovc_logging::verbosity = OVC_VERBOSITY_NOTICE;
             } else if(LevelStr == "verbose") {
                 ovc_logging::verbosity = OVC_VERBOSITY_VERBOSE;
-            } else if(LevelStr == "veryverbose") {
-                ovc_logging::verbosity = OVC_VERBOSITY_VERY_VERBOSE;
+            } else if(LevelStr == "details") {
+                ovc_logging::verbosity = OVC_VERBOSITY_DETAILS;
             }
         } else if(arg == "-tests") {
             std::string TestStr(argv[++i]);

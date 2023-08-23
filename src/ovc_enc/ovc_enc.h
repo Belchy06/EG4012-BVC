@@ -19,9 +19,11 @@ public:
 	ovc_enc_result encode(ovc_picture* in_picture, ovc_nal** out_nal_units, size_t* out_num_nal_units);
 
 private:
-	size_t get_size_in_bytes(ovc_chroma_format in_format);
+	void construct_and_output_vps();
+	void construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, size_t in_byte_length, int in_spiht_step_size);
 
 private:
+	bool		   send_vps;
 	ovc_enc_config config;
 
 	std::vector<ovc_nal> output_nals;

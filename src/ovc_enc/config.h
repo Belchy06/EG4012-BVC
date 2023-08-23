@@ -25,4 +25,6 @@ public:
 	ovc_partition	   partition_type;
 	ovc_spiht		   spiht;
 	ovc_entropy_coder  entropy_coder;
+
+	bool repeat_vps;
 };

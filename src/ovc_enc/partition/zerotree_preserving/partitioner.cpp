@@ -37,8 +37,6 @@ std::vector<matrix<double>> zerotree_preserving_partitioner::partition(const mat
 					size_t offset_x = i % step_x;
 					size_t offset_y = i / step_y;
 					stream(x, y) = in_matrix((x + offset_x) * step_x, (y + offset_y) * step_y);
-					LOG(LogZerotreePreservingPartitioner, OVC_VERBOSITY_VERY_VERBOSE, "downsampled {}, {}", x, y);
-					LOG(LogZerotreePreservingPartitioner, OVC_VERBOSITY_VERY_VERBOSE, "original {}, {}", x * step_x, y * step_y);
 				}
 			}
 		}

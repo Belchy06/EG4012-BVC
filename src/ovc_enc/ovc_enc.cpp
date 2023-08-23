@@ -8,6 +8,7 @@
 #include "ovc_common/util/util.h"
 
 ovc_encoder::ovc_encoder()
+	: send_vps(true)
 {
 }
 
@@ -65,8 +66,12 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 {
 	output_nals.clear();
 
+	// VPS is 1 per video (or picture if configured for such)
+	// VPS NAL
+	construct_and_output_vps();
+
 	// TODO (belchy06): Parallelize
-	for (size_t component = 0; component < (size_t)(config.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
+	for (uint8_t component = 0; component < (uint8_t)(config.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
 	{
 		size_t				plane_width = (component == 0 ? config.width : util::scale_x(config.width, config.format));
 		size_t				plane_height = (component == 0 ? config.height : util::scale_y(config.height, config.format));
@@ -86,12 +91,12 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 		ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(plane_matrix, config.num_levels);
 		matrix<double>						 decomp_matrix = decomposition.to_matrix();
 
-		std::vector<matrix<double>> streams = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
+		std::vector<matrix<double>> partitions = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
 		// TODO (belchy06): Parallelize
-		size_t streamId = 0;
-		for (matrix<double> stream : streams)
+		for (uint16_t i = 0; i < partitions.size(); i++)
 		{
-			spiht_encoder->encode(stream, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
+			matrix<double>& partition = partitions[i];
+			spiht_encoder->encode(partition, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
 			uint8_t* spiht_bitstream = new uint8_t();
 			size_t	 spiht_byte_length = 0;
 			int		 spiht_step_size = 0;
@@ -103,97 +108,51 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 			entropy_coder->flush(&entropy_bitstream, &entropy_byte_length);
 
 			std::vector<uint8_t> bytes;
-			for (size_t i = 0; i < entropy_byte_length; i++)
-			{
-				bytes.push_back(entropy_bitstream[i]);
-			}
+			bytes.reserve(entropy_byte_length);
+			bytes.assign(entropy_bitstream[0], entropy_bitstream[entropy_byte_length - 1]);
 
+			// PPS is one per partition
+			// PPS NAL
+			construct_and_output_pps(component, i, partition.get_num_columns(), partition.get_num_rows(), spiht_byte_length, spiht_step_size);
+
+			// PARTITION NAL
+			/* NAL HEADER (2 BYTES) */
 			/*
-			 +---------------+---------------+---------------+---------------+
+			+---------------+---------------+---------------+---------------+
 			 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 			 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			 | W F |   W C   | P | E |S| C | |FMT|       NUM_LEVELS          |
+			 |     START     |    RES    | T |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|
 			 +---------------+---------------+---------------+---------------+
-			 |          NUM_STREAMS          |           STREAM_ID           |
-			 +---------------+---------------+---------------+---------------+
-			 |                             WIDTH                             |
-			 +---------------+---------------+---------------+---------------+
-			 |                             HEIGHT                            |
-			 +---------------+---------------+---------------+---------------+
-			 |                             NUM_SYM                           |
-			 +---------------+---------------+---------------+---------------+
-			 |                             BPP                               |
-			 +---------------+---------------+---------------+---------------+
-			 |                             STEP                              |
-			 +---------------+---------------+---------------+---------------+
+
+			START = 0x1      (8)
+			RES   = 0x0      (6)
+			T     = Nal Type (2)
 			*/
 			std::vector<uint8_t> header;
-			uint8_t				 coder_config;
-			coder_config = 0;
-			coder_config |= (config.wavelet_family << 5) & 0b11100000;
-			coder_config |= (config.wavelet_config.value << 0) & 0b11111;
-			header.push_back(coder_config);
+			uint8_t				 header_byte;
+			header_byte = 0;
+			header_byte |= 0x0; // START
+			header.push_back(header_byte);
 
-			coder_config = 0;
+			header_byte = 0;
 			// clang-format off
-			coder_config |= (config.partition_type << 6) & 0b11000000;
-			coder_config |= (config.entropy_coder  << 4) & 0b00110000;
-			coder_config |= (config.spiht          << 3) & 0b00001000;
-			coder_config |= (component             << 1) & 0b00000110;
-			header.push_back(coder_config);
+			header_byte |= (0                      << 5) & 0b11111100; // RES
+			header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00000011; // T
+			header.push_back(header_byte);
 			// clang-format on
 
-			coder_config = 0;
-			// clang-format off
-			coder_config |= (config.format << 6)     & 0b11000000;
-			coder_config |= (config.num_levels >> 8) & 0b00111111;
-			header.push_back(coder_config);
-			// clang-format on
+			/* CODED STREAM FORMAT (VARIABLE BYTES) (0x2) */
 
-			header.push_back((uint8_t)(config.num_levels >> 0));
-
-			header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 8));
-			header.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 0));
-
-			header.push_back((uint8_t)(streamId >> 8));
-			header.push_back((uint8_t)(streamId >> 0));
-
-			header.push_back((uint8_t)(stream.get_num_columns() >> 24));
-			header.push_back((uint8_t)(stream.get_num_columns() >> 16));
-			header.push_back((uint8_t)(stream.get_num_columns() >> 8));
-			header.push_back((uint8_t)(stream.get_num_columns() >> 0));
-
-			header.push_back((uint8_t)(stream.get_num_rows() >> 24));
-			header.push_back((uint8_t)(stream.get_num_rows() >> 16));
-			header.push_back((uint8_t)(stream.get_num_rows() >> 8));
-			header.push_back((uint8_t)(stream.get_num_rows() >> 0));
-
-			header.push_back((uint8_t)(spiht_byte_length >> 24));
-			header.push_back((uint8_t)(spiht_byte_length >> 16));
-			header.push_back((uint8_t)(spiht_byte_length >> 8));
-			header.push_back((uint8_t)(spiht_byte_length >> 0));
-
-			uint8_t* bpp_arr = reinterpret_cast<uint8_t*>(&config.bits_per_pixel);
-			header.push_back(bpp_arr[3]);
-			header.push_back(bpp_arr[2]);
-			header.push_back(bpp_arr[1]);
-			header.push_back(bpp_arr[0]);
-
-			header.push_back((uint8_t)(spiht_step_size >> 24));
-			header.push_back((uint8_t)(spiht_step_size >> 16));
-			header.push_back((uint8_t)(spiht_step_size >> 8));
-			header.push_back((uint8_t)(spiht_step_size >> 0));
-
-			// Append bytes to the end of header
-			header.reserve(header.size() + bytes.size());
-			header.insert(header.end(), bytes.begin(), bytes.end());
+			std::vector<uint8_t> nal_bytes;
+			nal_bytes.reserve(header.size() + bytes.size());
+			nal_bytes.insert(nal_bytes.end(), header.begin(), header.end());
+			nal_bytes.insert(nal_bytes.end(), bytes.begin(), bytes.end());
 
 			ovc_nal nal;
-			nal.bytes = new uint8_t[header.size()]{ 0 };
-			memcpy(nal.bytes, header.data(), header.size());
-			nal.size = header.size();
+			nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
+			memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
+			nal.size = nal_bytes.size();
 			output_nals.push_back(nal);
-			streamId++;
 		}
 	}
 
@@ -203,24 +162,190 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	return ovc_enc_result::OVC_ENC_OK;
 }
 
-size_t ovc_encoder::get_size_in_bytes(ovc_chroma_format in_format)
+void ovc_encoder::construct_and_output_vps()
 {
-	size_t picture_samples = 0;
-	if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_MONOCHROME)
+	if (send_vps)
 	{
-		picture_samples = config.width * config.height;
+		/* NAL HEADER (2 BYTES) */
+		/*
+		+---------------+---------------+---------------+---------------+
+		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		 |     START     |    RES    | T |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|
+		 +---------------+---------------+---------------+---------------+
+
+		START = 0x1      (8)
+		RES   = 0x0      (6)
+		T     = Nal Type (2)
+		*/
+		std::vector<uint8_t> header;
+		uint8_t				 header_byte;
+		header_byte = 0;
+		header_byte |= 0x0; // START
+		header.push_back(header_byte);
+
+		header_byte = 0;
+		// clang-format off
+		header_byte |= (0                << 5) & 0b11111100; // RES
+		header_byte |= (OVC_NAL_TYPE_VPS << 0) & 0b00000011; // T
+		header.push_back(header_byte);
+		// clang-format on
+
+		/* VPS FORMAT (10 BYTES) (0x0) */
+		/*
+		+---------------+---------------+---------------+---------------+
+		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		 | W F |   W C   | P | S | E |FMT|              N L              |
+		 +---------------+---------------+---------------+---------------+
+		 |              N S              |              BPP              |
+		 +---------------+---------------+---------------+---------------+
+		 |           BPP (CONT)          |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|
+		 +---------------+---------------+---------------+---------------+
+
+		 W F = Wavelet Family (3)
+		 W C = Wavelet Config (5)
+		 P   = Partitoner     (2)
+		 S   = Spiht          (2)
+		 E   = Entropy Coder  (2)
+		 FMT = Format         (2)
+		 N L = # Levels		  (16)
+		 N S = # Streams	  (16)
+		 BPP = Bits Per Pixel (32)
+		*/
+		std::vector<uint8_t> vps;
+		uint8_t				 vps_byte;
+		vps_byte = 0;
+		// clang-format off
+		vps_byte |= (config.wavelet_family       << 5) & 0b11100000;
+		vps_byte |= (config.wavelet_config.value << 0) & 0b00011111;
+		vps.push_back(vps_byte);
+		// clang-format on
+
+		vps_byte = 0;
+		// clang-format off
+		vps_byte |= (config.partition_type << 6) & 0b11000000;
+		vps_byte |= (config.spiht          << 4) & 0b00110000;
+		vps_byte |= (config.entropy_coder  << 2) & 0b00001100;
+		vps_byte |= (config.format         << 0) & 0b00000011;
+		vps.push_back(vps_byte);
+		// clang-format on
+
+		vps.push_back((uint8_t)(config.num_levels >> 8));
+		vps.push_back((uint8_t)(config.num_levels >> 0));
+
+		vps.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 8));
+		vps.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 0));
+
+		uint8_t* bpp_arr = reinterpret_cast<uint8_t*>(&config.bits_per_pixel);
+		vps.push_back(bpp_arr[3]);
+		vps.push_back(bpp_arr[2]);
+		vps.push_back(bpp_arr[1]);
+		vps.push_back(bpp_arr[0]);
+
+		std::vector<uint8_t> nal_bytes;
+		nal_bytes.reserve(header.size() + vps.size());
+		nal_bytes.insert(nal_bytes.end(), header.begin(), header.end());
+		nal_bytes.insert(nal_bytes.end(), vps.begin(), vps.end());
+
+		ovc_nal nal;
+		nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
+		memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
+		nal.size = nal_bytes.size();
+		output_nals.push_back(nal);
 	}
-	else if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_420)
-	{
-		picture_samples = (3 * (config.width * config.height)) >> 1;
-	}
-	else if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_422)
-	{
-		picture_samples = 2 * config.width * config.height;
-	}
-	else if (in_format == ovc_chroma_format::OVC_CHROMA_FORMAT_444)
-	{
-		picture_samples = 3 * config.width * config.height;
-	}
-	return picture_samples;
+
+	send_vps &= config.repeat_vps;
+}
+
+void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, size_t in_byte_length, int in_spiht_step_size)
+{
+	/* NAL HEADER (2 BYTES) */
+	/*
+	 +---------------+---------------+
+	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 |     START     |    RES    | T |
+	 +---------------+---------------+
+
+	START = 0x1      (8)
+	RES   = 0x0      (6)
+	T     = Nal Type (2)
+	*/
+	std::vector<uint8_t> header;
+	uint8_t				 header_byte;
+	header_byte = 0;
+	header_byte |= 0x1; // START
+	header.push_back(header_byte);
+
+	header_byte = 0;
+	// clang-format off
+	header_byte |= (0                << 5) & 0b11111100; // RES
+	header_byte |= (OVC_NAL_TYPE_PPS << 0) & 0b00000011; // T
+	header.push_back(header_byte);
+	// clang-format on
+
+	/* PPS FORMAT (22 BYTES) (0x2) */
+	/*
+	 +---------------+---------------+---------------+---------------+
+	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| C |      PARTITION_ID         |
+	 +---------------+---------------+---------------+---------------+
+	 |                             WIDTH                             |
+	 +---------------+---------------+---------------+---------------+
+	 |                             HEIGHT                            |
+	 +---------------+---------------+---------------+---------------+
+	 |                             NUM_SYM                           |
+	 +---------------+---------------+---------------+---------------+
+	 |                             STEP                              |
+	 +---------------+---------------+---------------+---------------+
+
+	 C = Component (2)
+	*/
+	std::vector<uint8_t> pps;
+	uint8_t				 pps_byte;
+	pps_byte = 0;
+	// clang-format off
+	pps_byte |= (in_component    << 6) & 0b11000000;
+	pps_byte |= (in_partition_id >> 8) & 0b00111111;
+	pps.push_back(pps_byte);
+	// clang-format on
+
+	pps_byte = 0;
+	// clang-format off
+	pps_byte |= (in_partition_id >> 0) & 0b11111111;
+	pps.push_back(pps_byte);
+	// clang-format on
+
+	pps.push_back((uint8_t)(in_width >> 24));
+	pps.push_back((uint8_t)(in_width >> 16));
+	pps.push_back((uint8_t)(in_width >> 8));
+	pps.push_back((uint8_t)(in_width >> 0));
+
+	pps.push_back((uint8_t)(in_height >> 24));
+	pps.push_back((uint8_t)(in_height >> 16));
+	pps.push_back((uint8_t)(in_height >> 8));
+	pps.push_back((uint8_t)(in_height >> 0));
+
+	pps.push_back((uint8_t)(in_byte_length >> 24));
+	pps.push_back((uint8_t)(in_byte_length >> 16));
+	pps.push_back((uint8_t)(in_byte_length >> 8));
+	pps.push_back((uint8_t)(in_byte_length >> 0));
+
+	pps.push_back((uint8_t)(in_spiht_step_size >> 24));
+	pps.push_back((uint8_t)(in_spiht_step_size >> 16));
+	pps.push_back((uint8_t)(in_spiht_step_size >> 8));
+	pps.push_back((uint8_t)(in_spiht_step_size >> 0));
+
+	std::vector<uint8_t> nal_bytes;
+	nal_bytes.reserve(header.size() + pps.size());
+	nal_bytes.insert(nal_bytes.end(), header.begin(), header.end());
+	nal_bytes.insert(nal_bytes.end(), pps.begin(), pps.end());
+
+	ovc_nal nal;
+	nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
+	memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
+	nal.size = nal_bytes.size();
+	output_nals.push_back(nal);
 }
