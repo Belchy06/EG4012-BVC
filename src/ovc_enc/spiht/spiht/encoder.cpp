@@ -205,13 +205,20 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 		// update quantization step
 		step--;
 	}
+
+	// Pad the bitstream to the allocation amount as that's what the decoder is expecting
+	while (bitstream->size() < bit_allocation)
+	{
+		// TODO (belchy06): Figure out a way to not need padding
+		bitstream->write_bit(0);
+	}
 }
 
-void spiht_encoder::flush(uint8_t** out_bits, size_t* out_size, int* out_step)
+void spiht_encoder::flush(uint8_t** out_bits, int* out_step)
 {
 	*out_bits = new uint8_t[bitstream->occupancy()];
 	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
-	*out_size = bitstream->occupancy();
+
 	*out_step = output_step;
 
 	clear();

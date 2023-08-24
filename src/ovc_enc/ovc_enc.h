@@ -20,9 +20,10 @@ public:
 
 private:
 	void construct_and_output_vps();
-	void construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, size_t in_byte_length, int in_spiht_step_size);
+	void construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, int in_spiht_step_size);
 
 private:
+	bool		   initialised;
 	bool		   send_vps;
 	ovc_enc_config config;
 

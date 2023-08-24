@@ -56,7 +56,7 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	dec_res = decoder->init(&dec_config);
 	if (dec_res != OVC_DEC_OK)
 	{
-		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to init: %d", static_cast<uint8_t>(dec_res));
+		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to init: {}", static_cast<uint8_t>(dec_res));
 		return false;
 	}
 
@@ -65,7 +65,7 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 		dec_res = decoder->decode_nal(&nals[i]);
 		if (dec_res != OVC_DEC_OK)
 		{
-			LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to decode nal: %d", static_cast<uint8_t>(dec_res));
+			LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to decode nal: {}", static_cast<uint8_t>(dec_res));
 			return false;
 		}
 	}
@@ -74,7 +74,7 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	dec_res = decoder->get_picture(&output);
 	if (dec_res != OVC_DEC_OK)
 	{
-		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to get picture: %d", static_cast<uint8_t>(dec_res));
+		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to get picture: {}", static_cast<uint8_t>(dec_res));
 		return false;
 	}
 

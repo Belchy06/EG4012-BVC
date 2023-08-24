@@ -40,7 +40,6 @@ public:
 	uint16_t partition;
 	size_t	 width;
 	size_t	 height;
-	size_t	 num_bytes;
 	int		 step;
 
 	bool is_set = false;

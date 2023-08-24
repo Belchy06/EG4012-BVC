@@ -192,7 +192,7 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 
 ovc_dec_result ovc_decoder::handle_pps(uint8_t* in_bytes, size_t in_size)
 {
-	/* PPS FORMAT (18 BYTES) (0x1) */
+	/* PPS FORMAT (14 BYTES) (0x1) */
 	/*
 	 +---------------+---------------+---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
@@ -203,14 +203,12 @@ ovc_dec_result ovc_decoder::handle_pps(uint8_t* in_bytes, size_t in_size)
 	 +---------------+---------------+---------------+---------------+
 	 |                             HEIGHT                            |
 	 +---------------+---------------+---------------+---------------+
-	 |                             NUM_SYM                           |
-	 +---------------+---------------+---------------+---------------+
 	 |                             STEP                              |
 	 +---------------+---------------+---------------+---------------+
 
 	 C = Component (2)
 	*/
-	if (in_size < 18)
+	if (in_size < 14)
 	{
 		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode PPS (size < 18 (bytes))");
 		return OVC_DEC_MALFORMED_NAL_BODY;
@@ -237,12 +235,6 @@ ovc_dec_result ovc_decoder::handle_pps(uint8_t* in_bytes, size_t in_size)
 	pps.height |= in_bytes[byte_idx++] << 16;
 	pps.height |= in_bytes[byte_idx++] << 8;
 	pps.height |= in_bytes[byte_idx++] << 0;
-
-	pps.num_bytes = 0;
-	pps.num_bytes |= in_bytes[byte_idx++] << 24;
-	pps.num_bytes |= in_bytes[byte_idx++] << 16;
-	pps.num_bytes |= in_bytes[byte_idx++] << 8;
-	pps.num_bytes |= in_bytes[byte_idx++] << 0;
 
 	pps.step = 0;
 	pps.step |= in_bytes[byte_idx++] << 24;
@@ -298,8 +290,8 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 	if (!ppss[component].contains(partition_id))
 	{
 		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (No PPS received)");
-		LOG(LogDecode, OVC_VERBOSITY_DETAILS, "Component %s", (component == 0 ? "Y" : (component == 1 ? "U" : "V")));
-		LOG(LogDecode, OVC_VERBOSITY_DETAILS, "Partition %d", partition_id);
+		LOG(LogDecode, OVC_VERBOSITY_DETAILS, "Component: {}", (component == 0 ? "Y" : (component == 1 ? "U" : "V")));
+		LOG(LogDecode, OVC_VERBOSITY_DETAILS, "Partition: {}", partition_id);
 		return OVC_DEC_MISSING_PPS;
 	}
 
@@ -310,8 +302,8 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 	ovc_pps pps = ppss[component][partition_id];
 
 	// Decode
-	//                               num_bytes  num_symbols (bits)
-	entropy_decoder->decode(in_bytes, in_size, pps.num_bytes << 3);
+	//                               num_bytes            num_symbols (bits)
+	entropy_decoder->decode(in_bytes, in_size, (size_t)(ceil(pps.width * pps.height * vps.bits_per_pixel)));
 	uint8_t* entropy_decoded_bytes = new uint8_t();
 	size_t	 entropy_decoded_size = 0;
 	entropy_decoder->flush(&entropy_decoded_bytes, &entropy_decoded_size);

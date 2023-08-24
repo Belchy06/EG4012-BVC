@@ -12,7 +12,7 @@ public:
 	spiht_encoder();
 
 	void encode(matrix<double> in_matrix, ovc_spiht_config in_config);
-	void flush(uint8_t** out_bits, size_t* out_size, int* out_step);
+	void flush(uint8_t** out_bits, int* out_step);
 
 private:
 	void clear();

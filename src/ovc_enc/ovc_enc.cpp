@@ -6,9 +6,11 @@
 #include <vector>
 
 #include "ovc_common/util/util.h"
+#include "ovc_common/log.h"
 
 ovc_encoder::ovc_encoder()
 	: send_vps(true)
+	, initialised(false)
 {
 }
 
@@ -52,6 +54,8 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 		}
 	}
 
+	ovc_logging::verbosity = in_config->log_verbosity;
+
 	config = *in_config;
 
 	wavelet_decomposer = ovc_wavelet_decomposer_factory::create_wavelet_decomposer(in_config->wavelet_family, in_config->wavelet_config);
@@ -59,11 +63,18 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 	spiht_encoder = ovc_spiht_encoder_factory::create_spiht_encoder(in_config->spiht);
 	entropy_coder = ovc_entropy_encoder_factory::create_entropy_encoder(in_config->entropy_coder);
 
-	return ovc_enc_result::OVC_ENC_OK;
+	initialised = true;
+
+	return OVC_ENC_OK;
 }
 
 ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_units, size_t* out_num_nal_units)
 {
+	if (!initialised)
+	{
+		return OVC_ENC_UNINITIALISED;
+	}
+
 	output_nals.clear();
 
 	// VPS is 1 per video (or picture if configured for such)
@@ -97,10 +108,10 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 		{
 			matrix<double>& partition = partitions[i];
 			spiht_encoder->encode(partition, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
+			size_t	 spiht_byte_length = ((size_t)ceil(partition.get_num_columns() * partition.get_num_rows() * config.bits_per_pixel) >> 3);
 			uint8_t* spiht_bitstream = new uint8_t();
-			size_t	 spiht_byte_length = 0;
 			int		 spiht_step_size = 0;
-			spiht_encoder->flush(&spiht_bitstream, &spiht_byte_length, &spiht_step_size);
+			spiht_encoder->flush(&spiht_bitstream, &spiht_step_size);
 
 			entropy_coder->encode(spiht_bitstream, spiht_byte_length);
 			uint8_t* entropy_bitstream = new uint8_t();
@@ -115,7 +126,7 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 
 			// PPS is one per partition
 			// PPS NAL
-			construct_and_output_pps(component, i, partition.get_num_columns(), partition.get_num_rows(), spiht_byte_length, spiht_step_size);
+			construct_and_output_pps(component, i, partition.get_num_columns(), partition.get_num_rows(), spiht_step_size);
 
 			// PARTITION NAL
 			/* NAL HEADER (2 BYTES) */
@@ -188,7 +199,7 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	*out_nal_units = &output_nals[0];
 	*out_num_nal_units = static_cast<int>(output_nals.size());
 
-	return ovc_enc_result::OVC_ENC_OK;
+	return OVC_ENC_OK;
 }
 
 void ovc_encoder::construct_and_output_vps()
@@ -287,7 +298,7 @@ void ovc_encoder::construct_and_output_vps()
 	send_vps &= config.repeat_vps;
 }
 
-void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, size_t in_byte_length, int in_spiht_step_size)
+void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, int in_spiht_step_size)
 {
 	/* NAL HEADER (2 BYTES) */
 	/*
@@ -314,7 +325,7 @@ void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_par
 	header.push_back(header_byte);
 	// clang-format on
 
-	/* PPS FORMAT (18 BYTES) (0x1) */
+	/* PPS FORMAT (14 BYTES) (0x1) */
 	/*
 	 +---------------+---------------+---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
@@ -324,8 +335,6 @@ void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_par
 	 |                             WIDTH                             |
 	 +---------------+---------------+---------------+---------------+
 	 |                             HEIGHT                            |
-	 +---------------+---------------+---------------+---------------+
-	 |                             NUM_SYM                           |
 	 +---------------+---------------+---------------+---------------+
 	 |                             STEP                              |
 	 +---------------+---------------+---------------+---------------+
@@ -356,11 +365,6 @@ void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_par
 	pps.push_back((uint8_t)(in_height >> 16));
 	pps.push_back((uint8_t)(in_height >> 8));
 	pps.push_back((uint8_t)(in_height >> 0));
-
-	pps.push_back((uint8_t)(in_byte_length >> 24));
-	pps.push_back((uint8_t)(in_byte_length >> 16));
-	pps.push_back((uint8_t)(in_byte_length >> 8));
-	pps.push_back((uint8_t)(in_byte_length >> 0));
 
 	pps.push_back((uint8_t)(in_spiht_step_size >> 24));
 	pps.push_back((uint8_t)(in_spiht_step_size >> 16));
