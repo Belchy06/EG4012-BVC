@@ -12,9 +12,10 @@ bool decode_test::test(std::string in_source_path, std::string in_output_path)
 
 	ovc_dec_result res;
 
-	ovc_dec_config config{ 0 };
+	ovc_dec_config config;
+	config.log_verbosity = OVC_VERBOSITY_DETAILS;
 
-	res = decoder->init();
+	res = decoder->init(&config);
 
 	// Construct image
 

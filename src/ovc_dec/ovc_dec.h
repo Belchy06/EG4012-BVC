@@ -12,21 +12,65 @@
 #include "ovc_dec/result.h"
 #include "ovc_dec/config.h"
 
+class ovc_vps
+{
+public:
+	size_t			  width;
+	size_t			  height;
+	ovc_chroma_format format;
+	float			  framerate;
+	float			  bits_per_pixel;
+
+	int num_partitions;
+	int num_levels;
+
+	ovc_wavelet_family wavelet_family;
+	ovc_wavelet_config wavelet_config;
+	ovc_partition	   partition_type;
+	ovc_spiht		   spiht;
+	ovc_entropy_coder  entropy_coder;
+
+	bool is_set = false;
+};
+
+class ovc_pps
+{
+public:
+	uint8_t	 component;
+	uint16_t partition;
+	size_t	 width;
+	size_t	 height;
+	size_t	 num_bytes;
+	int		 step;
+
+	bool is_set = false;
+};
+
 class ovc_decoder
 {
 public:
 	ovc_decoder();
 
-	ovc_dec_result init();
+	ovc_dec_result init(ovc_dec_config* in_config);
 	ovc_dec_result decode_nal(const ovc_nal* in_nal_unit);
 	ovc_dec_result get_picture(ovc_picture* out_picture);
 
 private:
-	bool		picture_ready;
-	ovc_picture picture;
+	ovc_dec_result handle_vps(uint8_t* in_bytes, size_t in_size);
+	ovc_dec_result handle_pps(uint8_t* in_bytes, size_t in_size);
+	ovc_dec_result handle_partition(uint8_t* in_bytes, size_t in_size);
 
-	//       plane            stream         data
-	std::map<size_t, std::map<size_t, matrix<double>>> planes;
+private:
+	ovc_dec_config config;
+	ovc_vps		   vps;
+	bool		   initialised;
+	bool		   picture_ready;
+	ovc_picture	   picture;
+
+	//     component        partition   pps
+	std::map<size_t, std::map<size_t, ovc_pps>> ppss; // Stores the PPS used to decode the specified partition
+	//     component        partition        pps
+	std::map<size_t, std::map<size_t, matrix<double>>> partitions;
 
 	std::shared_ptr<ovc_wavelet_recomposer> wavelet_recomposer;
 	std::shared_ptr<ovc_departitioner>		departitioner;

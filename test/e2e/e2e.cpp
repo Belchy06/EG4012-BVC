@@ -1,8 +1,11 @@
+#include "ovc_common/log.h"
 #include "ovc_dec/ovc_dec.h"
 #include "ovc_enc/ovc_enc.h"
 #include "e2e.h"
 #include "../util/ppm.h"
 #include "../misc/lenna.h"
+
+#define LogE2E "LogE2E"
 
 bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 {
@@ -47,19 +50,37 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	std::shared_ptr<ovc_decoder> decoder = std::make_shared<ovc_decoder>();
 	ovc_dec_result				 dec_res;
 
-	ovc_dec_config dec_config{ 0 };
+	ovc_dec_config dec_config;
+	dec_config.log_verbosity = OVC_VERBOSITY_DETAILS;
 
-	dec_res = decoder->init();
+	dec_res = decoder->init(&dec_config);
+	if (dec_res != OVC_DEC_OK)
+	{
+		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to init: %d", static_cast<uint8_t>(dec_res));
+		return false;
+	}
 
 	for (size_t i = 0; i < num_nals; i++)
 	{
 		dec_res = decoder->decode_nal(&nals[i]);
+		if (dec_res != OVC_DEC_OK)
+		{
+			LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to decode nal: %d", static_cast<uint8_t>(dec_res));
+			return false;
+		}
 	}
 
 	ovc_picture output;
 	dec_res = decoder->get_picture(&output);
+	if (dec_res != OVC_DEC_OK)
+	{
+		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to get picture: %d", static_cast<uint8_t>(dec_res));
+		return false;
+	}
 
 	ppm::write(in_output_path, &output, "P6");
 
 	return true;
 }
+
+#undef LogE2E

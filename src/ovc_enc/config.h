@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "ovc_common/format.h"
+#include "ovc_common/verbosity.h"
 #include "ovc_common/entropy/entropy.h"
 #include "ovc_common/partition/partition.h"
 #include "ovc_common/spiht/spiht.h"
@@ -27,4 +28,6 @@ public:
 	ovc_entropy_coder  entropy_coder;
 
 	bool repeat_vps;
+
+	ovc_verbosity log_verbosity;
 };

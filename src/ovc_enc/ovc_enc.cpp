@@ -108,8 +108,10 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 			entropy_coder->flush(&entropy_bitstream, &entropy_byte_length);
 
 			std::vector<uint8_t> bytes;
-			bytes.reserve(entropy_byte_length);
-			bytes.assign(entropy_bitstream[0], entropy_bitstream[entropy_byte_length - 1]);
+			for (size_t j = 0; j < entropy_byte_length; j++)
+			{
+				bytes.push_back(entropy_bitstream[j]);
+			}
 
 			// PPS is one per partition
 			// PPS NAL
@@ -118,34 +120,61 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 			// PARTITION NAL
 			/* NAL HEADER (2 BYTES) */
 			/*
-			+---------------+---------------+---------------+---------------+
-			 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-			 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			 |     START     |    RES    | T |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|
-			 +---------------+---------------+---------------+---------------+
+			 +---------------+---------------+
+			 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+			 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+			 |     START     |    RES    | T |
+			 +---------------+---------------|
 
 			START = 0x1      (8)
 			RES   = 0x0      (6)
 			T     = Nal Type (2)
 			*/
-			std::vector<uint8_t> header;
-			uint8_t				 header_byte;
-			header_byte = 0;
-			header_byte |= 0x0; // START
-			header.push_back(header_byte);
+			std::vector<uint8_t> nal_header;
+			uint8_t				 nal_header_byte;
+			nal_header_byte = 0;
+			nal_header_byte |= 0x0; // START
+			nal_header.push_back(nal_header_byte);
 
-			header_byte = 0;
+			nal_header_byte = 0;
 			// clang-format off
-			header_byte |= (0                      << 5) & 0b11111100; // RES
-			header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00000011; // T
-			header.push_back(header_byte);
+			nal_header_byte |= (0                      << 5) & 0b11111100; // RES
+			nal_header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00000011; // T
+			nal_header.push_back(nal_header_byte);
 			// clang-format on
 
-			/* CODED STREAM FORMAT (VARIABLE BYTES) (0x2) */
+			/* PARTITION FORMAT (VARIABLE BYTES) (0x2) */
+			/*
+			+---------------+---------------+---------------+---------------+
+			|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+			+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+			| C |      PARTITION_ID         |       PARTITION DATA ...      |
+			+---------------+---------------+                               +
+			|                                                               |
+			|                               +---------------+---------------+
+			|                               :
+			+---------------+---------------|
+			*/
+
+			std::vector<uint8_t> partition_header;
+			uint8_t				 partition_header_byte;
+			partition_header_byte = 0;
+			// clang-format off
+			partition_header_byte |= (component    << 6) & 0b11000000;
+			partition_header_byte |= (i            >> 8) & 0b00111111;
+			partition_header.push_back(partition_header_byte);
+			// clang-format on
+
+			partition_header_byte = 0;
+			// clang-format off
+			partition_header_byte |= (i >> 0) & 0b11111111;
+			partition_header.push_back(partition_header_byte);
+			// clang-format on
 
 			std::vector<uint8_t> nal_bytes;
-			nal_bytes.reserve(header.size() + bytes.size());
-			nal_bytes.insert(nal_bytes.end(), header.begin(), header.end());
+			nal_bytes.reserve(nal_header.size() + partition_header.size() + bytes.size());
+			nal_bytes.insert(nal_bytes.end(), nal_header.begin(), nal_header.end());
+			nal_bytes.insert(nal_bytes.end(), partition_header.begin(), partition_header.end());
 			nal_bytes.insert(nal_bytes.end(), bytes.begin(), bytes.end());
 
 			ovc_nal nal;
@@ -168,11 +197,11 @@ void ovc_encoder::construct_and_output_vps()
 	{
 		/* NAL HEADER (2 BYTES) */
 		/*
-		+---------------+---------------+---------------+---------------+
-		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-		 |     START     |    RES    | T |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|
-		 +---------------+---------------+---------------+---------------+
+		 +---------------+---------------+
+		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		 |     START     |    RES    | T |
+		 +---------------+---------------+
 
 		START = 0x1      (8)
 		RES   = 0x0      (6)
@@ -193,15 +222,15 @@ void ovc_encoder::construct_and_output_vps()
 
 		/* VPS FORMAT (10 BYTES) (0x0) */
 		/*
-		+---------------+---------------+---------------+---------------+
+		 +---------------+---------------+---------------+---------------+
 		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 		 | W F |   W C   | P | S | E |FMT|              N L              |
 		 +---------------+---------------+---------------+---------------+
 		 |              N S              |              BPP              |
 		 +---------------+---------------+---------------+---------------+
-		 |           BPP (CONT)          |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|
-		 +---------------+---------------+---------------+---------------+
+		 |           BPP (CONT)          |
+		 +---------------+---------------+
 
 		 W F = Wavelet Family (3)
 		 W C = Wavelet Config (5)
@@ -285,12 +314,12 @@ void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_par
 	header.push_back(header_byte);
 	// clang-format on
 
-	/* PPS FORMAT (22 BYTES) (0x2) */
+	/* PPS FORMAT (18 BYTES) (0x1) */
 	/*
 	 +---------------+---------------+---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| C |      PARTITION_ID         |
+	 |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx| C |      PARTITION_ID         |
 	 +---------------+---------------+---------------+---------------+
 	 |                             WIDTH                             |
 	 +---------------+---------------+---------------+---------------+
