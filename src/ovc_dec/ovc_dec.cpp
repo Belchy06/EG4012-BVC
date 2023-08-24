@@ -54,22 +54,22 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 	 +---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 |     START     |    RES    | T |
+	 |     START     | Z |     T     |
 	 +---------------+---------------+
 
-	START = 0x1      (8)
-	RES   = 0x0      (6)
-	T     = Nal Type (2)
+	START = 0x1       (8)
+	Z     = Zero bits (2)
+	T     = Nal Type  (6)
 	*/
 	// clang-format off
 	uint8_t		 start_byte = nal_bytes[0];
-	uint8_t		 type_byte  = nal_bytes[1];
-	uint8_t		 res  =                (type_byte & 0b11111100) >> 2;
-	ovc_nal_type type = (ovc_nal_type)((type_byte & 0b00000011) >> 0);
+    uint8_t		 type_byte  = nal_bytes[1];
+	uint8_t		 zero_bits  =          (type_byte & 0b11000000) >> 6;
+	ovc_nal_type type = (ovc_nal_type)((type_byte & 0b00111111) >> 0);
     nal_bytes += 2;
     nal_size -= 2;
 	// clang-format on
-	if ((start_byte & res) != 0)
+	if ((start_byte & zero_bits) != 0)
 	{
 		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL due to malformed header (start & res) != 0");
 		return OVC_DEC_MALFORMED_NAL_HEADER;

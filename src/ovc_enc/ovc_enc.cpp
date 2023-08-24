@@ -123,12 +123,12 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 			 +---------------+---------------+
 			 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 			 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			 |     START     |    RES    | T |
+			 |     START     | Z |     T     |
 			 +---------------+---------------|
 
-			START = 0x1      (8)
-			RES   = 0x0      (6)
-			T     = Nal Type (2)
+			START = 0x0       (8)
+			Z     = Zero bits (2)
+			T     = Nal Type  (8)
 			*/
 			std::vector<uint8_t> nal_header;
 			uint8_t				 nal_header_byte;
@@ -138,8 +138,8 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 
 			nal_header_byte = 0;
 			// clang-format off
-			nal_header_byte |= (0                      << 5) & 0b11111100; // RES
-			nal_header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00000011; // T
+            nal_header_byte |= (0                      << 6) & 0b11000000; // Z
+			nal_header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00111111; // T
 			nal_header.push_back(nal_header_byte);
 			// clang-format on
 
@@ -200,12 +200,12 @@ void ovc_encoder::construct_and_output_vps()
 		 +---------------+---------------+
 		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-		 |     START     |    RES    | T |
+		 |     START     | Z |     T     |
 		 +---------------+---------------+
 
-		START = 0x1      (8)
-		RES   = 0x0      (6)
-		T     = Nal Type (2)
+		START = 0x0       (8)
+		Z     = Zero bits (2)
+		T     = Nal Type  (8)
 		*/
 		std::vector<uint8_t> header;
 		uint8_t				 header_byte;
@@ -215,8 +215,8 @@ void ovc_encoder::construct_and_output_vps()
 
 		header_byte = 0;
 		// clang-format off
-		header_byte |= (0                << 5) & 0b11111100; // RES
-		header_byte |= (OVC_NAL_TYPE_VPS << 0) & 0b00000011; // T
+        header_byte |= (0                << 6) & 0b11000000; // Z
+		header_byte |= (OVC_NAL_TYPE_VPS << 0) & 0b00111111; // T
 		header.push_back(header_byte);
 		// clang-format on
 
@@ -294,23 +294,23 @@ void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_par
 	 +---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 |     START     |    RES    | T |
+	 |     START     | Z |     T     |
 	 +---------------+---------------+
 
-	START = 0x1      (8)
-	RES   = 0x0      (6)
-	T     = Nal Type (2)
+	START = 0x0       (8)
+	Z     = Zero bits (2)
+	T     = Nal Type  (8)
 	*/
 	std::vector<uint8_t> header;
 	uint8_t				 header_byte;
 	header_byte = 0;
-	header_byte |= 0x1; // START
+	header_byte |= 0x0; // START
 	header.push_back(header_byte);
 
 	header_byte = 0;
 	// clang-format off
-	header_byte |= (0                << 5) & 0b11111100; // RES
-	header_byte |= (OVC_NAL_TYPE_PPS << 0) & 0b00000011; // T
+    header_byte |= (0                << 6) & 0b11000000; // Z
+	header_byte |= (OVC_NAL_TYPE_PPS << 0) & 0b00111111; // T
 	header.push_back(header_byte);
 	// clang-format on
 
