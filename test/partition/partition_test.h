@@ -13,5 +13,5 @@ public:
 	static bool test(ovc_partition in_partition, size_t in_x, size_t in_y);
 
 private:
-	static std::vector<matrix<double>> partition(ovc_partition in_partition, matrix<double>& in_matrix, size_t in_num_levels, size_t in_num_streams);
+	static std::vector<matrix<double>> partition(ovc_partition in_partition, matrix<double>& in_matrix, size_t in_num_levels, size_t in_num_partitions);
 };

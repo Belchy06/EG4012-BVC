@@ -33,26 +33,97 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 		return OVC_ENC_INVALID_FORMAT;
 	}
 
-	if ((in_config->num_levels > 1 || in_config->num_streams_exp > 0) && in_config->partition_type == OVC_PARTITION_SKIP)
+	if ((in_config->num_levels > 1 || in_config->num_parts_exp > 0) && in_config->partition_type == OVC_PARTITION_SKIP)
 	{
 		return OVC_ENC_INVALID_PARAM;
 	}
 
-	// Calculate levels from streams or vice-versa. If user has specified both, ensure that the values are compatible
-	if ((in_config->num_levels != -1) && (in_config->num_streams_exp == -1))
+	if ((in_config->num_levels != -1) && (in_config->num_parts_exp != -1))
 	{
-		in_config->num_streams_exp = (int)(in_config->width * in_config->height / pow(4, in_config->num_levels));
-	}
-	else if ((in_config->num_streams_exp != -1) && (in_config->num_levels == -1))
-	{
-		in_config->num_levels = (int)(log2(in_config->width * in_config->height / pow(4, in_config->num_streams_exp)) / log2(4));
-	}
-	else if ((in_config->num_levels != -1) && (in_config->num_streams_exp != -1))
-	{
-		if (pow(4, in_config->num_streams_exp) > in_config->width * in_config->height / pow(4, in_config->num_levels))
+		if (pow(4, in_config->num_parts_exp) > in_config->width * in_config->height / pow(4, in_config->num_levels))
 		{
 			return OVC_ENC_INVALID_PARAM;
 		}
+	}
+
+	if ((in_config->num_parts_exp == -1) && (in_config->num_levels == -1))
+	{
+		// Both params are unset, calculate heuristically
+		if (in_config->preset == OVC_ENC_PRESET_RESILLIENCE)
+		{
+			in_config->num_levels = 0;
+			in_config->num_parts_exp = int(log(in_config->width * in_config->height / pow(4, in_config->num_levels)) / log(4));
+		}
+		else if (in_config->preset == OVC_ENC_PRESET_COMPRESSION)
+		{
+			int num_levels_x = 0;
+			while (in_config->width % (1 << (num_levels_x + 1)) == 0)
+			{
+				num_levels_x++;
+			}
+
+			int num_levels_y = 0;
+			while (in_config->height % (1 << (num_levels_y + 1)) == 0)
+			{
+				num_levels_y++;
+			}
+
+			in_config->num_parts_exp = (num_levels_x < num_levels_y) ? num_levels_x : num_levels_y;
+		}
+		else if (in_config->preset == OVC_ENC_PRESET_BALANCED)
+		{
+			int num_levels_x = 0;
+			while (in_config->width % (1 << (num_levels_x + 1)) == 0)
+			{
+				num_levels_x++;
+			}
+
+			int num_levels_y = 0;
+			while (in_config->height % (1 << (num_levels_y + 1)) == 0)
+			{
+				num_levels_y++;
+			}
+
+			in_config->num_levels = int(floor(((num_levels_x < num_levels_y) ? num_levels_x : num_levels_y) / 2));
+			in_config->num_parts_exp = int(floor((log(in_config->width * in_config->height / pow(4, in_config->num_levels)) / log(4)) / 2));
+		}
+	}
+
+	// Calculate levels from partitions or vice-versa. If user has specified both, ensure that the values are compatible
+	if ((in_config->num_levels != -1) && (in_config->num_parts_exp == -1))
+	{
+		// User has specified number of wavelet levels. Calculate number of streams accordingly
+		if (in_config->preset == OVC_ENC_PRESET_RESILLIENCE)
+		{
+			in_config->num_parts_exp = int(log(in_config->width * in_config->height / pow(4, in_config->num_levels)) / log(4));
+		}
+		else if (in_config->preset == OVC_ENC_PRESET_COMPRESSION)
+		{
+			in_config->num_parts_exp = 0;
+		}
+		else if (in_config->preset == OVC_ENC_PRESET_BALANCED)
+		{
+			in_config->num_parts_exp = int(floor((log(in_config->width * in_config->height / pow(4, in_config->num_levels)) / log(4)) / 2));
+		}
+	}
+	else if ((in_config->num_parts_exp != -1) && (in_config->num_levels == -1))
+	{
+		int num_levels_x = 0;
+		while (in_config->width % (1 << (num_levels_x + 1)) == 0)
+		{
+			num_levels_x++;
+		}
+
+		int num_levels_y = 0;
+		while (in_config->height % (1 << (num_levels_y + 1)) == 0)
+		{
+			num_levels_y++;
+		}
+
+		int max_image_levels = (num_levels_x < num_levels_y) ? num_levels_x : num_levels_y;
+		int max_part_levels = int(floor(log(in_config->width * in_config->height / pow(4, in_config->num_parts_exp)) / log(4)));
+
+		in_config->num_levels = (max_part_levels < max_image_levels) ? max_part_levels : max_image_levels;
 	}
 
 	ovc_logging::verbosity = in_config->log_verbosity;
@@ -122,7 +193,7 @@ void ovc_encoder::encode_component(ovc_picture* in_picture, uint8_t in_component
 	ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(plane_matrix, config.num_levels);
 	matrix<double>						 decomp_matrix = decomposition.to_matrix();
 
-	std::vector<matrix<double>> partitions = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
+	std::vector<matrix<double>> partitions = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_parts_exp));
 
 	std::vector<std::thread> threads;
 	for (uint16_t i = 0; i < partitions.size(); i++)
@@ -312,8 +383,8 @@ void ovc_encoder::construct_and_output_vps()
 		vps.push_back((uint8_t)(config.num_levels >> 8));
 		vps.push_back((uint8_t)(config.num_levels >> 0));
 
-		vps.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 8));
-		vps.push_back((uint8_t)((size_t)pow(4, config.num_streams_exp) >> 0));
+		vps.push_back((uint8_t)((size_t)pow(4, config.num_parts_exp) >> 8));
+		vps.push_back((uint8_t)((size_t)pow(4, config.num_parts_exp) >> 0));
 
 		uint8_t* bpp_arr = reinterpret_cast<uint8_t*>(&config.bits_per_pixel);
 		vps.push_back(bpp_arr[3]);

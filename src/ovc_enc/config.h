@@ -8,6 +8,7 @@
 #include "ovc_common/partition/partition.h"
 #include "ovc_common/spiht/spiht.h"
 #include "ovc_common/wavelet/wavelet.h"
+#include "ovc_enc/preset.h"
 
 class ovc_enc_config
 {
@@ -18,9 +19,10 @@ public:
 	float			  framerate;
 	float			  bits_per_pixel;
 
-	int num_streams_exp = -1;
+	int num_parts_exp = -1;
 	int num_levels = -1;
 
+	ovc_enc_preset	   preset;
 	ovc_wavelet_family wavelet_family;
 	ovc_wavelet_config wavelet_config;
 	ovc_partition	   partition_type;

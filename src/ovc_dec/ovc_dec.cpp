@@ -312,28 +312,6 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 	matrix<double> partition = matrix<double>(pps.height, pps.width);
 	spiht_decoder->flush(partition);
 
-	// TODO (belchy06): Flow should be something like
-	/*
-		if(partitions.contains(stream_id))
-		{
-			// we've already seen this partition
-			// this means we've lost some nals. decode what we have
-			decode(partitions)
-
-			partitions.clear()
-			partitions.insert(stream_id, matrix)
-		}
-		else
-		{
-			partitions.insert(stream_id, matrix)
-
-			if(partitions.size() == num_streams)
-			{
-				decode(partitions)
-			}
-		}
-	*/
-
 	std::map<size_t, matrix<double>>& plane_partitions = partitions[component];
 	plane_partitions[partition_id] = partition;
 
