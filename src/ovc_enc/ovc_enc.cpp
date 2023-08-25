@@ -3,6 +3,7 @@
 #include <bitset>
 #include <cmath>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #include "ovc_common/util/util.h"
@@ -58,11 +59,6 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 
 	config = *in_config;
 
-	wavelet_decomposer = ovc_wavelet_decomposer_factory::create_wavelet_decomposer(in_config->wavelet_family, in_config->wavelet_config);
-	partitioner = ovc_partitioner_factory::create_partitioner(in_config->partition_type);
-	spiht_encoder = ovc_spiht_encoder_factory::create_spiht_encoder(in_config->spiht);
-	entropy_coder = ovc_entropy_encoder_factory::create_entropy_encoder(in_config->entropy_coder);
-
 	initialised = true;
 
 	return OVC_ENC_OK;
@@ -82,124 +78,166 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	construct_and_output_vps();
 
 	// TODO (belchy06): Parallelize
+	std::vector<std::thread> threads;
 	for (uint8_t component = 0; component < (uint8_t)(config.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
 	{
-		size_t				plane_width = (component == 0 ? config.width : util::scale_x(config.width, config.format));
-		size_t				plane_height = (component == 0 ? config.height : util::scale_y(config.height, config.format));
-		matrix<double>		plane_matrix(plane_height, plane_width);
-		std::vector<double> plane_data;
-		for (size_t x = 0; x < plane_width; x++)
-		{
-			for (size_t y = 0; y < plane_height; y++)
-			{
-				uint8_t* plane = in_picture->planes[component].data;
-				plane_data.push_back((double)plane[x + y * plane_width]);
-			}
-		}
+		std::thread thread = std::thread([in_picture, component, this]() {
+			encode_component(in_picture, component);
+		});
 
-		plane_matrix.set_data(plane_data);
+		threads.push_back(std::move(thread));
+	}
 
-		ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(plane_matrix, config.num_levels);
-		matrix<double>						 decomp_matrix = decomposition.to_matrix();
-
-		std::vector<matrix<double>> partitions = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
-		// TODO (belchy06): Parallelize
-		for (uint16_t i = 0; i < partitions.size(); i++)
-		{
-			matrix<double>& partition = partitions[i];
-			spiht_encoder->encode(partition, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
-			size_t	 spiht_byte_length = ((size_t)ceil(partition.get_num_columns() * partition.get_num_rows() * config.bits_per_pixel) >> 3);
-			uint8_t* spiht_bitstream = new uint8_t();
-			int		 spiht_step_size = 0;
-			spiht_encoder->flush(&spiht_bitstream, &spiht_step_size);
-
-			entropy_coder->encode(spiht_bitstream, spiht_byte_length);
-			uint8_t* entropy_bitstream = new uint8_t();
-			size_t	 entropy_byte_length = 0;
-			entropy_coder->flush(&entropy_bitstream, &entropy_byte_length);
-
-			std::vector<uint8_t> bytes;
-			for (size_t j = 0; j < entropy_byte_length; j++)
-			{
-				bytes.push_back(entropy_bitstream[j]);
-			}
-
-			// PPS is one per partition
-			// PPS NAL
-			construct_and_output_pps(component, i, partition.get_num_columns(), partition.get_num_rows(), spiht_step_size);
-
-			// PARTITION NAL
-			/* NAL HEADER (2 BYTES) */
-			/*
-			 +---------------+---------------+
-			 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-			 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			 |     START     | Z |     T     |
-			 +---------------+---------------|
-
-			START = 0x0       (8)
-			Z     = Zero bits (2)
-			T     = Nal Type  (8)
-			*/
-			std::vector<uint8_t> nal_header;
-			uint8_t				 nal_header_byte;
-			nal_header_byte = 0;
-			nal_header_byte |= 0x0; // START
-			nal_header.push_back(nal_header_byte);
-
-			nal_header_byte = 0;
-			// clang-format off
-            nal_header_byte |= (0                      << 6) & 0b11000000; // Z
-			nal_header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00111111; // T
-			nal_header.push_back(nal_header_byte);
-			// clang-format on
-
-			/* PARTITION FORMAT (VARIABLE BYTES) (0x2) */
-			/*
-			+---------------+---------------+---------------+---------------+
-			|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-			+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-			| C |      PARTITION_ID         |       PARTITION DATA ...      |
-			+---------------+---------------+                               +
-			|                                                               |
-			|                               +---------------+---------------+
-			|                               :
-			+---------------+---------------|
-			*/
-
-			std::vector<uint8_t> partition_header;
-			uint8_t				 partition_header_byte;
-			partition_header_byte = 0;
-			// clang-format off
-			partition_header_byte |= (component    << 6) & 0b11000000;
-			partition_header_byte |= (i            >> 8) & 0b00111111;
-			partition_header.push_back(partition_header_byte);
-			// clang-format on
-
-			partition_header_byte = 0;
-			// clang-format off
-			partition_header_byte |= (i >> 0) & 0b11111111;
-			partition_header.push_back(partition_header_byte);
-			// clang-format on
-
-			std::vector<uint8_t> nal_bytes;
-			nal_bytes.reserve(nal_header.size() + partition_header.size() + bytes.size());
-			nal_bytes.insert(nal_bytes.end(), nal_header.begin(), nal_header.end());
-			nal_bytes.insert(nal_bytes.end(), partition_header.begin(), partition_header.end());
-			nal_bytes.insert(nal_bytes.end(), bytes.begin(), bytes.end());
-
-			ovc_nal nal;
-			nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
-			memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
-			nal.size = nal_bytes.size();
-			output_nals.push_back(nal);
-		}
+	for (std::thread& thread : threads)
+	{
+		thread.join();
 	}
 
 	*out_nal_units = &output_nals[0];
 	*out_num_nal_units = static_cast<int>(output_nals.size());
 
 	return OVC_ENC_OK;
+}
+
+void ovc_encoder::encode_component(ovc_picture* in_picture, uint8_t in_component)
+{
+	size_t				plane_width = (in_component == 0 ? config.width : util::scale_x(config.width, config.format));
+	size_t				plane_height = (in_component == 0 ? config.height : util::scale_y(config.height, config.format));
+	matrix<double>		plane_matrix(plane_height, plane_width);
+	std::vector<double> plane_data;
+	for (size_t x = 0; x < plane_width; x++)
+	{
+		for (size_t y = 0; y < plane_height; y++)
+		{
+			uint8_t* plane = in_picture->planes[in_component].data;
+			plane_data.push_back((double)plane[x + y * plane_width]);
+		}
+	}
+
+	plane_matrix.set_data(plane_data);
+
+	std::shared_ptr<ovc_wavelet_decomposer> wavelet_decomposer = ovc_wavelet_decomposer_factory::create_wavelet_decomposer(config.wavelet_family, config.wavelet_config);
+	std::shared_ptr<ovc_partitioner>		partitioner = ovc_partitioner_factory::create_partitioner(config.partition_type);
+
+	ovc_wavelet_decomposition_2d<double> decomposition = wavelet_decomposer->decompose(plane_matrix, config.num_levels);
+	matrix<double>						 decomp_matrix = decomposition.to_matrix();
+
+	std::vector<matrix<double>> partitions = partitioner->partition(decomp_matrix, config.num_levels, (size_t)pow(4, config.num_streams_exp));
+
+	std::vector<std::thread> threads;
+	for (uint16_t i = 0; i < partitions.size(); i++)
+	{
+		matrix<double> partition = partitions[i];
+		std::thread	   thread = std::thread([partition, i, in_component, this]() {
+			   encode_partition(partition, i, in_component);
+		   });
+
+		threads.push_back(std::move(thread));
+	}
+
+	for (std::thread& thread : threads)
+	{
+		thread.join();
+	}
+}
+
+void ovc_encoder::encode_partition(matrix<double> in_partition, uint16_t in_partition_id, uint8_t in_component)
+{
+	size_t width = in_partition.get_num_columns();
+	size_t height = in_partition.get_num_rows();
+
+	std::shared_ptr<ovc_spiht_encoder>	 spiht_encoder = ovc_spiht_encoder_factory::create_spiht_encoder(config.spiht);
+	std::shared_ptr<ovc_entropy_encoder> entropy_coder = ovc_entropy_encoder_factory::create_entropy_encoder(config.entropy_coder);
+
+	spiht_encoder->encode(in_partition, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
+	size_t	 spiht_byte_length = ((size_t)ceil(width * height * config.bits_per_pixel) >> 3);
+	uint8_t* spiht_bitstream = new uint8_t();
+	int		 spiht_step_size = 0;
+	spiht_encoder->flush(&spiht_bitstream, &spiht_step_size);
+
+	entropy_coder->encode(spiht_bitstream, spiht_byte_length);
+	uint8_t* entropy_bitstream = new uint8_t();
+	size_t	 entropy_byte_length = 0;
+	entropy_coder->flush(&entropy_bitstream, &entropy_byte_length);
+
+	std::vector<uint8_t> bytes;
+	for (size_t j = 0; j < entropy_byte_length; j++)
+	{
+		bytes.push_back(entropy_bitstream[j]);
+	}
+
+	// PPS is one per partition
+	// PPS NAL
+	construct_and_output_pps(in_component, in_partition_id, width, height, spiht_step_size);
+
+	// PARTITION NAL
+	/* NAL HEADER (2 BYTES) */
+	/*
+	 +---------------+---------------+
+	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 |     START     | Z |     T     |
+	 +---------------+---------------|
+
+	START = 0x0       (8)
+	Z     = Zero bits (2)
+	T     = Nal Type  (8)
+	*/
+	std::vector<uint8_t> nal_header;
+	uint8_t				 nal_header_byte;
+	nal_header_byte = 0;
+	nal_header_byte |= 0x0; // START
+	nal_header.push_back(nal_header_byte);
+
+	nal_header_byte = 0;
+	// clang-format off
+    nal_header_byte |= (0                      << 6) & 0b11000000; // Z
+	nal_header_byte |= (OVC_NAL_TYPE_PARTITION << 0) & 0b00111111; // T
+	nal_header.push_back(nal_header_byte);
+	// clang-format on
+
+	/* PARTITION FORMAT (VARIABLE BYTES) (0x2) */
+	/*
+	+---------------+---------------+---------------+---------------+
+	|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
+	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	| C |      PARTITION_ID         |       PARTITION DATA ...      |
+	+---------------+---------------+                               +
+	|                                                               |
+	|                               +---------------+---------------+
+	|                               :
+	+---------------+---------------|
+	*/
+
+	std::vector<uint8_t> partition_header;
+	uint8_t				 partition_header_byte;
+	partition_header_byte = 0;
+	// clang-format off
+	partition_header_byte |= (in_component    << 6) & 0b11000000;
+	partition_header_byte |= (in_partition_id >> 8) & 0b00111111;
+	partition_header.push_back(partition_header_byte);
+	// clang-format on
+
+	partition_header_byte = 0;
+	// clang-format off
+	partition_header_byte |= (in_partition_id >> 0) & 0b11111111;
+	partition_header.push_back(partition_header_byte);
+	// clang-format on
+
+	std::vector<uint8_t> nal_bytes;
+	nal_bytes.reserve(nal_header.size() + partition_header.size() + bytes.size());
+	nal_bytes.insert(nal_bytes.end(), nal_header.begin(), nal_header.end());
+	nal_bytes.insert(nal_bytes.end(), partition_header.begin(), partition_header.end());
+	nal_bytes.insert(nal_bytes.end(), bytes.begin(), bytes.end());
+
+	ovc_nal nal;
+	nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
+	memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
+	nal.size = nal_bytes.size();
+
+	output_nals_mutex.lock();
+	output_nals.push_back(nal);
+	output_nals_mutex.unlock();
 }
 
 void ovc_encoder::construct_and_output_vps()
@@ -292,7 +330,10 @@ void ovc_encoder::construct_and_output_vps()
 		nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
 		memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
 		nal.size = nal_bytes.size();
+
+		output_nals_mutex.lock();
 		output_nals.push_back(nal);
+		output_nals_mutex.unlock();
 	}
 
 	send_vps &= config.repeat_vps;
@@ -380,5 +421,8 @@ void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_par
 	nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
 	memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
 	nal.size = nal_bytes.size();
+
+	output_nals_mutex.lock();
 	output_nals.push_back(nal);
+	output_nals_mutex.unlock();
 }
