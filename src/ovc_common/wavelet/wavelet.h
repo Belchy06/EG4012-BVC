@@ -3,6 +3,7 @@
 #include <array>
 #include <stdexcept>
 #include <vector>
+#include <string>
 
 #include "ovc_common/math/matrix.h"
 #include "ovc_common/wavelet/wavelet_config.h"
@@ -17,6 +18,29 @@ typedef enum
 	OVC_WAVELET_FAMILY_REVERSE_BIORTHOGONAL,
 	OVC_WAVELET_FAMILY_SYMLETS
 } ovc_wavelet_family;
+
+inline std::string wavelet_family_to_string(ovc_wavelet_family in_wavelet_family)
+{
+	switch (in_wavelet_family)
+	{
+		case OVC_WAVELET_FAMILY_SKIP:
+			return "OVC_WAVELET_FAMILY_SKIP";
+		case OVC_WAVELET_FAMILY_BIORTHOGONAL:
+			return "OVC_WAVELET_FAMILY_BIORTHOGONAL";
+		case OVC_WAVELET_FAMILY_COIFLETS:
+			return "OVC_WAVELET_FAMILY_COIFLETS";
+		case OVC_WAVELET_FAMILY_DAUBECHIES:
+			return "OVC_WAVELET_FAMILY_DAUBECHIES";
+		case OVC_WAVELET_FAMILY_HAAR:
+			return "OVC_WAVELET_FAMILY_HAAR";
+		case OVC_WAVELET_FAMILY_REVERSE_BIORTHOGONAL:
+			return "OVC_WAVELET_FAMILY_REVERSE_BIORTHOGONAL";
+		case OVC_WAVELET_FAMILY_SYMLETS:
+			return "OVC_WAVELET_FAMILY_SYMLETS";
+		default:
+			return "";
+	}
+}
 
 typedef enum
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 
 typedef enum : uint8_t
 {
@@ -24,3 +25,50 @@ typedef enum : uint8_t
 	OVC_WAVELET_SYMLETS_19,
 	OVC_WAVELET_SYMLETS_20
 } ovc_wavelet_symlets_config;
+
+inline std::string symlets_config_to_string(ovc_wavelet_symlets_config in_symlets_config)
+{
+	switch (in_symlets_config)
+	{
+		case OVC_WAVELET_SYMLETS_2:
+			return "OVC_WAVELET_SYMLETS_2";
+		case OVC_WAVELET_SYMLETS_3:
+			return "OVC_WAVELET_SYMLETS_3";
+		case OVC_WAVELET_SYMLETS_4:
+			return "OVC_WAVELET_SYMLETS_4";
+		case OVC_WAVELET_SYMLETS_5:
+			return "OVC_WAVELET_SYMLETS_5";
+		case OVC_WAVELET_SYMLETS_6:
+			return "OVC_WAVELET_SYMLETS_6";
+		case OVC_WAVELET_SYMLETS_7:
+			return "OVC_WAVELET_SYMLETS_7";
+		case OVC_WAVELET_SYMLETS_8:
+			return "OVC_WAVELET_SYMLETS_8";
+		case OVC_WAVELET_SYMLETS_9:
+			return "OVC_WAVELET_SYMLETS_9";
+		case OVC_WAVELET_SYMLETS_10:
+			return "OVC_WAVELET_SYMLETS_10";
+		case OVC_WAVELET_SYMLETS_11:
+			return "OVC_WAVELET_SYMLETS_11";
+		case OVC_WAVELET_SYMLETS_12:
+			return "OVC_WAVELET_SYMLETS_12";
+		case OVC_WAVELET_SYMLETS_13:
+			return "OVC_WAVELET_SYMLETS_13";
+		case OVC_WAVELET_SYMLETS_14:
+			return "OVC_WAVELET_SYMLETS_14";
+		case OVC_WAVELET_SYMLETS_15:
+			return "OVC_WAVELET_SYMLETS_15";
+		case OVC_WAVELET_SYMLETS_16:
+			return "OVC_WAVELET_SYMLETS_16";
+		case OVC_WAVELET_SYMLETS_17:
+			return "OVC_WAVELET_SYMLETS_17";
+		case OVC_WAVELET_SYMLETS_18:
+			return "OVC_WAVELET_SYMLETS_18";
+		case OVC_WAVELET_SYMLETS_19:
+			return "OVC_WAVELET_SYMLETS_19";
+		case OVC_WAVELET_SYMLETS_20:
+			return "OVC_WAVELET_SYMLETS_20";
+		default:
+			return "";
+	}
+}

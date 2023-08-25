@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "ovc_common/spiht/spiht_config.h"
 
 typedef enum
@@ -7,6 +9,19 @@ typedef enum
 	OVC_SPIHT_SKIP,
 	OVC_SPIHT_ENABLE,
 } ovc_spiht;
+
+inline std::string spiht_to_string(ovc_spiht in_spiht)
+{
+	switch (in_spiht)
+	{
+		case OVC_SPIHT_SKIP:
+			return "OVC_SPIHT_SKIP";
+		case OVC_SPIHT_ENABLE:
+			return "OVC_SPIHT_ENABLE";
+		default:
+			return "";
+	}
+}
 
 typedef enum
 {
