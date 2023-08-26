@@ -93,6 +93,8 @@ ovc_dec_result ovc_decoder::get_picture(ovc_picture* out_picture)
 	*out_picture = std::move(picture);
 	out_picture->framerate = 29.97f;
 
+	reset();
+
 	return OVC_DEC_OK;
 }
 
