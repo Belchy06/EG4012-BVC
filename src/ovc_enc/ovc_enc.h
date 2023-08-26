@@ -26,7 +26,6 @@ private:
 	void encode_partition(matrix<double> in_partition, uint16_t in_partition_id, uint8_t in_component);
 
 	void construct_and_output_vps();
-	void construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, int in_spiht_step_size);
 
 private:
 	bool		   initialised;

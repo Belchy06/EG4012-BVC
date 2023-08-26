@@ -18,9 +18,9 @@ std::vector<matrix<double>> offset_zerotree_partitioner::partition(const matrix<
 	// smallest size, split into in_num_parts, that's step size
 	for (size_t i = 0; i < (size_t)in_num_parts; i++)
 	{
-		size_t		   stream_height = (size_t)(sqrt(in_num_parts) * in_matrix.get_num_rows() / in_num_parts);
-		size_t		   stream_width = (size_t)(sqrt(in_num_parts) * in_matrix.get_num_columns() / in_num_parts);
-		matrix<double> partition = matrix<double>(stream_height, stream_width);
+		size_t		   partition_height = (size_t)(sqrt(in_num_parts) * in_matrix.get_num_rows() / in_num_parts);
+		size_t		   partition_width = (size_t)(sqrt(in_num_parts) * in_matrix.get_num_columns() / in_num_parts);
+		matrix<double> partition = matrix<double>(partition_height, partition_width);
 
 		// How big is this level?
 		size_t mat_x = raw_x;

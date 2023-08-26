@@ -27,7 +27,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 		}
 	}
 
-	step = (int)floor(log((float)max) / log(2.f));
+	uint16_t step = (uint16_t)floor(log((float)max) / log(2.f));
 	output_step = step;
 	for (size_t y = 0; y <= height / (1 << in_config.num_levels); y++)
 	{
@@ -48,7 +48,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 		// process LIP
 		for (size_t i = 0; i < lip.size(); i++)
 		{
-			bool significant = is_significant_pixel(in_matrix, lip[i].x, lip[i].y);
+			bool significant = is_significant_pixel(in_matrix, lip[i].x, lip[i].y, step);
 			bitstream->write_bit(uint8_t(significant));
 			if (++bit_cnt > bit_allocation)
 			{
@@ -71,7 +71,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 		{
 			if (lis[i].type == OVC_SPIHT_TYPE_A)
 			{
-				bool significant = is_significant_set_A(in_matrix, in_config.num_levels, lis[i].x, lis[i].y);
+				bool significant = is_significant_set_A(in_matrix, in_config.num_levels, lis[i].x, lis[i].y, step);
 				bitstream->write_bit((uint8_t)significant);
 				if (++bit_cnt > bit_allocation)
 				{
@@ -82,7 +82,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 					int64_t sx, sy;
 					get_successor(in_matrix, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
 					// process the four offsprings
-					significant = is_significant_pixel(in_matrix, sx, sy);
+					significant = is_significant_pixel(in_matrix, sx, sy, step);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
 					{
@@ -102,7 +102,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 					{
 						lip.push_back(ovc_spiht_pixel(sx, sy));
 					}
-					significant = is_significant_pixel(in_matrix, sx + 1, sy);
+					significant = is_significant_pixel(in_matrix, sx + 1, sy, step);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
 					{
@@ -121,7 +121,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 					{
 						lip.push_back(ovc_spiht_pixel(sx + 1, sy));
 					}
-					significant = is_significant_pixel(in_matrix, sx, sy + 1);
+					significant = is_significant_pixel(in_matrix, sx, sy + 1, step);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
 					{
@@ -140,7 +140,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 					{
 						lip.push_back(ovc_spiht_pixel(sx, sy + 1));
 					}
-					significant = is_significant_pixel(in_matrix, sx + 1, sy + 1);
+					significant = is_significant_pixel(in_matrix, sx + 1, sy + 1, step);
 					bitstream->write_bit((uint8_t)significant);
 					if (++bit_cnt > bit_allocation)
 					{
@@ -171,7 +171,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 			}
 			else
 			{
-				bool significant = is_significant_set_B(in_matrix, in_config.num_levels, lis[i].x, lis[i].y);
+				bool significant = is_significant_set_B(in_matrix, in_config.num_levels, lis[i].x, lis[i].y, step);
 				bitstream->write_bit((uint8_t)significant);
 				if (++bit_cnt > bit_allocation)
 				{
@@ -214,7 +214,7 @@ void spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
 	}
 }
 
-void spiht_encoder::flush(uint8_t** out_bits, int* out_step)
+void spiht_encoder::flush(uint8_t** out_bits, uint16_t* out_step)
 {
 	*out_bits = new uint8_t[bitstream->occupancy()];
 	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
@@ -231,7 +231,6 @@ void spiht_encoder::clear()
 	lsp.clear();
 	lis.clear();
 
-	step = 0;
 	output_step = 0;
 	bitstream = new ovc_bitstream();
 }
@@ -268,45 +267,45 @@ void spiht_encoder::get_successor(matrix<double>& in_matrix, size_t in_num_level
 	}
 }
 
-bool spiht_encoder::is_significant_pixel(matrix<double>& in_matrix, int64_t in_x, int64_t in_y)
+bool spiht_encoder::is_significant_pixel(matrix<double>& in_matrix, int64_t in_x, int64_t in_y, uint16_t in_step)
 {
-	return std::abs((int64_t)in_matrix(in_y, in_x)) >= (1 << step);
+	return std::abs((int64_t)in_matrix(in_y, in_x)) >= (1 << in_step);
 }
 
-bool spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t in_count)
+bool spiht_encoder::is_significant_set_A(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, uint16_t in_step, int64_t in_count)
 {
-	if (in_count > 1 && is_significant_pixel(in_matrix, in_x, in_y))
+	if (in_count > 1 && is_significant_pixel(in_matrix, in_x, in_y, in_step))
 		return true;
 	int64_t sx, sy;
 	get_successor(in_matrix, in_num_levels, in_x, in_y, &sx, &sy);
 	if (sx == -1 || sy == -1)
 		return false;
-	if (is_significant_set_A(in_matrix, in_num_levels, sx, sy, in_count + 1))
+	if (is_significant_set_A(in_matrix, in_num_levels, sx, sy, in_step, in_count + 1))
 		return true;
-	else if (is_significant_set_A(in_matrix, in_num_levels, sx + 1, sy, in_count + 1))
+	else if (is_significant_set_A(in_matrix, in_num_levels, sx + 1, sy, in_step, in_count + 1))
 		return true;
-	else if (is_significant_set_A(in_matrix, in_num_levels, sx, sy + 1, in_count + 1))
+	else if (is_significant_set_A(in_matrix, in_num_levels, sx, sy + 1, in_step, in_count + 1))
 		return true;
-	else if (is_significant_set_A(in_matrix, in_num_levels, sx + 1, sy + 1, in_count + 1))
+	else if (is_significant_set_A(in_matrix, in_num_levels, sx + 1, sy + 1, in_step, in_count + 1))
 		return true;
 	return false;
 }
 
-bool spiht_encoder::is_significant_set_B(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t in_count)
+bool spiht_encoder::is_significant_set_B(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, uint16_t in_step, int64_t in_count)
 {
-	if (in_count > 2 && is_significant_pixel(in_matrix, in_x, in_y))
+	if (in_count > 2 && is_significant_pixel(in_matrix, in_x, in_y, in_step))
 		return true;
 	int64_t sx, sy;
 	get_successor(in_matrix, in_num_levels, in_x, in_y, &sx, &sy);
 	if (sx == -1 || sy == -1)
 		return false;
-	if (is_significant_set_B(in_matrix, in_num_levels, sx, sy, in_count + 1))
+	if (is_significant_set_B(in_matrix, in_num_levels, sx, sy, in_step, in_count + 1))
 		return true;
-	else if (is_significant_set_B(in_matrix, in_num_levels, sx + 1, sy, in_count + 1))
+	else if (is_significant_set_B(in_matrix, in_num_levels, sx + 1, sy, in_step, in_count + 1))
 		return true;
-	else if (is_significant_set_B(in_matrix, in_num_levels, sx, sy + 1, in_count + 1))
+	else if (is_significant_set_B(in_matrix, in_num_levels, sx, sy + 1, in_step, in_count + 1))
 		return true;
-	else if (is_significant_set_B(in_matrix, in_num_levels, sx + 1, sy + 1, in_count + 1))
+	else if (is_significant_set_B(in_matrix, in_num_levels, sx + 1, sy + 1, in_step, in_count + 1))
 		return true;
 	return false;
 }

@@ -15,8 +15,10 @@
 class ovc_vps
 {
 public:
-	size_t			  width;
-	size_t			  height;
+	size_t			  luma_width;
+	size_t			  luma_height;
+	size_t			  chroma_width;
+	size_t			  chroma_height;
 	ovc_chroma_format format;
 	float			  framerate;
 	float			  bits_per_pixel;
@@ -38,8 +40,6 @@ class ovc_pps
 public:
 	uint8_t	 component;
 	uint16_t partition;
-	size_t	 width;
-	size_t	 height;
 	int		 step;
 
 	bool is_set = false;
@@ -55,8 +55,8 @@ public:
 	ovc_dec_result get_picture(ovc_picture* out_picture);
 
 private:
+	void		   reset();
 	ovc_dec_result handle_vps(uint8_t* in_bytes, size_t in_size);
-	ovc_dec_result handle_pps(uint8_t* in_bytes, size_t in_size);
 	ovc_dec_result handle_partition(uint8_t* in_bytes, size_t in_size);
 
 private:
@@ -66,8 +66,6 @@ private:
 	bool		   picture_ready;
 	ovc_picture	   picture;
 
-	//     component        partition   pps
-	std::map<size_t, std::map<size_t, ovc_pps>> ppss; // Stores the PPS used to decode the specified partition
 	//     component        partition        pps
 	std::map<size_t, std::map<size_t, matrix<double>>> partitions;
 

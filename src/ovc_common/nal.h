@@ -5,7 +5,6 @@
 typedef enum : uint8_t
 {
 	OVC_NAL_TYPE_VPS,
-	OVC_NAL_TYPE_PPS,
 	OVC_NAL_TYPE_PARTITION,
 } ovc_nal_type;
 

@@ -223,7 +223,7 @@ void ovc_encoder::encode_partition(matrix<double> in_partition, uint16_t in_part
 	spiht_encoder->encode(in_partition, { .bpp = config.bits_per_pixel, .num_levels = (size_t)config.num_levels });
 	size_t	 spiht_byte_length = ((size_t)ceil(width * height * config.bits_per_pixel) >> 3);
 	uint8_t* spiht_bitstream = new uint8_t();
-	int		 spiht_step_size = 0;
+	uint16_t spiht_step_size = 0;
 	spiht_encoder->flush(&spiht_bitstream, &spiht_step_size);
 
 	entropy_coder->encode(spiht_bitstream, spiht_byte_length);
@@ -236,10 +236,6 @@ void ovc_encoder::encode_partition(matrix<double> in_partition, uint16_t in_part
 	{
 		bytes.push_back(entropy_bitstream[j]);
 	}
-
-	// PPS is one per partition
-	// PPS NAL
-	construct_and_output_pps(in_component, in_partition_id, width, height, spiht_step_size);
 
 	// PARTITION NAL
 	/* NAL HEADER (2 BYTES) */
@@ -267,21 +263,28 @@ void ovc_encoder::encode_partition(matrix<double> in_partition, uint16_t in_part
 	nal_header.push_back(nal_header_byte);
 	// clang-format on
 
-	/* PARTITION FORMAT (VARIABLE BYTES) (0x2) */
+	/* PARTITION FORMAT (VARIABLE BYTES) (0x1) */
 	/*
 	+---------------+---------------+---------------+---------------+
 	|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	| C |      PARTITION_ID         |       PARTITION DATA ...      |
-	+---------------+---------------+                               +
-	|                                                               |
+	|      0x0      |      0x0      |      0x0      |      0x1      | // Start code
+	+---------------+---------------+-------------------------------+
+	| C |      PARTITION_ID         |              STEP             |
+	+---------------+---------------+-------------------------------+
+	|         PARTITION DATA ...                                    |
 	|                               +---------------+---------------+
 	|                               :
 	+---------------+---------------|
 	*/
 
 	std::vector<uint8_t> partition_header;
-	uint8_t				 partition_header_byte;
+	partition_header.push_back(0x0);
+	partition_header.push_back(0x0);
+	partition_header.push_back(0x0);
+	partition_header.push_back(0x1);
+
+	uint8_t partition_header_byte;
 	partition_header_byte = 0;
 	// clang-format off
 	partition_header_byte |= (in_component    << 6) & 0b11000000;
@@ -294,6 +297,9 @@ void ovc_encoder::encode_partition(matrix<double> in_partition, uint16_t in_part
 	partition_header_byte |= (in_partition_id >> 0) & 0b11111111;
 	partition_header.push_back(partition_header_byte);
 	// clang-format on
+
+	partition_header.push_back((spiht_step_size >> 8) & 0b11111111);
+	partition_header.push_back((spiht_step_size >> 0) & 0b11111111);
 
 	std::vector<uint8_t> nal_bytes;
 	nal_bytes.reserve(nal_header.size() + partition_header.size() + bytes.size());
@@ -340,16 +346,26 @@ void ovc_encoder::construct_and_output_vps()
 		header.push_back(header_byte);
 		// clang-format on
 
-		/* VPS FORMAT (10 BYTES) (0x0) */
+		/* VPS FORMAT (26 BYTES) (0x0) */
 		/*
 		 +---------------+---------------+---------------+---------------+
 		 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 		 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		 |      0x0      |      0x0      |      0x0      |      0x1      | // Start code
+		 +---------------+---------------+-------------------------------+
 		 | W F |   W C   | P | S | E |FMT|              N L              |
 		 +---------------+---------------+---------------+---------------+
-		 |              N S              |              BPP              |
+		 |              N P              |              BPP              |
 		 +---------------+---------------+---------------+---------------+
-		 |           BPP (CONT)          |
+		 |           BPP (CONT)          |              L W              |
+		 +---------------+---------------+---------------+---------------+
+		 |            L W (CONT)         |              L H              |
+		 +---------------+---------------+---------------+---------------+
+		 |            L H (CONT)         |              C W              |
+		 +---------------+---------------+---------------+---------------+
+		 |            C W (CONT)         |              C H              |
+		 +---------------+---------------+---------------+---------------+
+		 |            C H (CONT)         |
 		 +---------------+---------------+
 
 		 W F = Wavelet Family (3)
@@ -359,11 +375,20 @@ void ovc_encoder::construct_and_output_vps()
 		 E   = Entropy Coder  (2)
 		 FMT = Format         (2)
 		 N L = # Levels		  (16)
-		 N S = # Streams	  (16)
+		 N P = # Partitions	  (16)
 		 BPP = Bits Per Pixel (32)
+		 L W = Luma Width     (32)
+		 L H = Luma Height    (32)
+		 C W = Chroma Width   (32)
+		 C H = Chroma Height  (32)
 		*/
 		std::vector<uint8_t> vps;
-		uint8_t				 vps_byte;
+		vps.push_back(0x0);
+		vps.push_back(0x0);
+		vps.push_back(0x0);
+		vps.push_back(0x1);
+
+		uint8_t vps_byte;
 		vps_byte = 0;
 		// clang-format off
 		vps_byte |= (config.wavelet_family       << 5) & 0b11100000;
@@ -392,6 +417,38 @@ void ovc_encoder::construct_and_output_vps()
 		vps.push_back(bpp_arr[1]);
 		vps.push_back(bpp_arr[0]);
 
+		// luma width
+		// clang-format off
+		vps.push_back((config.width >> 24) & 0b11111111);
+		vps.push_back((config.width >> 16) & 0b11111111);
+		vps.push_back((config.width >>  8) & 0b11111111);
+		vps.push_back((config.width >>  0) & 0b11111111);
+		// clang-format on
+
+		// luma height
+		// clang-format off
+		vps.push_back((config.height >> 24) & 0b11111111);
+		vps.push_back((config.height >> 16) & 0b11111111);
+		vps.push_back((config.height >>  8) & 0b11111111);
+		vps.push_back((config.height >>  0) & 0b11111111);
+		// clang-format on
+
+		// chroma width
+		// clang-format off
+		vps.push_back((util::scale_x(config.width, config.format) >> 24) & 0b11111111);
+		vps.push_back((util::scale_x(config.width, config.format) >> 16) & 0b11111111);
+		vps.push_back((util::scale_x(config.width, config.format) >>  8) & 0b11111111);
+		vps.push_back((util::scale_x(config.width, config.format) >>  0) & 0b11111111);
+		// clang-format on
+
+		// chroma height
+		// clang-format off
+		vps.push_back((util::scale_y(config.height, config.format) >> 24) & 0b11111111);
+		vps.push_back((util::scale_y(config.height, config.format) >> 16) & 0b11111111);
+		vps.push_back((util::scale_y(config.height, config.format) >>  8) & 0b11111111);
+		vps.push_back((util::scale_y(config.height, config.format) >>  0) & 0b11111111);
+		// clang-format on
+
 		std::vector<uint8_t> nal_bytes;
 		nal_bytes.reserve(header.size() + vps.size());
 		nal_bytes.insert(nal_bytes.end(), header.begin(), header.end());
@@ -408,92 +465,4 @@ void ovc_encoder::construct_and_output_vps()
 	}
 
 	send_vps &= config.repeat_vps;
-}
-
-void ovc_encoder::construct_and_output_pps(uint8_t in_component, uint16_t in_partition_id, size_t in_width, size_t in_height, int in_spiht_step_size)
-{
-	/* NAL HEADER (2 BYTES) */
-	/*
-	 +---------------+---------------+
-	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 |     START     | Z |     T     |
-	 +---------------+---------------+
-
-	START = 0x0       (8)
-	Z     = Zero bits (2)
-	T     = Nal Type  (8)
-	*/
-	std::vector<uint8_t> header;
-	uint8_t				 header_byte;
-	header_byte = 0;
-	header_byte |= 0x0; // START
-	header.push_back(header_byte);
-
-	header_byte = 0;
-	// clang-format off
-    header_byte |= (0                << 6) & 0b11000000; // Z
-	header_byte |= (OVC_NAL_TYPE_PPS << 0) & 0b00111111; // T
-	header.push_back(header_byte);
-	// clang-format on
-
-	/* PPS FORMAT (14 BYTES) (0x1) */
-	/*
-	 +---------------+---------------+---------------+---------------+
-	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx| C |      PARTITION_ID         |
-	 +---------------+---------------+---------------+---------------+
-	 |                             WIDTH                             |
-	 +---------------+---------------+---------------+---------------+
-	 |                             HEIGHT                            |
-	 +---------------+---------------+---------------+---------------+
-	 |                             STEP                              |
-	 +---------------+---------------+---------------+---------------+
-
-	 C = Component (2)
-	*/
-	std::vector<uint8_t> pps;
-	uint8_t				 pps_byte;
-	pps_byte = 0;
-	// clang-format off
-	pps_byte |= (in_component    << 6) & 0b11000000;
-	pps_byte |= (in_partition_id >> 8) & 0b00111111;
-	pps.push_back(pps_byte);
-	// clang-format on
-
-	pps_byte = 0;
-	// clang-format off
-	pps_byte |= (in_partition_id >> 0) & 0b11111111;
-	pps.push_back(pps_byte);
-	// clang-format on
-
-	pps.push_back((uint8_t)(in_width >> 24));
-	pps.push_back((uint8_t)(in_width >> 16));
-	pps.push_back((uint8_t)(in_width >> 8));
-	pps.push_back((uint8_t)(in_width >> 0));
-
-	pps.push_back((uint8_t)(in_height >> 24));
-	pps.push_back((uint8_t)(in_height >> 16));
-	pps.push_back((uint8_t)(in_height >> 8));
-	pps.push_back((uint8_t)(in_height >> 0));
-
-	pps.push_back((uint8_t)(in_spiht_step_size >> 24));
-	pps.push_back((uint8_t)(in_spiht_step_size >> 16));
-	pps.push_back((uint8_t)(in_spiht_step_size >> 8));
-	pps.push_back((uint8_t)(in_spiht_step_size >> 0));
-
-	std::vector<uint8_t> nal_bytes;
-	nal_bytes.reserve(header.size() + pps.size());
-	nal_bytes.insert(nal_bytes.end(), header.begin(), header.end());
-	nal_bytes.insert(nal_bytes.end(), pps.begin(), pps.end());
-
-	ovc_nal nal;
-	nal.bytes = new uint8_t[nal_bytes.size()]{ 0 };
-	memcpy(nal.bytes, nal_bytes.data(), nal_bytes.size());
-	nal.size = nal_bytes.size();
-
-	output_nals_mutex.lock();
-	output_nals.push_back(nal);
-	output_nals_mutex.unlock();
 }

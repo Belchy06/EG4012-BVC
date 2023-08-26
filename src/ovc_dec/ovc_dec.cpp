@@ -14,13 +14,7 @@ ovc_decoder::ovc_decoder()
 
 ovc_dec_result ovc_decoder::init(ovc_dec_config* in_config)
 {
-	ppss[0] = std::map<size_t, ovc_pps>();
-	ppss[1] = std::map<size_t, ovc_pps>();
-	ppss[2] = std::map<size_t, ovc_pps>();
-
-	partitions[0] = std::map<size_t, matrix<double>>();
-	partitions[1] = std::map<size_t, matrix<double>>();
-	partitions[2] = std::map<size_t, matrix<double>>();
+	reset();
 
 	ovc_logging::verbosity = in_config->log_verbosity;
 
@@ -79,8 +73,6 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 	{
 		case OVC_NAL_TYPE_VPS:
 			return handle_vps(nal_bytes, nal_size);
-		case OVC_NAL_TYPE_PPS:
-			return handle_pps(nal_bytes, nal_size);
 		case OVC_NAL_TYPE_PARTITION:
 			return handle_partition(nal_bytes, nal_size);
 		default:
@@ -101,29 +93,42 @@ ovc_dec_result ovc_decoder::get_picture(ovc_picture* out_picture)
 	*out_picture = std::move(picture);
 	out_picture->framerate = 29.97f;
 
+	return OVC_DEC_OK;
+}
+
+void ovc_decoder::reset()
+{
+	picture_ready = false;
+	picture = ovc_picture();
+
 	partitions.clear();
 	partitions[0] = std::map<size_t, matrix<double>>();
 	partitions[1] = std::map<size_t, matrix<double>>();
 	partitions[2] = std::map<size_t, matrix<double>>();
-
-	picture_ready = false;
-	picture = ovc_picture();
-
-	return OVC_DEC_OK;
 }
 
 ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 {
-	/* VPS FORMAT (10 BYTES) (0x0) */
+	/* VPS FORMAT (30 BYTES) (0x0) */
 	/*
 	 +---------------+---------------+---------------+---------------+
 	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 |      0x0      |      0x0      |      0x0      |      0x1      | // Start code
+	 +---------------+---------------+-------------------------------+
 	 | W F |   W C   | P | S | E |FMT|              N L              |
 	 +---------------+---------------+---------------+---------------+
 	 |              N P              |              BPP              |
 	 +---------------+---------------+---------------+---------------+
-	 |           BPP (CONT)          |
+	 |           BPP (CONT)          |              L W              |
+	 +---------------+---------------+---------------+---------------+
+	 |            L W (CONT)         |              L H              |
+	 +---------------+---------------+---------------+---------------+
+	 |            L H (CONT)         |              C W              |
+	 +---------------+---------------+---------------+---------------+
+	 |            C W (CONT)         |              C H              |
+	 +---------------+---------------+---------------+---------------+
+	 |            C H (CONT)         |
 	 +---------------+---------------+
 
 	 W F = Wavelet Family (3)
@@ -135,15 +140,31 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 	 N L = # Levels		  (16)
 	 N P = # Partitions	  (16)
 	 BPP = Bits Per Pixel (32)
+	 L W = Luma Width     (32)
+	 L H = Luma Height    (32)
+	 C W = Chroma Width   (32)
+	 C H = Chroma Height  (32)
 	*/
-	if (in_size < 10)
+	if (in_size < 30)
 	{
 		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode VPS (size < 10 (bytes))");
 		return OVC_DEC_MALFORMED_NAL_BODY;
 	}
 
 	// Parse values for vps
-	size_t	byte_idx = 0;
+	size_t	 byte_idx = 0;
+	uint32_t start_code = 0;
+	start_code |= in_bytes[byte_idx++] << 24;
+	start_code |= in_bytes[byte_idx++] << 16;
+	start_code |= in_bytes[byte_idx++] << 8;
+	start_code |= in_bytes[byte_idx++] << 0;
+
+	if (start_code != 0x1)
+	{
+		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode VPS (incorrect start sequence)");
+		return OVC_DEC_MALFORMED_NAL_BODY;
+	}
+
 	uint8_t vps_byte = 0;
 	// clang-format off
 	vps_byte = in_bytes[byte_idx++];
@@ -179,6 +200,30 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 	bits_per_pixel.bpp_int |= in_bytes[byte_idx++] << 0;
 	vps.bits_per_pixel = bits_per_pixel.bpp_float;
 
+	vps.luma_width = 0;
+	vps.luma_width |= in_bytes[byte_idx++] << 24;
+	vps.luma_width |= in_bytes[byte_idx++] << 16;
+	vps.luma_width |= in_bytes[byte_idx++] << 8;
+	vps.luma_width |= in_bytes[byte_idx++] << 0;
+
+	vps.luma_height = 0;
+	vps.luma_height |= in_bytes[byte_idx++] << 24;
+	vps.luma_height |= in_bytes[byte_idx++] << 16;
+	vps.luma_height |= in_bytes[byte_idx++] << 8;
+	vps.luma_height |= in_bytes[byte_idx++] << 0;
+
+	vps.chroma_width = 0;
+	vps.chroma_width |= in_bytes[byte_idx++] << 24;
+	vps.chroma_width |= in_bytes[byte_idx++] << 16;
+	vps.chroma_width |= in_bytes[byte_idx++] << 8;
+	vps.chroma_width |= in_bytes[byte_idx++] << 0;
+
+	vps.chroma_height = 0;
+	vps.chroma_height |= in_bytes[byte_idx++] << 24;
+	vps.chroma_height |= in_bytes[byte_idx++] << 16;
+	vps.chroma_height |= in_bytes[byte_idx++] << 8;
+	vps.chroma_height |= in_bytes[byte_idx++] << 0;
+
 	vps.is_set = true;
 
 	// Intialise components based on specified vps
@@ -190,80 +235,23 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 	return OVC_DEC_OK;
 }
 
-ovc_dec_result ovc_decoder::handle_pps(uint8_t* in_bytes, size_t in_size)
-{
-	/* PPS FORMAT (14 BYTES) (0x1) */
-	/*
-	 +---------------+---------------+---------------+---------------+
-	 |0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
-	 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	 |xxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx| C |      PARTITION_ID         |
-	 +---------------+---------------+---------------+---------------+
-	 |                             WIDTH                             |
-	 +---------------+---------------+---------------+---------------+
-	 |                             HEIGHT                            |
-	 +---------------+---------------+---------------+---------------+
-	 |                             STEP                              |
-	 +---------------+---------------+---------------+---------------+
-
-	 C = Component (2)
-	*/
-	if (in_size < 14)
-	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode PPS (size < 18 (bytes))");
-		return OVC_DEC_MALFORMED_NAL_BODY;
-	}
-
-	// Extract values for pps
-	size_t	byte_idx = 1;
-	ovc_pps pps = ovc_pps();
-	pps.component = 0;
-	pps.component |= (in_bytes[0] & 0b11000000) >> 6;
-
-	pps.partition = 0;
-	pps.partition |= (in_bytes[0] & 0b00111111) << 8;
-	pps.partition |= in_bytes[byte_idx++] << 0;
-
-	pps.width = 0;
-	pps.width |= in_bytes[byte_idx++] << 24;
-	pps.width |= in_bytes[byte_idx++] << 16;
-	pps.width |= in_bytes[byte_idx++] << 8;
-	pps.width |= in_bytes[byte_idx++] << 0;
-
-	pps.height = 0;
-	pps.height |= in_bytes[byte_idx++] << 24;
-	pps.height |= in_bytes[byte_idx++] << 16;
-	pps.height |= in_bytes[byte_idx++] << 8;
-	pps.height |= in_bytes[byte_idx++] << 0;
-
-	pps.step = 0;
-	pps.step |= in_bytes[byte_idx++] << 24;
-	pps.step |= in_bytes[byte_idx++] << 16;
-	pps.step |= in_bytes[byte_idx++] << 8;
-	pps.step |= in_bytes[byte_idx++] << 0;
-
-	pps.is_set = true;
-
-	ppss[pps.component][pps.partition] = pps;
-
-	return OVC_DEC_OK;
-}
-
 ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 {
-	/* PARTITION FORMAT (VARIABLE BYTES) (0x2) */
+	/* PARTITION FORMAT (VARIABLE BYTES) (0x1) */
 	/*
 	+---------------+---------------+---------------+---------------+
 	|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|0|1|2|3|4|5|6|7|
 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	| C |      PARTITION_ID         |       PARTITION DATA ...      |
-	+---------------+---------------+                               +
-	|                                                               |
+	|      0x0      |      0x0      |      0x0      |      0x1      | // Start code
+	+---------------+---------------+-------------------------------+
+	| C |      PARTITION_ID         |              STEP             |
+	+---------------+---------------+-------------------------------+
+	|         PARTITION DATA ...                                    |
 	|                               +---------------+---------------+
 	|                               :
 	+---------------+---------------|
 	*/
-	if (in_size < 2)
+	if (in_size < 8)
 	{
 		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (size < 2 (bytes))");
 		return OVC_DEC_MALFORMED_NAL_BODY;
@@ -275,7 +263,19 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 		return OVC_DEC_MISSING_VPS;
 	}
 
-	size_t	byte_idx = 0;
+	size_t	 byte_idx = 0;
+	uint32_t start_code = 0;
+	start_code |= in_bytes[byte_idx++] << 24;
+	start_code |= in_bytes[byte_idx++] << 16;
+	start_code |= in_bytes[byte_idx++] << 8;
+	start_code |= in_bytes[byte_idx++] << 0;
+
+	if (start_code != 0x1)
+	{
+		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (incorrect start sequence)");
+		return OVC_DEC_MALFORMED_NAL_BODY;
+	}
+
 	uint8_t partition_byte = 0;
 	// clang-format off
 	partition_byte = in_bytes[byte_idx++];
@@ -287,29 +287,26 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
     partition_id |=        (in_bytes[byte_idx++]) << 0;
 	// clang-format on
 
-	if (!ppss[component].contains(partition_id))
-	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (No PPS received)");
-		LOG(LogDecode, OVC_VERBOSITY_DETAILS, "Component: {}", (component == 0 ? "Y" : (component == 1 ? "U" : "V")));
-		LOG(LogDecode, OVC_VERBOSITY_DETAILS, "Partition: {}", partition_id);
-		return OVC_DEC_MISSING_PPS;
-	}
+	uint16_t step = 0;
+	step |= in_bytes[byte_idx++] << 8;
+	step |= in_bytes[byte_idx++] << 0;
 
 	// Update data to account for the two start bytes read
-	in_bytes += 2;
-	in_size -= 2;
+	in_bytes += 8;
+	in_size -= 8;
 
-	ovc_pps pps = ppss[component][partition_id];
+	size_t width = size_t(sqrt(vps.num_partitions) * (component == 0 ? vps.luma_width : vps.chroma_width) / vps.num_partitions);
+	size_t height = size_t(sqrt(vps.num_partitions) * (component == 0 ? vps.luma_height : vps.chroma_height) / vps.num_partitions);
 
 	// Decode
 	//                               num_bytes            num_symbols (bits)
-	entropy_decoder->decode(in_bytes, in_size, (size_t)(ceil(pps.width * pps.height * vps.bits_per_pixel)));
+	entropy_decoder->decode(in_bytes, in_size, (size_t)(ceil(width * height * vps.bits_per_pixel)));
 	uint8_t* entropy_decoded_bytes = new uint8_t();
 	size_t	 entropy_decoded_size = 0;
 	entropy_decoder->flush(&entropy_decoded_bytes, &entropy_decoded_size);
 
-	spiht_decoder->decode(entropy_decoded_bytes, entropy_decoded_size, pps.width, pps.height, { .bpp = vps.bits_per_pixel, .num_levels = (size_t)vps.num_levels, .step = pps.step });
-	matrix<double> partition = matrix<double>(pps.height, pps.width);
+	spiht_decoder->decode(entropy_decoded_bytes, entropy_decoded_size, width, height, { .bpp = vps.bits_per_pixel, .num_levels = (size_t)vps.num_levels, .step = step });
+	matrix<double> partition = matrix<double>(height, width);
 	spiht_decoder->flush(partition);
 
 	std::map<size_t, matrix<double>>& plane_partitions = partitions[component];

@@ -11,7 +11,7 @@ public:
 		: bitstream(new ovc_bitstream()){};
 
 	virtual void encode(matrix<double> in_matrix, ovc_spiht_config in_config) = 0;
-	virtual void flush(uint8_t** out_bits, int* out_step) = 0;
+	virtual void flush(uint8_t** out_bits, uint16_t* out_step) = 0;
 
 protected:
 	ovc_bitstream* bitstream;
