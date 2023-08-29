@@ -1,7 +1,6 @@
 #include <cmath>
 #include <cstring>
 
-#include "ovc_common/log.h"
 #include "ovc_dec/ovc_dec.h"
 
 #define LogDecode "LogDecode"
@@ -14,7 +13,13 @@ ovc_decoder::ovc_decoder()
 
 ovc_dec_result ovc_decoder::init(ovc_dec_config* in_config)
 {
-	reset();
+	picture_ready = false;
+	picture = ovc_picture();
+
+	planes.clear();
+	planes[0] = std::map<size_t, matrix<double>>();
+	planes[1] = std::map<size_t, matrix<double>>();
+	planes[2] = std::map<size_t, matrix<double>>();
 
 	ovc_logging::verbosity = in_config->log_verbosity;
 
@@ -25,11 +30,16 @@ ovc_dec_result ovc_decoder::init(ovc_dec_config* in_config)
 	return OVC_DEC_OK;
 }
 
+void ovc_decoder::set_logging_callback(ovc_logging_callback in_callback)
+{
+	ovc_logging::logging_function = in_callback;
+}
+
 ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 {
 	if (!initialised)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL. Decoder uninitialised");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL. Decoder uninitialised");
 		return OVC_DEC_UNINITIALISED;
 	}
 
@@ -39,7 +49,7 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 
 	if (nal_size < 2)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL due to malformed header (size < 2 (bytes))");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL due to malformed header (size < 2 (bytes))");
 		return OVC_DEC_MALFORMED_NAL_HEADER;
 	}
 
@@ -65,7 +75,7 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 	// clang-format on
 	if ((start_byte & zero_bits) != 0)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL due to malformed header (start & res) != 0");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Dropping NAL due to malformed header (start & res) != 0");
 		return OVC_DEC_MALFORMED_NAL_HEADER;
 	}
 
@@ -76,7 +86,7 @@ ovc_dec_result ovc_decoder::decode_nal(const ovc_nal* in_nal_unit)
 		case OVC_NAL_TYPE_PARTITION:
 			return handle_partition(nal_bytes, nal_size);
 		default:
-			LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unknown NAL type");
+			OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unknown NAL type");
 			return OVC_DEC_MALFORMED_NAL_HEADER;
 	}
 }
@@ -93,24 +103,106 @@ ovc_dec_result ovc_decoder::get_picture(ovc_picture* out_picture)
 	*out_picture = std::move(picture);
 	out_picture->framerate = 29.97f;
 
-	reset();
+	picture_ready = false;
 
 	return OVC_DEC_OK;
 }
 
-void ovc_decoder::reset()
+ovc_dec_result ovc_decoder::flush()
 {
-	picture_ready = false;
+	// Reset our picture memory
 	picture = ovc_picture();
 
-	partitions.clear();
-	partitions[0] = std::map<size_t, matrix<double>>();
-	partitions[1] = std::map<size_t, matrix<double>>();
-	partitions[2] = std::map<size_t, matrix<double>>();
+	for (uint8_t component = 0; component < (uint8_t)(vps.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
+	{
+		// Get the partitions for this plane
+		std::map<size_t, matrix<double>>& partitions = planes[component];
+		if (partitions.size() != (size_t)vps.num_partitions)
+		{
+			// We've missed a partition. Find which partition it is and supplement with a 0 matrix
+
+			// Get all the partition_ids we currently have
+			std::vector<size_t> keys;
+			for (auto const& partition : partitions)
+			{
+				keys.push_back(partition.first);
+			}
+
+			// Find which partition_ids are missing
+			std::vector<size_t> missing_keys;
+			for (size_t i = 0; i < vps.num_partitions; i++)
+			{
+				if (std::find(keys.begin(), keys.end(), i) == keys.end())
+				{
+					missing_keys.push_back(i);
+				}
+			}
+
+			// Supplement this missing partition with a 0 matrix
+			size_t width = size_t(sqrt(vps.num_partitions) * (component == 0 ? vps.luma_width : vps.chroma_width) / vps.num_partitions);
+			size_t height = size_t(sqrt(vps.num_partitions) * (component == 0 ? vps.luma_height : vps.chroma_height) / vps.num_partitions);
+			for (size_t i = 0; i < missing_keys.size(); i++)
+			{
+				size_t		   missing_key = missing_keys[i];
+				matrix<double> supplement_partition = matrix<double>(height, width, 0);
+				partitions[missing_key] = supplement_partition;
+				OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a zero matrix", component, missing_key);
+			}
+		}
+
+		std::vector<matrix<double>> parts;
+		for (size_t i = 0; i < (size_t)vps.num_partitions; i++)
+		{
+			parts.push_back(partitions[i]);
+		}
+
+		matrix<double> full = departitioner->departition(parts, vps.num_levels);
+
+		ovc_wavelet_decomposition_2d<double> decomposition = ovc_wavelet_decomposition_2d<double>::from_matrix(full, vps.num_levels);
+		matrix<double>						 image = wavelet_recomposer->recompose(decomposition, full.size());
+
+		std::vector<uint8_t> plane_data;
+		for (size_t y = 0; y < image.get_num_rows(); y++)
+		{
+			for (size_t x = 0; x < image.get_num_columns(); x++)
+			{
+				double pixel = trunc(image(y, x));
+				plane_data.push_back((uint8_t)pixel);
+			}
+		}
+
+		ovc_plane plane;
+		plane.data = new uint8_t[image.get_num_rows() * image.get_num_columns()]{ 0 };
+
+		plane.height = image.get_num_rows();
+		plane.width = image.get_num_columns();
+		plane.bit_depth = 8;
+		memcpy(plane.data, plane_data.data(), plane_data.size());
+
+		picture.planes[component] = plane;
+		picture.format = vps.format;
+	}
+
+	// A picture has been decoded and is now ready
+	picture_ready = true;
+
+	// Now we're finished with the planes, we can reset them ready for whatever new NALs come in
+	planes.clear();
+	planes[0] = std::map<size_t, matrix<double>>();
+	planes[1] = std::map<size_t, matrix<double>>();
+	planes[2] = std::map<size_t, matrix<double>>();
+
+	return OVC_DEC_OK;
 }
 
 ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 {
+	// New VPS signals the start of a new frame. Decode the current state of the planes and reset
+	if (vps.is_set)
+	{
+		flush();
+	}
+
 	/* VPS FORMAT (30 BYTES) (0x0) */
 	/*
 	 +---------------+---------------+---------------+---------------+
@@ -149,7 +241,7 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 	*/
 	if (in_size < 30)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode VPS (size < 10 (bytes))");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode VPS (size < 10 (bytes))");
 		return OVC_DEC_MALFORMED_NAL_BODY;
 	}
 
@@ -163,7 +255,7 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 
 	if (start_code != 0x1)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode VPS (incorrect start sequence)");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode VPS (incorrect start sequence)");
 		return OVC_DEC_MALFORMED_NAL_BODY;
 	}
 
@@ -255,13 +347,13 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 	*/
 	if (in_size < 8)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (size < 2 (bytes))");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (size < 2 (bytes))");
 		return OVC_DEC_MALFORMED_NAL_BODY;
 	}
 
 	if (!vps.is_set)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (No VPS received)");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (No VPS received)");
 		return OVC_DEC_MISSING_VPS;
 	}
 
@@ -274,7 +366,7 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 
 	if (start_code != 0x1)
 	{
-		LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (incorrect start sequence)");
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Unable to decode partition (incorrect start sequence)");
 		return OVC_DEC_MALFORMED_NAL_BODY;
 	}
 
@@ -311,53 +403,12 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 	matrix<double> partition = matrix<double>(height, width);
 	spiht_decoder->flush(partition);
 
-	std::map<size_t, matrix<double>>& plane_partitions = partitions[component];
-	plane_partitions[partition_id] = partition;
+	// Get the partitions for this plane
+	std::map<size_t, matrix<double>>& partitions = planes[component];
+	// Assign the partition data to partition_id
+	partitions[partition_id] = partition;
 
-	if (plane_partitions.size() == (size_t)vps.num_partitions)
-	{
-		std::vector<matrix<double>> parts;
-		for (size_t i = 0; i < (size_t)vps.num_partitions; i++)
-		{
-			parts.push_back(plane_partitions[i]);
-		}
-		matrix<double> full = departitioner->departition(parts, vps.num_levels);
-
-		ovc_wavelet_decomposition_2d<double> decomposition = ovc_wavelet_decomposition_2d<double>::from_matrix(full, vps.num_levels);
-		matrix<double>						 image = wavelet_recomposer->recompose(decomposition, full.size());
-
-		std::vector<uint8_t> plane_data;
-		for (size_t y = 0; y < image.get_num_rows(); y++)
-		{
-			for (size_t x = 0; x < image.get_num_columns(); x++)
-			{
-				double pixel = trunc(image(y, x));
-				plane_data.push_back((uint8_t)pixel);
-			}
-		}
-
-		ovc_plane plane;
-		plane.data = new uint8_t[image.get_num_rows() * image.get_num_columns()]{ 0 };
-
-		plane.height = image.get_num_rows();
-		plane.width = image.get_num_columns();
-		plane.bit_depth = 8;
-		memcpy(plane.data, plane_data.data(), plane_data.size());
-
-		picture.planes[component] = plane;
-		picture.format = vps.format;
-	}
-
-	if (vps.format == OVC_CHROMA_FORMAT_MONOCHROME)
-	{
-		picture_ready = picture.planes[0].width != 0;
-	}
-	else
-	{
-		picture_ready = picture.planes[0].width != 0 && picture.planes[1].width != 0 && picture.planes[2].width != 0;
-	}
-
-	return ovc_dec_result::OVC_DEC_OK;
+	return OVC_DEC_OK;
 }
 
 #undef LogDecode

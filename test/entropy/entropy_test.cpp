@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <vector>
 
-#include "ovc_common/log.h"
+#include "ovc_common/log/log.h"
 #include "ovc_dec/entropy/decoder_factory.h"
 #include "ovc_enc/entropy/encoder_factory.h"
 
@@ -31,7 +31,7 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		raw_string += x.to_string();
 		raw_string += " ";
 	}
-	LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Raw data: [ {} ]", raw_string);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Raw data: [ %s ]", raw_string);
 
 	uint8_t* coded_data = new uint8_t();
 	size_t	 coded_size = 0;
@@ -45,7 +45,7 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		coded_string += x.to_string();
 		coded_string += " ";
 	}
-	LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Coded data: [ {} ]", coded_string);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Coded data: [ %s ]", coded_string);
 
 	// Decode
 	uint8_t* decoded_data = new uint8_t();
@@ -60,7 +60,7 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		decoded_string += x.to_string();
 		decoded_string += " ";
 	}
-	LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Decoded data: [ {} ]", decoded_string);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Decoded data: [ %s ]", decoded_string);
 
 	bool success = true;
 	success &= (decoded_size == raw_size);
@@ -72,9 +72,9 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		}
 	}
 
-	LOG(LogEntropyTest, OVC_VERBOSITY_VERBOSE, "Raw size: {} bytes", raw_size);
-	LOG(LogEntropyTest, OVC_VERBOSITY_VERBOSE, "Compressed size: {} bytes", coded_size);
-	LOG(LogEntropyTest, OVC_VERBOSITY_VERBOSE, "{}", (success ? "Success" : "Fail"));
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_VERBOSE, "Raw size: %d bytes", raw_size);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_VERBOSE, "Compressed size: %d bytes", coded_size);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_VERBOSE, "%s", (success ? "Success" : "Fail"));
 
 	return success;
 }

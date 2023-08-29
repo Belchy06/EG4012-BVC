@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "ovc_common/log.h"
+#include "ovc_common/log/log.h"
 #include "partition_test.h"
 
 #include "ovc_enc/partition/partitioner_factory.h"

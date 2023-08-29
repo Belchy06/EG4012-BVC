@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "ovc_common/log.h"
+#include "ovc_common/log/log.h"
 #include "ovc_enc/wavelet/decomposer.h"
 #include "ovc_enc/wavelet/decomposer_factory.h"
 #include "ovc_dec/wavelet/recomposer.h"
@@ -21,7 +21,7 @@ bool wavelet_test::test(ovc_wavelet_family in_wavelet_family, ovc_wavelet_config
 
 	double norm = ovc_vector::norm((raw - recomposition).get_data());
 
-	LOG(LogWaveletTest, OVC_VERBOSITY_VERBOSE, "l2-norm: {}", norm);
+	OVC_LOG(LogWaveletTest, OVC_VERBOSITY_VERBOSE, "l2-norm: %d", norm);
 	return trunc(norm) == 0;
 }
 

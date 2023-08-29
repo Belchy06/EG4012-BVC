@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "ovc_common/log.h"
+#include "ovc_common/log/log.h"
 #include "ovc_dec/partition/offset_zerotree/departitioner.h"
 
 #define LogOffsetZerotreeDepartitioner "LogOffsetZerotreeDepartitioner"
@@ -36,8 +36,6 @@ matrix<double> offset_zerotree_departitioner::departition(std::vector<matrix<dou
 				size_t offset_x = i % step_x;
 				size_t offset_y = i / step_y;
 				full(y * step_y + offset_y, x * step_x + offset_x) = partition(y, x);
-				// LOG(LogOffsetZerotreePartitioner, OVC_VERBOSITY_VERY_VERBOSE, "downsampled {}, {}", x, y);
-				// LOG(LogOffsetZerotreePartitioner, OVC_VERBOSITY_VERY_VERBOSE, "original {}, {}", x * step_x + offset_x, y * step_y + offset_y);
 			}
 		}
 	}

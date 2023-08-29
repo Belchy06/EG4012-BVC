@@ -1,4 +1,4 @@
-#include "ovc_common/log.h"
+#include "ovc_common/log/log.h"
 #include "ovc_dec/ovc_dec.h"
 #include "ovc_enc/ovc_enc.h"
 #include "e2e.h"
@@ -56,7 +56,7 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 	dec_res = decoder->init(&dec_config);
 	if (dec_res != OVC_DEC_OK)
 	{
-		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to init: {}", static_cast<uint8_t>(dec_res));
+		OVC_LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to init: %d", static_cast<uint8_t>(dec_res));
 		return false;
 	}
 
@@ -65,16 +65,25 @@ bool e2e_test::test(std::string in_source_path, std::string in_output_path)
 		dec_res = decoder->decode_nal(&nals[i]);
 		if (dec_res != OVC_DEC_OK)
 		{
-			LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to decode nal: {}", static_cast<uint8_t>(dec_res));
+			OVC_LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to decode nal: %d", static_cast<uint8_t>(dec_res));
 			return false;
 		}
+	}
+
+	// We know we've decoded all the nals possible. Force the decoder to decode what it's received.
+	// In a live stream situation, this is triggered by the reception of a new VPS
+	dec_res = decoder->flush();
+	if (dec_res != OVC_DEC_OK)
+	{
+		OVC_LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to flush decoder: %d", static_cast<uint8_t>(dec_res));
+		return false;
 	}
 
 	ovc_picture output;
 	dec_res = decoder->get_picture(&output);
 	if (dec_res != OVC_DEC_OK)
 	{
-		LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to get picture: {}", static_cast<uint8_t>(dec_res));
+		OVC_LOG(LogE2E, OVC_VERBOSITY_ERROR, "Failed to get picture: %d", static_cast<uint8_t>(dec_res));
 		return false;
 	}
 

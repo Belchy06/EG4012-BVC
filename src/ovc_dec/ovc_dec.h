@@ -2,6 +2,7 @@
 
 #include <map>
 
+#include "ovc_common/log/log.h"
 #include "ovc_common/nal.h"
 #include "ovc_common/picture.h"
 #include "ovc_common/plane.h"
@@ -23,8 +24,8 @@ public:
 	float			  framerate;
 	float			  bits_per_pixel;
 
-	int num_partitions;
-	int num_levels;
+	uint16_t num_partitions;
+	uint16_t num_levels;
 
 	ovc_wavelet_family wavelet_family;
 	ovc_wavelet_config wavelet_config;
@@ -51,11 +52,12 @@ public:
 	ovc_decoder();
 
 	ovc_dec_result init(ovc_dec_config* in_config);
+	void		   set_logging_callback(ovc_logging_callback in_callback);
 	ovc_dec_result decode_nal(const ovc_nal* in_nal_unit);
+	ovc_dec_result flush();
 	ovc_dec_result get_picture(ovc_picture* out_picture);
 
 private:
-	void		   reset();
 	ovc_dec_result handle_vps(uint8_t* in_bytes, size_t in_size);
 	ovc_dec_result handle_partition(uint8_t* in_bytes, size_t in_size);
 
@@ -66,8 +68,8 @@ private:
 	bool		   picture_ready;
 	ovc_picture	   picture;
 
-	//     component        partition        pps
-	std::map<size_t, std::map<size_t, matrix<double>>> partitions;
+	//     component       partition_id     data
+	std::map<size_t, std::map<size_t, matrix<double>>> planes;
 
 	std::shared_ptr<ovc_wavelet_recomposer> wavelet_recomposer;
 	std::shared_ptr<ovc_departitioner>		departitioner;

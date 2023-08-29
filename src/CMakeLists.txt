@@ -8,6 +8,7 @@ set(OVC_COMMON_SOURCES
     "ovc_common/bitstream/bitstream.cpp"
     "ovc_common/linked_list/node.h"
     "ovc_common/linked_list/linked_list.h"
+    "ovc_common/log/log.cpp"
     "ovc_common/entropy/huffman/huffman_node.h"
     "ovc_common/entropy/huffman/huffman_node.cpp"
     "ovc_common/math/vector.h"

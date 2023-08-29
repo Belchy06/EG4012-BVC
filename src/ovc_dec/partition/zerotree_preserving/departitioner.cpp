@@ -1,4 +1,4 @@
-#include "ovc_common/log.h"
+#include "ovc_common/log/log.h"
 #include "ovc_dec/partition/zerotree_preserving/departitioner.h"
 
 #define LogZerotreePreservingDepartitioner "LogZerotreePreservingDepartitioner"

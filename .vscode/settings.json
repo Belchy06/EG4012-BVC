@@ -74,6 +74,7 @@
         "thread": "cpp",
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "cstdarg": "cpp"
     }
 }

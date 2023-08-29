@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "ovc_common/util/util.h"
-#include "ovc_common/log.h"
 
 ovc_encoder::ovc_encoder()
 	: send_vps(true)
@@ -133,6 +132,11 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 	initialised = true;
 
 	return OVC_ENC_OK;
+}
+
+void ovc_encoder::set_logging_callback(ovc_logging_callback in_callback)
+{
+	ovc_logging::logging_function = in_callback;
 }
 
 ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_units, size_t* out_num_nal_units)
