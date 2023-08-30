@@ -31,7 +31,7 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		raw_string += x.to_string();
 		raw_string += " ";
 	}
-	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Raw data: [ %s ]", raw_string);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Raw data: [ %s ]", raw_string.c_str());
 
 	uint8_t* coded_data = new uint8_t();
 	size_t	 coded_size = 0;
@@ -45,7 +45,7 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		coded_string += x.to_string();
 		coded_string += " ";
 	}
-	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Coded data: [ %s ]", coded_string);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Coded data: [ %s ]", coded_string.c_str());
 
 	// Decode
 	uint8_t* decoded_data = new uint8_t();
@@ -60,7 +60,7 @@ bool entropy_test::test(ovc_entropy_coder in_entropy_coder, size_t in_raw_size)
 		decoded_string += x.to_string();
 		decoded_string += " ";
 	}
-	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Decoded data: [ %s ]", decoded_string);
+	OVC_LOG(LogEntropyTest, OVC_VERBOSITY_DETAILS, "Decoded data: [ %s ]", decoded_string.c_str());
 
 	bool success = true;
 	success &= (decoded_size == raw_size);

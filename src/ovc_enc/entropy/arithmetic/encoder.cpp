@@ -28,7 +28,7 @@ void arithmetic_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 	}
 }
 
-void arithmetic_encoder::flush(uint8_t** out_bits, size_t* out_size)
+void arithmetic_encoder::flush(uint8_t** out_bytes, size_t* out_size)
 {
 	underflow_count++;
 
@@ -36,8 +36,8 @@ void arithmetic_encoder::flush(uint8_t** out_bits, size_t* out_size)
 	bitstream->write_bit(val);
 	flush_inverse_bits(val);
 
-	*out_bits = new uint8_t[bitstream->occupancy()];
-	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
+	*out_bytes = new uint8_t[bitstream->occupancy()];
+	memcpy(*out_bytes, bitstream->data(), bitstream->occupancy());
 	*out_size = bitstream->occupancy();
 
 	clear();

@@ -8,6 +8,7 @@
 #include "e2e/e2e_test.h"
 #include "entropy/entropy_test.h"
 #include "encode/encode_test.h"
+#include "interleave/interleave_test.h"
 #include "partition/partition_test.h"
 #include "resilience/resilience_test.h"
 #include "wavelet/wavelet_test.h"
@@ -18,6 +19,8 @@ int main(int argc, const char* argv[])
 {
 	ovc_logging::verbosity = OVC_VERBOSITY_SILENT;
 
+	uint16_t seed = 1337;
+
 	bool entropy = true;
 	bool wavelet = true;
 	bool partition = true;
@@ -25,6 +28,7 @@ int main(int argc, const char* argv[])
 	bool decode = true;
 	bool e2e = true;
 	bool resilience = true;
+	bool interleave = true;
 
 	std::string source_path;
 	std::string output_path;
@@ -66,6 +70,7 @@ int main(int argc, const char* argv[])
             decode = false;
             e2e = false;
             resilience = false;
+            interleave = false;
 
             std::stringstream ss(TestStr);
             std::string test;
@@ -85,6 +90,8 @@ int main(int argc, const char* argv[])
                     e2e = true;
                 } else if(test == "resilience") {
                     resilience = true;
+                } else if(test == "interleave") {
+                    interleave = true;
                 }
             }
         } else if(arg == "-source") {
@@ -93,6 +100,8 @@ int main(int argc, const char* argv[])
             output_path = std::string(argv[++i]);
         } else if(arg == "-num_dropped_nals") {
             std::stringstream(argv[++i]) >> num_dropped_nals;
+        } else if(arg == "-seed") {
+            std::stringstream(argv[++i]) >> seed;
         }
 		// clang-format on
 	}
@@ -246,11 +255,24 @@ int main(int argc, const char* argv[])
 	if (resilience)
 	{
 		/**
-		 * END2END TEST
+		 * RESILIENCE TEST
 		 */
 		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_RESILIENCE");
 		bSuccess &= resilience_test::test(num_dropped_nals, output_path);
 	}
+
+	if (interleave)
+	{
+		/**
+		 * INTERLEAVE TEST
+		 */
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_INTERLEAVE_SKIP");
+		bSuccess &= interleave_test::test(OVC_INTERLEAVE_SKIP, seed, 32);
+
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_INTERLEAVE_RANDOM");
+		bSuccess &= interleave_test::test(OVC_INTERLEAVE_RANDOM, seed, 32);
+	}
+
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 
 	return bSuccess ? 0 : -1;

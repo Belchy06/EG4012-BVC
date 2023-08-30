@@ -11,16 +11,18 @@
             // "preLaunchTask": "Build Test",
             "args": [
                 "-verbosity",
-                "veryverbose",
+                "details",
                 "-tests",
                 // "entropy"
-                "resilience",
+                "interleave",
                 "-source",
                 "${workspaceFolder}\\lena_gray_64.ppm",
                 "-output",
                 "${workspaceFolder}\\decompressed.ppm",
                 "-num_dropped_nals",
-                "1"
+                "1",
+                "-seed",
+                "42"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

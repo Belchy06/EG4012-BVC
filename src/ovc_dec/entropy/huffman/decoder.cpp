@@ -63,10 +63,10 @@ void huffman_decoder::decode(uint8_t* in_bytes, size_t in_size, size_t in_num_sy
 	}
 }
 
-void huffman_decoder::flush(uint8_t** out_bits, size_t* out_size)
+void huffman_decoder::flush(uint8_t** out_bytes, size_t* out_size)
 {
-	*out_bits = new uint8_t[output->occupancy()];
-	memcpy(*out_bits, output->data(), output->occupancy());
+	*out_bytes = new uint8_t[output->occupancy()];
+	memcpy(*out_bytes, output->data(), output->occupancy());
 	*out_size = output->occupancy();
 
 	clear();

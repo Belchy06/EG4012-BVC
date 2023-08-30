@@ -13,6 +13,7 @@ set(OVC_TEST_SOURCES
     "decode/decode_test.cpp"
     "e2e/e2e_test.cpp"
     "resilience/resilience_test.cpp"
+    "interleave/interleave_test.cpp"
     "main.cpp")
 
 if(MSVC)

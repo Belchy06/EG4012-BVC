@@ -15,7 +15,7 @@ public:
 	virtual void decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbols) = 0;
 
 	// Each implementation is responisble for the retrieval of decoded data
-	virtual void flush(uint8_t** out_bits, size_t* out_size) = 0;
+	virtual void flush(uint8_t** out_bytes, size_t* out_size) = 0;
 
 protected:
 	ovc_bitstream* bitstream;

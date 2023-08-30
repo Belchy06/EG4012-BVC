@@ -11,7 +11,7 @@ public:
 		: bitstream(new ovc_bitstream()){};
 
 	virtual void encode(const uint8_t* in_bytes, size_t in_size) = 0;
-	virtual void flush(uint8_t** out_bits, size_t* out_size) = 0;
+	virtual void flush(uint8_t** out_bytes, size_t* out_size) = 0;
 
 protected:
 	ovc_bitstream* bitstream;

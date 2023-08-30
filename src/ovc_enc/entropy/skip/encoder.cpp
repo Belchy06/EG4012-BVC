@@ -8,10 +8,10 @@ void skip_entropy_encoder::encode(const uint8_t* in_bytes, size_t in_size)
 	}
 }
 
-void skip_entropy_encoder::flush(uint8_t** out_bits, size_t* out_size)
+void skip_entropy_encoder::flush(uint8_t** out_bytes, size_t* out_size)
 {
-	*out_bits = new uint8_t[bitstream->occupancy()];
-	memcpy(*out_bits, bitstream->data(), bitstream->occupancy());
+	*out_bytes = new uint8_t[bitstream->occupancy()];
+	memcpy(*out_bytes, bitstream->data(), bitstream->occupancy());
 	*out_size = bitstream->occupancy();
 
 	delete bitstream;
