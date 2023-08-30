@@ -4,22 +4,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 set(OVC_TEST_SOURCES
-    "misc/lenna.h"
     "misc/lenna.cpp"
-    "util/ppm.h"
     "util/ppm.cpp"
-    "entropy/entropy_test.h"
     "entropy/entropy_test.cpp"
-    "wavelet/wavelet_test.h"
     "wavelet/wavelet_test.cpp"
-    "partition/partition_test.h"
     "partition/partition_test.cpp"
-    "encode/encode_test.h"
     "encode/encode_test.cpp"
-    "decode/decode_test.h"
     "decode/decode_test.cpp"
-    "e2e/e2e.h"
-    "e2e/e2e.cpp"
+    "e2e/e2e_test.cpp"
+    "resilience/resilience_test.cpp"
     "main.cpp")
 
 if(MSVC)

@@ -5,10 +5,11 @@
 #include "ovc_common/log/log.h"
 #include "ovc_common/verbosity.h"
 #include "decode/decode_test.h"
-#include "e2e/e2e.h"
+#include "e2e/e2e_test.h"
 #include "entropy/entropy_test.h"
 #include "encode/encode_test.h"
 #include "partition/partition_test.h"
+#include "resilience/resilience_test.h"
 #include "wavelet/wavelet_test.h"
 
 #define LogTest "LogTest"
@@ -23,9 +24,12 @@ int main(int argc, const char* argv[])
 	bool encode = true;
 	bool decode = true;
 	bool e2e = true;
+	bool resilience = true;
 
 	std::string source_path;
 	std::string output_path;
+
+	size_t num_dropped_nals;
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -61,6 +65,7 @@ int main(int argc, const char* argv[])
 	        encode = false;
             decode = false;
             e2e = false;
+            resilience = false;
 
             std::stringstream ss(TestStr);
             std::string test;
@@ -78,12 +83,16 @@ int main(int argc, const char* argv[])
                     decode = true;
                 } else if(test == "e2e") {
                     e2e = true;
+                } else if(test == "resilience") {
+                    resilience = true;
                 }
             }
         } else if(arg == "-source") {
             source_path = std::string(argv[++i]);
         } else if(arg == "-output") {
             output_path = std::string(argv[++i]);
+        } else if(arg == "-num_dropped_nals") {
+            std::stringstream(argv[++i]) >> num_dropped_nals;
         }
 		// clang-format on
 	}
@@ -110,19 +119,19 @@ int main(int argc, const char* argv[])
 		 * ENTROPY TEST
 		 */
 		// SKIP
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENTROPY_CODER_SKIP");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENTROPY_CODER_SKIP");
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_SKIP, 32);
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_SKIP, 64);
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_SKIP, 128);
 
 		// ARITHMETIC
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENTROPY_CODER_ARITHMETIC");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENTROPY_CODER_ARITHMETIC");
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_ARITHMETIC, 32);
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_ARITHMETIC, 64);
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_ARITHMETIC, 128);
 
 		// HUFFMAN
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENTROPY_CODER_HUFFMAN");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENTROPY_CODER_HUFFMAN");
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_HUFFMAN, 32);
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_HUFFMAN, 64);
 		bSuccess &= entropy_test::test(OVC_ENTROPY_CODER_HUFFMAN, 128);
@@ -134,65 +143,65 @@ int main(int argc, const char* argv[])
 		 * WAVELET TEST
 		 */
 		// Haar
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_HAAR");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_HAAR");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_HAAR, { .haar_config = { ovc_wavelet_haar_config::OVC_WAVELET_HAAR_DEFAULT } }, 64, 64, 4);
 		// Bi-orthogonal
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_1p1");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_1p1");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_1p1 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_1p3");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_1p3");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_1p3 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_1p5");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_1p5");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_1p5 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p2");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p2");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_2p2 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p4");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p4");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_2p4 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p6");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p6");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_2p6 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p8");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_2p8");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_2p8 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p1");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p1");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_3p1 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p3");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p3");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_3p3 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p5");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p5");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_3p5 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p7");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p7");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_3p7 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p9");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_3p9");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_3p9 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_4p4");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_4p4");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_4p4 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_5p5");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_5p5");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_5p5 } }, 64, 64, 4);
 
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_6p8");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_BIORTHOGONAL_6p8");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_BIORTHOGONAL, { .biorthogonal_config = { ovc_wavelet_biorthogonal_config::OVC_WAVELET_BIORTHOGONAL_6p8 } }, 64, 64, 4);
 
 		// Coiflets
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_1");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_1");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_COIFLETS, { .coiflets_config = { ovc_wavelet_coiflets_config::OVC_WAVELET_COIFLETS_1 } }, 64, 64, 4);
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_2");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_2");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_COIFLETS, { .coiflets_config = { ovc_wavelet_coiflets_config::OVC_WAVELET_COIFLETS_2 } }, 64, 64, 4);
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_3");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_3");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_COIFLETS, { .coiflets_config = { ovc_wavelet_coiflets_config::OVC_WAVELET_COIFLETS_3 } }, 64, 64, 4);
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_4");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_4");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_COIFLETS, { .coiflets_config = { ovc_wavelet_coiflets_config::OVC_WAVELET_COIFLETS_4 } }, 64, 64, 4);
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_5");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_WAVELET_COIFLETS_5");
 		bSuccess &= wavelet_test::test(OVC_WAVELET_FAMILY_COIFLETS, { .coiflets_config = { ovc_wavelet_coiflets_config::OVC_WAVELET_COIFLETS_5 } }, 64, 64, 4);
 	}
 
@@ -201,9 +210,9 @@ int main(int argc, const char* argv[])
 		/**
 		 * PARTITION TEST
 		 */
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_PARTITION_OFFSET_ZEROTREE");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_PARTITION_OFFSET_ZEROTREE");
 		bSuccess &= partition_test::test(OVC_PARTITION_OFFSET_ZEROTREE, 64, 64);
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_PARTITION_ZEROTREE_PRESERVING");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_PARTITION_ZEROTREE_PRESERVING");
 		bSuccess &= partition_test::test(OVC_PARTITION_ZEROTREE_PRESERVING, 64, 64);
 	}
 
@@ -212,7 +221,7 @@ int main(int argc, const char* argv[])
 		/**
 		 * ENCODE TEST
 		 */
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENCODE");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_ENCODE");
 		bSuccess &= encode_test::test(source_path, output_path);
 	}
 
@@ -221,7 +230,7 @@ int main(int argc, const char* argv[])
 		/**
 		 * DECODE TEST
 		 */
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_DECODE");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_DECODE");
 		bSuccess &= decode_test::test(source_path, output_path);
 	}
 
@@ -230,8 +239,17 @@ int main(int argc, const char* argv[])
 		/**
 		 * END2END TEST
 		 */
-		 OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_E2E");
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_E2E");
 		bSuccess &= e2e_test::test(source_path, output_path);
+	}
+
+	if (resilience)
+	{
+		/**
+		 * END2END TEST
+		 */
+		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_RESILIENCE");
+		bSuccess &= resilience_test::test(num_dropped_nals, output_path);
 	}
 	std::cout << ((bSuccess) ? "Success" : "Failure") << std::endl;
 

@@ -14,11 +14,13 @@
                 "veryverbose",
                 "-tests",
                 // "entropy"
-                "e2e",
+                "resilience",
                 "-source",
                 "${workspaceFolder}\\lena_gray_64.ppm",
                 "-output",
-                "${workspaceFolder}\\decompressed.ppm"
+                "${workspaceFolder}\\decompressed.ppm",
+                "-num_dropped_nals",
+                "1"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

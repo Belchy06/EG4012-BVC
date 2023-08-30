@@ -1,7 +1,7 @@
 #include "ovc_common/log/log.h"
 #include "ovc_dec/ovc_dec.h"
 #include "ovc_enc/ovc_enc.h"
-#include "e2e.h"
+#include "e2e_test.h"
 #include "../util/ppm.h"
 #include "../misc/lenna.h"
 

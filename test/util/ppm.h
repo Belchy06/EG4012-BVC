@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "ovc_common/picture.h"
 
 class ppm
