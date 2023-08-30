@@ -161,7 +161,7 @@ ovc_dec_result ovc_decoder::flush()
 							supplement_partition(y, x) = sum / keys.size();
 						}
 					}
-					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a the average of surrounding values", component, missing_key);
+					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with the average of surrounding values", component, missing_key);
 				}
 				else if (config.error_concealment == OVC_ERROR_CONCEALMENT_AVERAGE_SURROUNDING)
 				{
@@ -204,7 +204,7 @@ ovc_dec_result ovc_decoder::flush()
 							supplement_partition(y, x) = sum / num_used_partitions;
 						}
 					}
-					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a the average of surrounding values in a + shape", component, missing_key);
+					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with the average of surrounding values in a + shape", component, missing_key);
 				}
 				else if (config.error_concealment == OVC_ERROR_CONCEALMENT_SKIP)
 				{
