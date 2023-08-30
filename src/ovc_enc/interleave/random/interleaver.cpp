@@ -18,6 +18,7 @@ void random_interleaver::interleave(const uint8_t* in_bytes, size_t in_size)
 
 	std::shuffle(indices.begin(), indices.end(), generator);
 
+	bytes.clear();
 	bytes.assign(in_size, 0);
 	for (size_t i = 0; i < in_size; i++)
 	{
@@ -28,7 +29,5 @@ void random_interleaver::interleave(const uint8_t* in_bytes, size_t in_size)
 void random_interleaver::flush(uint8_t** out_bytes, size_t* out_size)
 {
 	*out_size = bytes.size();
-	*out_bytes = std::move(bytes.data());
-
-	bytes.clear();
+	memcpy(*out_bytes, bytes.data(), bytes.size());
 }
