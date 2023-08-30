@@ -145,8 +145,73 @@ ovc_dec_result ovc_decoder::flush()
 			{
 				size_t		   missing_key = missing_keys[i];
 				matrix<double> supplement_partition = matrix<double>(height, width, 0);
+				if (config.error_concealment == OVC_ERROR_CONCEALMENT_AVERAGE_RECEIVED)
+				{
+					for (size_t y = 0; y < supplement_partition.get_num_rows(); y++)
+					{
+						for (size_t x = 0; x < supplement_partition.get_num_columns(); x++)
+						{
+							// Average with other partitions
+							double sum = 0;
+							for (size_t j = 0; j < keys.size(); j++)
+							{
+								size_t key = keys[j];
+								sum += partitions[key](y, x);
+							}
+							supplement_partition(y, x) = sum / keys.size();
+						}
+					}
+					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a the average of surrounding values", component, missing_key);
+				}
+				else if (config.error_concealment == OVC_ERROR_CONCEALMENT_AVERAGE_SURROUNDING)
+				{
+					for (size_t y = 0; y < supplement_partition.get_num_rows(); y++)
+					{
+						for (size_t x = 0; x < supplement_partition.get_num_columns(); x++)
+						{
+							// Average with surrounding partitions in + shape
+							double sum = 0;
+							size_t num_used_partitions = 0;
+
+							// Right neighbour (if we received it)
+							if (std::find(keys.begin(), keys.end(), missing_key + 1) != keys.end())
+							{
+								sum += partitions[missing_key + 1](y, x);
+								num_used_partitions++;
+							}
+
+							// Left neighbour (if we received it)
+							if (std::find(keys.begin(), keys.end(), missing_key - 1) != keys.end())
+							{
+								sum += partitions[missing_key - 1](y, x);
+								num_used_partitions++;
+							}
+
+							// Top neighbour (if we received it)
+							if (std::find(keys.begin(), keys.end(), missing_key - (size_t)sqrt(vps.num_partitions)) != keys.end())
+							{
+								sum += partitions[missing_key - (size_t)sqrt(vps.num_partitions)](y, x);
+								num_used_partitions++;
+							}
+
+							// Bottom neighbour (if we received it)
+							if (std::find(keys.begin(), keys.end(), missing_key + (size_t)sqrt(vps.num_partitions)) != keys.end())
+							{
+								sum += partitions[missing_key + (size_t)sqrt(vps.num_partitions)](y, x);
+								num_used_partitions++;
+							}
+
+							supplement_partition(y, x) = sum / num_used_partitions;
+						}
+					}
+					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a the average of surrounding values in a + shape", component, missing_key);
+				}
+				else if (config.error_concealment == OVC_ERROR_CONCEALMENT_SKIP)
+				{
+					OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a zero matrix", component, missing_key);
+				}
+
 				partitions[missing_key] = supplement_partition;
-				OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Supplementing c: %d, p: %d with a zero matrix", component, missing_key);
 			}
 		}
 

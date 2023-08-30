@@ -258,7 +258,7 @@ int main(int argc, const char* argv[])
 		 * RESILIENCE TEST
 		 */
 		OVC_LOG(LogTest, OVC_VERBOSITY_VERBOSE, "OVC_RESILIENCE");
-		bSuccess &= resilience_test::test(num_dropped_nals, output_path);
+		bSuccess &= resilience_test::test(num_dropped_nals, seed, output_path);
 	}
 
 	if (interleave)

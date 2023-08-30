@@ -30,6 +30,7 @@ public:
 	ovc_entropy_coder  entropy_coder;
 
 	bool repeat_vps;
+	bool multithreading;
 
 	ovc_verbosity log_verbosity;
 };

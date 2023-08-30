@@ -8,8 +8,10 @@
 
 #define LogResilience "LogResilience"
 
-bool resilience_test::test(size_t in_num_dropped_nals, std::string in_output_path)
+bool resilience_test::test(size_t in_num_dropped_nals, uint16_t in_seed, std::string in_output_path)
 {
+	std::srand(in_seed);
+
 	std::shared_ptr<ovc_encoder> encoder = std::make_shared<ovc_encoder>();
 
 	ovc_enc_result enc_res;
@@ -36,6 +38,9 @@ bool resilience_test::test(size_t in_num_dropped_nals, std::string in_output_pat
 	// Entropy coding settings
 	enc_config.entropy_coder = OVC_ENTROPY_CODER_ARITHMETIC;
 
+	// Additional settings
+	enc_config.multithreading = false;
+
 	enc_res = encoder->init(&enc_config);
 
 	// Construct image
@@ -54,6 +59,7 @@ bool resilience_test::test(size_t in_num_dropped_nals, std::string in_output_pat
 
 	ovc_dec_config dec_config;
 	dec_config.log_verbosity = OVC_VERBOSITY_DETAILS;
+	dec_config.error_concealment = OVC_ERROR_CONCEALMENT_AVERAGE_SURROUNDING;
 
 	dec_res = decoder->init(&dec_config);
 	if (dec_res != OVC_DEC_OK)
@@ -71,7 +77,7 @@ bool resilience_test::test(size_t in_num_dropped_nals, std::string in_output_pat
 	for (size_t i = 0; i < in_num_dropped_nals; i++)
 	{
 
-		size_t dropped_nal_index = rand() % (nal_vec.size() - 1) + 1;
+		size_t dropped_nal_index = std::rand() % (nal_vec.size() - 1) + 1;
 		nal_vec.erase(nal_vec.begin() + dropped_nal_index);
 
 		OVC_LOG(LogResilience, OVC_VERBOSITY_NOTICE, "Dropping nal: %d", static_cast<uint8_t>(dropped_nal_index));

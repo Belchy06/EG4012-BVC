@@ -156,11 +156,18 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	std::vector<std::thread> threads;
 	for (uint8_t component = 0; component < (uint8_t)(config.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
 	{
-		std::thread thread = std::thread([in_picture, component, this]() {
-			encode_component(in_picture, component);
-		});
+		if (config.multithreading)
+		{
+			std::thread thread = std::thread([in_picture, component, this]() {
+				encode_component(in_picture, component);
+			});
 
-		threads.push_back(std::move(thread));
+			threads.push_back(std::move(thread));
+		}
+		else
+		{
+			encode_component(in_picture, component);
+		}
 	}
 
 	for (std::thread& thread : threads)
@@ -203,11 +210,18 @@ void ovc_encoder::encode_component(ovc_picture* in_picture, uint8_t in_component
 	for (uint16_t i = 0; i < partitions.size(); i++)
 	{
 		matrix<double> partition = partitions[i];
-		std::thread	   thread = std::thread([partition, i, in_component, this]() {
-			   encode_partition(partition, i, in_component);
-		   });
+		if (config.multithreading)
+		{
+			std::thread thread = std::thread([partition, i, in_component, this]() {
+				encode_partition(partition, i, in_component);
+			});
 
-		threads.push_back(std::move(thread));
+			threads.push_back(std::move(thread));
+		}
+		else
+		{
+			encode_partition(partition, i, in_component);
+		}
 	}
 
 	for (std::thread& thread : threads)
