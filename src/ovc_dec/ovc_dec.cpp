@@ -446,6 +446,13 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
     partition_id |=        (in_bytes[byte_idx++]) << 0;
 	// clang-format on
 
+	if (planes[component].contains(partition_id))
+	{
+		// This is the second time we're receiving this partition, indicating a new frame being received
+		OVC_LOG(LogDecode, OVC_VERBOSITY_WARNING, "Duplicate partition (c: %d, p: %d) received", component, partition_id);
+		flush();
+	}
+
 	uint16_t step = 0;
 	step |= in_bytes[byte_idx++] << 8;
 	step |= in_bytes[byte_idx++] << 0;
