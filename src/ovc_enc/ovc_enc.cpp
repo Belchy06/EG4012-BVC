@@ -7,6 +7,11 @@
 #include <vector>
 
 #include "ovc_common/util/util.h"
+#include "ovc_enc/entropy/encoder_factory.h"
+#include "ovc_enc/interleave/interleaver_factory.h"
+#include "ovc_enc/partition/partitioner_factory.h"
+#include "ovc_enc/spiht/encoder_factory.h"
+#include "ovc_enc/wavelet/decomposer_factory.h"
 
 ovc_encoder::ovc_encoder()
 	: send_vps(true)
@@ -125,6 +130,10 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 		in_config->num_levels = (max_part_levels < max_image_levels) ? max_part_levels : max_image_levels;
 	}
 
+	ovc_interleave_config interleaver_config;
+	interleaver_config.seed = in_config->seed;
+	interleaver = ovc_interleaver_factory::create_interleaver(in_config->interleaver, interleaver_config);
+
 	ovc_logging::verbosity = in_config->log_verbosity;
 
 	config = *in_config;
@@ -174,6 +183,9 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 	{
 		thread.join();
 	}
+
+	// Interleaver shuffles (or not) the order of the nals when output
+	output_nals = interleaver->interleave(output_nals);
 
 	*out_nal_units = &output_nals[0];
 	*out_num_nal_units = static_cast<int>(output_nals.size());

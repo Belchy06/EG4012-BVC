@@ -14,7 +14,7 @@
                 "details",
                 "-tests",
                 // "entropy"
-                "resilience",
+                "interleave",
                 "-source",
                 "${workspaceFolder}\\lena_gray_64.ppm",
                 "-output",

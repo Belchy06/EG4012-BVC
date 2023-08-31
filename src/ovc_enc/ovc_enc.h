@@ -7,10 +7,7 @@
 #include "ovc_common/nal.h"
 #include "ovc_common/picture.h"
 #include "ovc_enc/config.h"
-#include "ovc_enc/entropy/encoder_factory.h"
-#include "ovc_enc/partition/partitioner_factory.h"
-#include "ovc_enc/spiht/encoder_factory.h"
-#include "ovc_enc/wavelet/decomposer_factory.h"
+#include "ovc_enc/interleave/interleaver.h"
 #include "ovc_enc/spiht/encoder.h"
 #include "ovc_enc/result.h"
 
@@ -36,4 +33,6 @@ private:
 
 	std::mutex			 output_nals_mutex;
 	std::vector<ovc_nal> output_nals;
+
+	std::shared_ptr<ovc_interleaver> interleaver;
 };

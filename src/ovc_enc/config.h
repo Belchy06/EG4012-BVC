@@ -5,6 +5,7 @@
 #include "ovc_common/format.h"
 #include "ovc_common/verbosity.h"
 #include "ovc_common/entropy/entropy.h"
+#include "ovc_common/interleave/interleave.h"
 #include "ovc_common/partition/partition.h"
 #include "ovc_common/spiht/spiht.h"
 #include "ovc_common/wavelet/wavelet.h"
@@ -18,6 +19,7 @@ public:
 	ovc_chroma_format format;
 	float			  framerate;
 	float			  bits_per_pixel;
+	uint16_t		  seed;
 
 	int num_parts_exp = -1;
 	int num_levels = -1;
@@ -28,6 +30,7 @@ public:
 	ovc_partition	   partition_type;
 	ovc_spiht		   spiht;
 	ovc_entropy_coder  entropy_coder;
+	ovc_interleave	   interleaver;
 
 	bool repeat_vps;
 	bool multithreading;

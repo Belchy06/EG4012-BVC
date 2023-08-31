@@ -9,8 +9,7 @@ class random_deinterleaver : public ovc_deinterleaver
 public:
 	random_deinterleaver(ovc_interleave_config in_config);
 
-	virtual void deinterleave(const uint8_t* in_bytes, size_t in_size) override;
-	virtual void flush(uint8_t** out_bytes, size_t* out_size) override;
+	virtual std::vector<ovc_nal> deinterleave(std::vector<ovc_nal> in_nals) override;
 
 private:
 	std::mt19937 generator;

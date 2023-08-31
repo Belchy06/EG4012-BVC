@@ -4,14 +4,13 @@
 
 #include "ovc_common/bitstream/bitstream.h"
 #include "ovc_common/interleave/interleave_config.h"
+#include "ovc_common/nal.h"
 
 class ovc_deinterleaver
 {
 public:
-	virtual void deinterleave(const uint8_t* in_bytes, size_t in_size) = 0;
-	virtual void flush(uint8_t** out_bytes, size_t* out_size) = 0;
+	virtual std::vector<ovc_nal> deinterleave(std::vector<ovc_nal> in_nals) = 0;
 
 protected:
-	std::vector<uint8_t>  bytes;
 	ovc_interleave_config config;
 };
