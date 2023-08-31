@@ -157,10 +157,6 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 
 	output_nals.clear();
 
-	// VPS is 1 per video (or picture if configured for such)
-	// VPS NAL
-	construct_and_output_vps();
-
 	// TODO (belchy06): Parallelize
 	std::vector<std::thread> threads;
 	for (uint8_t component = 0; component < (uint8_t)(config.format == OVC_CHROMA_FORMAT_MONOCHROME ? 1 : 3); component++)
@@ -186,6 +182,11 @@ ovc_enc_result ovc_encoder::encode(ovc_picture* in_picture, ovc_nal** out_nal_un
 
 	// Interleaver shuffles (or not) the order of the nals when output
 	output_nals = interleaver->interleave(output_nals);
+
+	// VPS is 1 per video (or picture if configured for such)
+	// VPS NAL
+	// This must be the first NAL in an AU
+	construct_and_output_vps();
 
 	*out_nal_units = &output_nals[0];
 	*out_num_nal_units = static_cast<int>(output_nals.size());
@@ -490,7 +491,7 @@ void ovc_encoder::construct_and_output_vps()
 		nal.size = nal_bytes.size();
 
 		output_nals_mutex.lock();
-		output_nals.push_back(nal);
+		output_nals.insert(output_nals.begin(), nal);
 		output_nals_mutex.unlock();
 	}
 
