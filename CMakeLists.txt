@@ -13,7 +13,9 @@ include(GNUInstallDirs)
 
 find_package(Threads REQUIRED)
 
+
 # Project options
+option(BUILD_SHARED_LIBS "Build shared instead of static libraries." OFF)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 endif()

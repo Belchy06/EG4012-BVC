@@ -262,12 +262,6 @@ ovc_dec_result ovc_decoder::flush()
 
 ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 {
-	// New VPS signals the start of a new frame. Decode the current state of the planes and reset
-	if (vps.is_set)
-	{
-		flush();
-	}
-
 	/* VPS FORMAT (30 BYTES) (0x0) */
 	/*
 	 +---------------+---------------+---------------+---------------+
