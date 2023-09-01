@@ -53,7 +53,7 @@ void arithmetic_encoder::clear()
 	mid = high >> 1;
 
 	delete bitstream;
-	bitstream = new ovc_bitstream();
+	bitstream = new ovc::bitstream();
 }
 
 void arithmetic_encoder::update()

@@ -2,7 +2,7 @@
 
 #include "ovc_dec/entropy/decoder.h"
 
-class arithmetic_decoder : public ovc_entropy_decoder
+class arithmetic_decoder : public entropy_decoder
 {
 public:
 	arithmetic_decoder();

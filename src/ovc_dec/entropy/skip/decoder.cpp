@@ -15,5 +15,5 @@ void skip_entropy_decoder::flush(uint8_t** out_bytes, size_t* out_size)
 	*out_size = bitstream->occupancy();
 
 	delete bitstream;
-	bitstream = new ovc_bitstream();
+	bitstream = new ovc::bitstream();
 }

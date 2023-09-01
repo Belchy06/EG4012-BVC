@@ -1,10 +1,13 @@
 #pragma once
 
-typedef enum
+namespace ovc
 {
-	OVC_CHROMA_FORMAT_MONOCHROME,
-	OVC_CHROMA_FORMAT_420,
-	OVC_CHROMA_FORMAT_422,
-	OVC_CHROMA_FORMAT_444,
-	OVC_CHROMA_FORMAT_UNDEFINED
-} ovc_chroma_format;
+	typedef enum
+	{
+		CHROMA_FORMAT_UNDEFINED,
+		CHROMA_FORMAT_MONOCHROME,
+		CHROMA_FORMAT_420,
+		CHROMA_FORMAT_422,
+		CHROMA_FORMAT_444
+	} chroma_format;
+} // namespace ovc

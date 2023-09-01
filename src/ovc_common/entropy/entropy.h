@@ -2,24 +2,27 @@
 
 #include <string>
 
-typedef enum
+namespace ovc
 {
-	OVC_ENTROPY_CODER_SKIP,
-	OVC_ENTROPY_CODER_ARITHMETIC,
-	OVC_ENTROPY_CODER_HUFFMAN
-} ovc_entropy_coder;
-
-inline std::string entropy_coder_to_string(ovc_entropy_coder in_entropy_coder)
-{
-	switch (in_entropy_coder)
+	typedef enum
 	{
-		case OVC_ENTROPY_CODER_SKIP:
-			return "OVC_ENTROPY_CODER_SKIP";
-		case OVC_ENTROPY_CODER_ARITHMETIC:
-			return "OVC_ENTROPY_CODER_ARITHMETIC";
-		case OVC_ENTROPY_CODER_HUFFMAN:
-			return "OVC_ENTROPY_CODER_HUFFMAN";
-		default:
-			return "";
+		ENTROPY_CODER_SKIP,
+		ENTROPY_CODER_ARITHMETIC,
+		ENTROPY_CODER_HUFFMAN
+	} entropy_coder;
+
+	inline std::string entropy_coder_to_string(entropy_coder in_entropy_coder)
+	{
+		switch (in_entropy_coder)
+		{
+			case ENTROPY_CODER_SKIP:
+				return "ENTROPY_CODER_SKIP";
+			case ENTROPY_CODER_ARITHMETIC:
+				return "ENTROPY_CODER_ARITHMETIC";
+			case ENTROPY_CODER_HUFFMAN:
+				return "ENTROPY_CODER_HUFFMAN";
+			default:
+				return "";
+		}
 	}
-}
+} // namespace ovc

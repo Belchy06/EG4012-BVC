@@ -9,10 +9,10 @@
  *
  */
 huffman_decoder::huffman_decoder()
-	: output(new ovc_bitstream())
+	: output(new ovc::bitstream())
 {
-	nyt = new huffman_node(OVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
-	nodes[OVC_HUFFMAN_NODE_NYT] = nyt;
+	nyt = new huffman_node(ovc::HUFFMAN_NODE_NYT, 0, node_list.create_left());
+	nodes[ovc::HUFFMAN_NODE_NYT] = nyt;
 }
 
 huffman_decoder::~huffman_decoder()
@@ -85,12 +85,12 @@ void huffman_decoder::clear()
 	nodes.clear();
 
 	// Initialisation
-	bitstream = new ovc_bitstream();
-	output = new ovc_bitstream();
+	bitstream = new ovc::bitstream();
+	output = new ovc::bitstream();
 
 	node_list = linked_list<huffman_node*>();
-	nyt = new huffman_node(OVC_HUFFMAN_NODE_NYT, 0, node_list.create_left());
-	nodes[OVC_HUFFMAN_NODE_NYT] = nyt;
+	nyt = new huffman_node(ovc::HUFFMAN_NODE_NYT, 0, node_list.create_left());
+	nodes[ovc::HUFFMAN_NODE_NYT] = nyt;
 }
 
 huffman_node* huffman_decoder::traverse_tree(huffman_node* in_node)
@@ -115,6 +115,6 @@ void huffman_decoder::expand_nyt(int64_t in_symbol)
 	huffman_node* value_node = new huffman_node(in_symbol, 1, value_list_node);
 	nyt = nyt->expand(value_node, new_nyt_list_node);
 
-	nodes[OVC_HUFFMAN_NODE_NYT] = nyt;
+	nodes[ovc::HUFFMAN_NODE_NYT] = nyt;
 	nodes[in_symbol] = value_node;
 }

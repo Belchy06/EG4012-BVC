@@ -117,7 +117,7 @@ void arithmetic_decoder::clear()
 	encoded = 0;
 	history[0] = history[1] = 1;
 
-	bitstream = new ovc_bitstream();
+	bitstream = new ovc::bitstream();
 }
 
 void arithmetic_decoder::update()

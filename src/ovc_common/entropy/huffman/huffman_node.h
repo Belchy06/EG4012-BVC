@@ -14,9 +14,9 @@ public:
 	huffman_node* expand(huffman_node* in_value_node, node<huffman_node*>* in_new_nyt_list_node);
 	void		  increment();
 
-	int64_t		   get_symbol();
-	huffman_node*  go_via(uint8_t in_bit);
-	ovc_bitstream* get_code();
+	int64_t			get_symbol();
+	huffman_node*	go_via(uint8_t in_bit);
+	ovc::bitstream* get_code();
 
 	bool is_internal() const;
 	bool is_leaf() const;
@@ -41,5 +41,5 @@ private:
 	huffman_node* right;
 	huffman_node* parent;
 
-	ovc_bitstream code;
+	ovc::bitstream code;
 };

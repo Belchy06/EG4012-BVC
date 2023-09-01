@@ -2,7 +2,7 @@
 
 #include "ovc_enc/partition/partitioner.h"
 
-class offset_zerotree_partitioner : public ovc_partitioner
+class offset_zerotree_partitioner : public partitioner
 {
 public:
 	offset_zerotree_partitioner();

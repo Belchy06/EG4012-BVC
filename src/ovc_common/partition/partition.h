@@ -2,24 +2,27 @@
 
 #include <string>
 
-typedef enum
+namespace ovc
 {
-	OVC_PARTITION_SKIP,
-	OVC_PARTITION_OFFSET_ZEROTREE,
-	OVC_PARTITION_ZEROTREE_PRESERVING
-} ovc_partition;
-
-inline std::string partition_to_string(ovc_partition in_partition)
-{
-	switch (in_partition)
+	typedef enum
 	{
-		case OVC_PARTITION_SKIP:
-			return "OVC_PARTITION_SKIP";
-		case OVC_PARTITION_OFFSET_ZEROTREE:
-			return "OVC_PARTITION_OFFSET_ZEROTREE";
-		case OVC_PARTITION_ZEROTREE_PRESERVING:
-			return "OVC_PARTITION_ZEROTREE_PRESERVING";
-		default:
-			return "";
+		PARTITION_SKIP,
+		PARTITION_OFFSET_ZEROTREE,
+		PARTITION_ZEROTREE_PRESERVING
+	} partition;
+
+	inline std::string partition_to_string(partition in_partition)
+	{
+		switch (in_partition)
+		{
+			case PARTITION_SKIP:
+				return "PARTITION_SKIP";
+			case PARTITION_OFFSET_ZEROTREE:
+				return "PARTITION_OFFSET_ZEROTREE";
+			case PARTITION_ZEROTREE_PRESERVING:
+				return "PARTITION_ZEROTREE_PRESERVING";
+			default:
+				return "";
+		}
 	}
-}
+} // namespace ovc

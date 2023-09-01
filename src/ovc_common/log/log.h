@@ -8,36 +8,39 @@
 
 #include "ovc_common/verbosity.h"
 
-typedef void (*ovc_logging_callback)(int, const char*, va_list);
-
-namespace ovc_logging
+namespace ovc
 {
-	inline ovc_verbosity								  verbosity;
-	extern std::function<void(int, const char*, va_list)> logging_function;
-} // namespace ovc_logging
+	typedef void (*logging_callback)(int, const char*, va_list);
 
-inline void DEFAULT_OVC_LOG(int in_verbosity, const char* in_format, va_list in_args)
-{
-	std::vfprintf(stdout, in_format, in_args);
-}
-
-inline void OVC_LOG(std::string in_category, ovc_verbosity in_verbosity, const char* in_format, ...)
-{
-	if (ovc_logging::logging_function && in_verbosity <= ovc_logging::verbosity)
+	namespace logging
 	{
-		std::string log_string;
-		log_string += "[ ";
-		log_string += verbosity_to_string(in_verbosity);
-		log_string += " ] ";
-		log_string += in_category;
-		log_string += ": ";
-		std::string format_string(in_format);
-		log_string += format_string;
-		log_string += "\n";
+		inline verbosity									  verbosity;
+		extern std::function<void(int, const char*, va_list)> logging_function;
+	} // namespace logging
 
-		va_list args;
-		va_start(args, in_format);
-		ovc_logging::logging_function(in_verbosity, log_string.c_str(), args);
-		va_end(args);
+	inline void DEFAULT_LOG(int in_verbosity, const char* in_format, va_list in_args)
+	{
+		std::vfprintf(stdout, in_format, in_args);
 	}
-}
+
+	inline void LOG(std::string in_category, verbosity in_verbosity, const char* in_format, ...)
+	{
+		if (logging::logging_function && in_verbosity <= logging::verbosity)
+		{
+			std::string log_string;
+			log_string += "[ ";
+			log_string += verbosity_to_string(in_verbosity);
+			log_string += " ] ";
+			log_string += in_category;
+			log_string += ": ";
+			std::string format_string(in_format);
+			log_string += format_string;
+			log_string += "\n";
+
+			va_list args;
+			va_start(args, in_format);
+			logging::logging_function(in_verbosity, log_string.c_str(), args);
+			va_end(args);
+		}
+	}
+} // namespace ovc

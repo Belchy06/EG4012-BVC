@@ -2,15 +2,17 @@
 
 #include <stdint.h>
 
-typedef enum : uint8_t
+namespace ovc
 {
-	OVC_NAL_TYPE_VPS,
-	OVC_NAL_TYPE_PARTITION,
-} ovc_nal_type;
+	typedef enum : uint8_t
+	{
+		NAL_TYPE_VPS,
+		NAL_TYPE_PARTITION,
+	} nal_type;
 
-class ovc_nal
-{
-public:
-	uint8_t* bytes;
-	size_t	 size;
-};
+	typedef struct nal
+	{
+		uint8_t* bytes;
+		size_t	 size;
+	} nal;
+} // namespace ovc

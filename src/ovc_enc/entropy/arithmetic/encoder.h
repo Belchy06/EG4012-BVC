@@ -2,7 +2,7 @@
 
 #include "ovc_enc/entropy/encoder.h"
 
-class arithmetic_encoder : public ovc_entropy_encoder
+class arithmetic_encoder : public entropy_encoder
 {
 public:
 	arithmetic_encoder();

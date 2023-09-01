@@ -8,7 +8,7 @@
 #include "ovc_common/linked_list/node.h"
 #include "ovc_enc/entropy/encoder.h"
 
-class huffman_encoder : public ovc_entropy_encoder
+class huffman_encoder : public entropy_encoder
 {
 public:
 	huffman_encoder();

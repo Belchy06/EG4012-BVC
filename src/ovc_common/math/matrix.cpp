@@ -7,7 +7,7 @@
 
 #include "ovc_common/math/matrix.h"
 
-using namespace ovc_vector;
+using namespace ovc::vector;
 
 //=============================================================================
 // matrix c-tors and d-tor
@@ -318,37 +318,37 @@ void matrix<T>::reshape(size_t in_num_rows, size_t in_num_cols)
 template <typename T>
 void matrix<T>::round()
 {
-	ovc_vector::round(data);
+	ovc::vector::round(data);
 }
 
 template <typename T>
 void matrix<T>::floor()
 {
-	ovc_vector::floor(data);
+	ovc::vector::floor(data);
 }
 
 template <typename T>
 void matrix<T>::ceil()
 {
-	ovc_vector::ceil(data);
+	ovc::vector::ceil(data);
 }
 
 template <typename T>
 void matrix<T>::clamp(T min_value, T max_value)
 {
-	ovc_vector::clamp(data, min_value, max_value);
+	ovc::vector::clamp(data, min_value, max_value);
 }
 
 template <typename T>
 T matrix<T>::max() const
 {
-	return ovc_vector::max(data);
+	return ovc::vector::max(data);
 }
 
 template <typename T>
 T matrix<T>::min() const
 {
-	return ovc_vector::min(data);
+	return ovc::vector::min(data);
 }
 
 //=============================================================================

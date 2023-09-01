@@ -8,7 +8,7 @@
 #include <ostream>
 #include <vector>
 
-namespace ovc_vector
+namespace ovc::vector
 {
 
 	//===========================================================================
@@ -322,14 +322,14 @@ namespace ovc_vector
 	// Convolution types
 	typedef enum
 	{
-		OVC_WAVELET_CONVOLUTION_FULL,
-		OVC_WAVELET_CONVOLUTION_SAME,
-		OVC_WAVELET_CONVOLUTION_VALID,
-	} ovc_wavelet_convolution_type;
+		WAVELET_CONVOLUTION_FULL,
+		WAVELET_CONVOLUTION_SAME,
+		WAVELET_CONVOLUTION_VALID,
+	} wavelet_convolution_type;
 
 	// Convolution of vector with given filter
 	template <typename T>
-	std::vector<T> conv(const std::vector<T>& vector, const std::vector<T>& filter, ovc_wavelet_convolution_type convolutionType = OVC_WAVELET_CONVOLUTION_FULL)
+	std::vector<T> conv(const std::vector<T>& vector, const std::vector<T>& filter, wavelet_convolution_type convolutionType = WAVELET_CONVOLUTION_FULL)
 	{
 		const size_t vector_size = vector.size();
 		const size_t filter_size = filter.size();
@@ -340,12 +340,12 @@ namespace ovc_vector
 		// Compute convolution
 		size_t minI = 0;
 		size_t maxI = vector_size + filter_size - 1;
-		if (convolutionType == OVC_WAVELET_CONVOLUTION_SAME)
+		if (convolutionType == WAVELET_CONVOLUTION_SAME)
 		{
 			minI = filter_size / 2;
 			maxI = minI + vector_size;
 		}
-		else if (convolutionType == OVC_WAVELET_CONVOLUTION_VALID)
+		else if (convolutionType == WAVELET_CONVOLUTION_VALID)
 		{
 			minI = filter_size - 1;
 			maxI = vector_size;
@@ -366,7 +366,7 @@ namespace ovc_vector
 		return output;
 	}
 
-} // namespace ovc_vector
+} // namespace ovc::vector
 
 //=============================================================================
 // Output to std::ostream

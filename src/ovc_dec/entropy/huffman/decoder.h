@@ -8,7 +8,7 @@
 #include "ovc_common/linked_list/linked_list.h"
 #include "ovc_dec/entropy/decoder.h"
 
-class huffman_decoder : public ovc_entropy_decoder
+class huffman_decoder : public entropy_decoder
 {
 public:
 	huffman_decoder();
@@ -25,8 +25,8 @@ private:
 	huffman_node* traverse_tree(huffman_node* in_node);
 
 private:
-	ovc_bitstream* output;
-	huffman_node*  nyt;
+	ovc::bitstream* output;
+	huffman_node*	nyt;
 
 	std::map<int64_t, huffman_node*> nodes;
 	linked_list<huffman_node*>		 node_list;

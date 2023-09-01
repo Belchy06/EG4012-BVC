@@ -4,12 +4,12 @@
 
 #include "ovc_dec/interleave/deinterleaver.h"
 
-class random_deinterleaver : public ovc_deinterleaver
+class random_deinterleaver : public deinterleaver
 {
 public:
-	random_deinterleaver(ovc_interleave_config in_config);
+	random_deinterleaver(ovc::interleave_config in_config);
 
-	virtual std::vector<ovc_nal> deinterleave(std::vector<ovc_nal> in_nals) override;
+	virtual std::vector<ovc::nal> deinterleave(std::vector<ovc::nal> in_nals) override;
 
 private:
 	std::mt19937 generator;

@@ -1,10 +1,12 @@
 #pragma once
 
-class ovc_plane
+namespace ovc
 {
-public:
-	uint8_t* data;
-	size_t	 width;
-	size_t	 height;
-	size_t	 bit_depth;
-};
+	typedef struct plane
+	{
+		uint8_t* data;
+		size_t	 width;
+		size_t	 height;
+		size_t	 bit_depth;
+	} plane;
+} // namespace ovc

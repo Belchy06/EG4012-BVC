@@ -5,10 +5,12 @@
 #include "ovc_common/format.h"
 #include "ovc_common/plane.h"
 
-class ovc_picture
+namespace ovc
 {
-public:
-	ovc_plane		  planes[3];
-	ovc_chroma_format format;
-	double			  framerate;
-};
+	typedef struct picture
+	{
+		ovc::plane		   planes[3];
+		ovc::chroma_format format;
+		double			   framerate;
+	} picture;
+} // namespace ovc

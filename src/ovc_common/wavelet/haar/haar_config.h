@@ -3,18 +3,21 @@
 #include <stdint.h>
 #include <string>
 
-typedef enum : uint8_t
+namespace ovc
 {
-	OVC_WAVELET_HAAR_DEFAULT
-} ovc_wavelet_haar_config;
-
-inline std::string haar_config_to_string(ovc_wavelet_haar_config in_haar_config)
-{
-	switch (in_haar_config)
+	typedef enum : uint8_t
 	{
-		case OVC_WAVELET_HAAR_DEFAULT:
-			return "OVC_WAVELET_HAAR_DEFAULT";
-		default:
-			return "";
+		WAVELET_HAAR_DEFAULT
+	} wavelet_haar_config;
+
+	inline std::string haar_config_to_string(wavelet_haar_config in_haar_config)
+	{
+		switch (in_haar_config)
+		{
+			case WAVELET_HAAR_DEFAULT:
+				return "WAVELET_HAAR_DEFAULT";
+			default:
+				return "";
+		}
 	}
-}
+} // namespace ovc

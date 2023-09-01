@@ -5,16 +5,19 @@
 
 #include "ovc_common/wavelet/wavelet.h"
 
-// haar
-// https://wavelets.pybytes.com/wavelet/haar/
-class haar
+namespace ovc
 {
-public:
-	static std::vector<double> lo_d;
-	static std::vector<double> hi_d;
-	static std::vector<double> lo_r;
-	static std::vector<double> hi_r;
+	// haar
+	// https://wavelets.pybytes.com/wavelet/haar/
+	class haar
+	{
+	public:
+		static std::vector<double> lo_d;
+		static std::vector<double> hi_d;
+		static std::vector<double> lo_r;
+		static std::vector<double> hi_r;
 
-private:
-	static double inv_sqrt2;
-};
+	private:
+		static double inv_sqrt2;
+	};
+} // namespace ovc

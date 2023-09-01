@@ -1,7 +1,9 @@
 #pragma once
 
-class ovc_interleave_config
+namespace ovc
 {
-public:
-	uint16_t seed;
-};
+	typedef struct interleave_config
+	{
+		uint16_t seed;
+	} interleave_config;
+} // namespace ovc

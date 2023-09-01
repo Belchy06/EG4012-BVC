@@ -1,7 +1,10 @@
 #pragma once
 
-typedef enum
+namespace ovc
 {
-	OVC_HUFFMAN_NODE_NYT = -1,
-	OVC_HUFFMAN_NODE_INTERNAL = -2,
-} ovc_huffman_node_type;
+	typedef enum
+	{
+		HUFFMAN_NODE_NYT = -1,
+		HUFFMAN_NODE_INTERNAL = -2,
+	} huffman_node_type;
+} // namespace ovc

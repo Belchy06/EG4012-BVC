@@ -2,7 +2,7 @@
 
 #include "ovc_dec/partition/departitioner.h"
 
-class offset_zerotree_departitioner : public ovc_departitioner
+class offset_zerotree_departitioner : public departitioner
 {
 public:
 	offset_zerotree_departitioner();

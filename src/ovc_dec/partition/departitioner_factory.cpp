@@ -4,15 +4,15 @@
 
 #include "ovc_dec/partition/departitioner_factory.h"
 
-std::shared_ptr<ovc_departitioner> ovc_departitioner_factory::create_departitioner(ovc_partition in_partition)
+std::shared_ptr<departitioner> departitioner_factory::create_departitioner(ovc::partition in_partition)
 {
 	switch (in_partition)
 	{
-		case OVC_PARTITION_SKIP:
+		case ovc::PARTITION_SKIP:
 			return std::make_shared<skip_departitioner>();
-		case OVC_PARTITION_OFFSET_ZEROTREE:
+		case ovc::PARTITION_OFFSET_ZEROTREE:
 			return std::make_shared<offset_zerotree_departitioner>();
-		case OVC_PARTITION_ZEROTREE_PRESERVING:
+		case ovc::PARTITION_ZEROTREE_PRESERVING:
 			return std::make_shared<zerotree_preserving_departitioner>();
 		default:
 			return nullptr;

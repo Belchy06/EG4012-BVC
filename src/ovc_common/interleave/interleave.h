@@ -2,21 +2,24 @@
 
 #include <string>
 
-typedef enum
+namespace ovc
 {
-	OVC_INTERLEAVE_SKIP,
-	OVC_INTERLEAVE_RANDOM
-} ovc_interleave;
-
-inline std::string interleave_to_string(ovc_interleave in_interleave)
-{
-	switch (in_interleave)
+	typedef enum
 	{
-		case OVC_INTERLEAVE_SKIP:
-			return "OVC_INTERLEAVE_SKIP";
-		case OVC_INTERLEAVE_RANDOM:
-			return "OVC_INTERLEAVE_RANDOM";
-		default:
-			return "";
+		INTERLEAVE_SKIP,
+		INTERLEAVE_RANDOM
+	} interleave;
+
+	inline std::string interleave_to_string(interleave in_interleave)
+	{
+		switch (in_interleave)
+		{
+			case INTERLEAVE_SKIP:
+				return "INTERLEAVE_SKIP";
+			case INTERLEAVE_RANDOM:
+				return "INTERLEAVE_RANDOM";
+			default:
+				return "";
+		}
 	}
-}
+} // namespace ovc

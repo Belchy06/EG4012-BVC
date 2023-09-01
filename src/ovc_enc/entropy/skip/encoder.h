@@ -1,6 +1,6 @@
 #include "ovc_enc/entropy/encoder.h"
 
-class skip_entropy_encoder : public ovc_entropy_encoder
+class skip_entropy_encoder : public entropy_encoder
 {
 public:
 	virtual void encode(const uint8_t* in_bytes, size_t in_size) override;

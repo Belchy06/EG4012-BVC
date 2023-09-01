@@ -1,14 +1,14 @@
-#include "ovc_dec/spiht/spiht/decoder.h"
+#include "ovc_dec/compress/spiht/decompressor.h"
 
 #include <iostream>
 
-spiht_decoder::spiht_decoder()
-	: bitstream(new ovc_bitstream())
+spiht_decompressor::spiht_decompressor()
+	: bitstream(new ovc::bitstream())
 {
 	clear();
 }
 
-void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, ovc_spiht_config in_config)
+void spiht_decompressor::decompress(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, ovc::compression_config in_config)
 {
 	for (size_t i = 0; i < in_num_bytes; i++)
 	{
@@ -27,10 +27,10 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 	{
 		for (size_t x = 0; x <= width / (1 << in_config.num_levels); x++)
 		{
-			lip.push_back(ovc_spiht_pixel(x, y));
+			lip.push_back(ovc::spiht_pixel(x, y));
 			if ((x % 2 != 0) || (y % 2 != 0))
 			{
-				lis.push_back(ovc_spiht_set(x, y, OVC_SPIHT_TYPE_A));
+				lis.push_back(ovc::spiht_set(x, y, ovc::SPIHT_TYPE_A));
 			}
 		}
 	}
@@ -50,7 +50,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 			}
 			if (sig)
 			{
-				lsp.push_back(ovc_spiht_pixel(lip[i].x, lip[i].y));
+				lsp.push_back(ovc::spiht_pixel(lip[i].x, lip[i].y));
 				uint8_t bit = 0;
 				bitstream->read_bit(&bit);
 				output(lip[i].y, lip[i].x) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
@@ -65,7 +65,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 		// process LIS
 		for (int64_t i = 0; i < lis.size(); i++)
 		{
-			if (lis[i].type == OVC_SPIHT_TYPE_A)
+			if (lis[i].type == ovc::SPIHT_TYPE_A)
 			{
 				uint8_t sig = 0;
 				bitstream->read_bit(&sig);
@@ -86,7 +86,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					if (sig)
 					{
-						lsp.push_back(ovc_spiht_pixel(sx, sy));
+						lsp.push_back(ovc::spiht_pixel(sx, sy));
 						uint8_t bit = 0;
 						bitstream->read_bit(&bit);
 						output(sy, sx) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
@@ -97,7 +97,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					else
 					{
-						lip.push_back(ovc_spiht_pixel(sx, sy));
+						lip.push_back(ovc::spiht_pixel(sx, sy));
 					}
 					sig = 0;
 					bitstream->read_bit(&sig);
@@ -107,7 +107,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					if (sig)
 					{
-						lsp.push_back(ovc_spiht_pixel(sx + 1, sy));
+						lsp.push_back(ovc::spiht_pixel(sx + 1, sy));
 						uint8_t bit = 0;
 						bitstream->read_bit(&bit);
 						output(sy, sx + 1) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
@@ -118,7 +118,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					else
 					{
-						lip.push_back(ovc_spiht_pixel(sx + 1, sy));
+						lip.push_back(ovc::spiht_pixel(sx + 1, sy));
 					}
 					sig = 0;
 					bitstream->read_bit(&sig);
@@ -128,7 +128,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					if (sig)
 					{
-						lsp.push_back(ovc_spiht_pixel(sx, sy + 1));
+						lsp.push_back(ovc::spiht_pixel(sx, sy + 1));
 						uint8_t bit = 0;
 						bitstream->read_bit(&bit);
 						output(sy + 1, sx) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
@@ -139,7 +139,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					else
 					{
-						lip.push_back(ovc_spiht_pixel(sx, sy + 1));
+						lip.push_back(ovc::spiht_pixel(sx, sy + 1));
 					}
 					sig = 0;
 					bitstream->read_bit(&sig);
@@ -147,7 +147,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 						return;
 					if (sig)
 					{
-						lsp.push_back(ovc_spiht_pixel(sx + 1, sy + 1));
+						lsp.push_back(ovc::spiht_pixel(sx + 1, sy + 1));
 						uint8_t bit = 0;
 						bitstream->read_bit(&bit);
 						output(sy + 1, sx + 1) = (float)((((bool)bit) ? -1 : 1) * (1 << step));
@@ -158,13 +158,13 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					else
 					{
-						lip.push_back(ovc_spiht_pixel(sx + 1, sy + 1));
+						lip.push_back(ovc::spiht_pixel(sx + 1, sy + 1));
 					}
 					/* test if L(i, j) != 0 */
 					get_successor(output, in_config.num_levels, sx, sy, &sx, &sy);
 					if (sx != -1)
 					{
-						lis.push_back(ovc_spiht_set(lis[i].x, lis[i].y, OVC_SPIHT_TYPE_B));
+						lis.push_back(ovc::spiht_set(lis[i].x, lis[i].y, ovc::SPIHT_TYPE_B));
 					}
 					lis.erase(lis.begin() + i);
 					i--;
@@ -182,10 +182,10 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 				{
 					int64_t sx, sy;
 					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
-					lis.push_back(ovc_spiht_set(sx, sy, OVC_SPIHT_TYPE_A));
-					lis.push_back(ovc_spiht_set(sx + 1, sy, OVC_SPIHT_TYPE_A));
-					lis.push_back(ovc_spiht_set(sx, sy + 1, OVC_SPIHT_TYPE_A));
-					lis.push_back(ovc_spiht_set(sx + 1, sy + 1, OVC_SPIHT_TYPE_A));
+					lis.push_back(ovc::spiht_set(sx, sy, ovc::SPIHT_TYPE_A));
+					lis.push_back(ovc::spiht_set(sx + 1, sy, ovc::SPIHT_TYPE_A));
+					lis.push_back(ovc::spiht_set(sx, sy + 1, ovc::SPIHT_TYPE_A));
+					lis.push_back(ovc::spiht_set(sx + 1, sy + 1, ovc::SPIHT_TYPE_A));
 					lis.erase(lis.begin() + i);
 					i--;
 				}
@@ -222,13 +222,13 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 	}
 }
 
-void spiht_decoder::flush(matrix<double>& out_matrix)
+void spiht_decompressor::flush(matrix<double>& out_matrix)
 {
 	out_matrix = output;
 	clear();
 }
 
-void spiht_decoder::clear()
+void spiht_decompressor::clear()
 {
 	delete bitstream;
 	lip.clear();
@@ -236,10 +236,10 @@ void spiht_decoder::clear()
 	lis.clear();
 
 	step = 0;
-	bitstream = new ovc_bitstream();
+	bitstream = new ovc::bitstream();
 }
 
-void spiht_decoder::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t* out_sx, int64_t* out_sy)
+void spiht_decompressor::get_successor(matrix<double>& in_matrix, size_t in_num_levels, int64_t in_x, int64_t in_y, int64_t* out_sx, int64_t* out_sy)
 {
 	int64_t lx = (in_matrix.get_num_columns()) / (1 << in_num_levels);
 	int64_t ly = (in_matrix.get_num_rows()) / (1 << in_num_levels);

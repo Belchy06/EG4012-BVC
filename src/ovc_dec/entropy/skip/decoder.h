@@ -2,7 +2,7 @@
 
 #include "ovc_dec/entropy/decoder.h"
 
-class skip_entropy_decoder : public ovc_entropy_decoder
+class skip_entropy_decoder : public entropy_decoder
 {
 public:
 	virtual void decode(uint8_t* in_bytes, size_t in_size, size_t in_num_symbols) override;

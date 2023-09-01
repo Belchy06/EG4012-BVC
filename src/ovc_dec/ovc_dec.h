@@ -1,78 +1,109 @@
 #pragma once
 
-#include <map>
+#include <stdint.h>
+#include <stddef.h>
 
-#include "ovc_common/log/log.h"
-#include "ovc_common/nal.h"
-#include "ovc_common/picture.h"
-#include "ovc_common/plane.h"
-#include "ovc_dec/entropy/decoder_factory.h"
-#include "ovc_dec/partition/departitioner_factory.h"
-#include "ovc_dec/spiht/decoder_factory.h"
-#include "ovc_dec/wavelet/recomposer_factory.h"
-#include "ovc_dec/result.h"
-#include "ovc_dec/config.h"
-
-class ovc_vps
+#ifdef __cplusplus
+extern "C"
 {
-public:
-	size_t			  luma_width;
-	size_t			  luma_height;
-	size_t			  chroma_width;
-	size_t			  chroma_height;
-	ovc_chroma_format format;
-	float			  framerate;
-	float			  bits_per_pixel;
+#endif
 
-	uint16_t num_partitions;
-	uint16_t num_levels;
+#ifndef OVC_DEC_API
+	#define OVC_DEC_API
+#endif
 
-	ovc_wavelet_family wavelet_family;
-	ovc_wavelet_config wavelet_config;
-	ovc_partition	   partition_type;
-	ovc_spiht		   spiht;
-	ovc_entropy_coder  entropy_coder;
+	typedef enum
+	{
+		OVC_DEC_OK,
+		OVC_DEC_ERROR,
+		OVC_DEC_UNINITIALISED,
+		OVC_DEC_NO_PICTURE,
+		OVC_DEC_MALFORMED_NAL_HEADER,
+		OVC_DEC_MALFORMED_NAL_BODY,
+		OVC_DEC_MISSING_VPS,
+		OVC_DEC_MISSING_PPS,
+		OVC_DEC_INVALID_ARGUMENT
+	} ovc_dec_result;
 
-	bool is_set = false;
-};
+	typedef enum
+	{
+		OVC_DEC_CHROMA_FORMAT_UNDEFINED,
+		OVC_DEC_CHROMA_FORMAT_MONOCHROME,
+		OVC_DEC_CHROMA_FORMAT_420,
+		OVC_DEC_CHROMA_FORMAT_422,
+		OVC_DEC_CHROMA_FORMAT_444,
+	} ovc_dec_chroma_format;
 
-class ovc_pps
-{
-public:
-	uint8_t	 component;
-	uint16_t partition;
-	int		 step;
+	typedef enum
+	{
+		OVC_DEC_VERBOSITY_SILENT,
+		OVC_DEC_VERBOSITY_ERROR,
+		OVC_DEC_VERBOSITY_WARNING,
+		OVC_DEC_VERBOSITY_INFO,
+		OVC_DEC_VERBOSITY_NOTICE,
+		OVC_DEC_VERBOSITY_VERBOSE,
+		OVC_DEC_VERBOSITY_DETAILS
+	} ovc_dec_verbosity;
 
-	bool is_set = false;
-};
+	typedef enum
+	{
+		OVC_DEC_ERROR_CONCEALMENT_SKIP,
+		OVC_DEC_ERROR_CONCEALMENT_AVERAGE_RECEIVED,
+		OVC_DEC_ERROR_CONCEALMENT_AVERAGE_SURROUNDING
+	} ovc_dec_error_concealment;
 
-class ovc_decoder
-{
-public:
-	ovc_decoder();
+	typedef struct ovc_dec_config
+	{
+		ovc_dec_error_concealment error_concealment;
+	} ovc_dec_config;
 
-	ovc_dec_result init(ovc_dec_config* in_config);
-	void		   set_logging_callback(ovc_logging_callback in_callback);
-	ovc_dec_result decode_nal(const ovc_nal* in_nal_unit);
-	ovc_dec_result flush();
-	ovc_dec_result get_picture(ovc_picture* out_picture);
+	typedef struct ovc_dec_nal
+	{
+	public:
+		uint8_t* bytes;
+		size_t	 size;
+	} ovc_dec_nal;
 
-private:
-	ovc_dec_result handle_vps(uint8_t* in_bytes, size_t in_size);
-	ovc_dec_result handle_partition(uint8_t* in_bytes, size_t in_size);
+	typedef struct ovc_decoder ovc_decoder;
 
-private:
-	ovc_dec_config config;
-	ovc_vps		   vps;
-	bool		   initialised;
-	bool		   picture_ready;
-	ovc_picture	   picture;
+	typedef struct ovc_dec_plane
+	{
+		uint8_t* data;
+		size_t	 width;
+		size_t	 height;
+		size_t	 bit_depth;
+	} ovc_dec_plane;
 
-	//     component       partition_id     data
-	std::map<size_t, std::map<size_t, matrix<double>>> planes;
+	typedef struct ovc_dec_picture
+	{
+		ovc_dec_plane		  planes[3];
+		ovc_dec_chroma_format format;
+		double				  framerate;
+	} ovc_dec_picture;
 
-	std::shared_ptr<ovc_wavelet_recomposer> wavelet_recomposer;
-	std::shared_ptr<ovc_departitioner>		departitioner;
-	std::shared_ptr<ovc_spiht_decoder>		spiht_decoder;
-	std::shared_ptr<ovc_entropy_decoder>	entropy_decoder;
-};
+	typedef void (*ovc_dec_logging_callback)(int, const char*, va_list);
+
+	typedef struct ovc_decoder_api
+	{
+		// config
+		ovc_dec_config* (*config_create)(void);
+		ovc_dec_result (*config_destroy)(ovc_dec_config* in_config);
+		// picture
+		ovc_dec_picture* (*picture_create)(ovc_decoder* in_decoder);
+		ovc_dec_result (*picture_destroy)(ovc_dec_picture* in_picture);
+		// decoder
+		ovc_decoder* (*decoder_create)(ovc_dec_config* in_config);
+		ovc_dec_result (*decoder_destroy)(ovc_decoder* in_decoder);
+		ovc_dec_result (*decode_nal)(ovc_decoder* in_decoder, ovc_dec_nal* in_nal);
+		ovc_dec_result (*flush)(ovc_decoder* in_decoder);
+		ovc_dec_result (*get_picture)(ovc_decoder* in_decoder, ovc_dec_picture* out_picture);
+		// misc
+		void (*set_logging_callback)(ovc_dec_logging_callback in_callback);
+		void (*set_logging_verbosity)(ovc_dec_verbosity in_verbosity);
+	} ovc_decoder_api;
+
+	OVC_DEC_API const ovc_decoder_api* ovc_decoder_api_get(void);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

@@ -3,15 +3,15 @@
 #include <vector>
 
 #include "ovc_common/spiht/spiht.h"
-#include "ovc_common/spiht/spiht_config.h"
-#include "ovc_enc/spiht/encoder.h"
+#include "ovc_common/compress/compress_config.h"
+#include "ovc_enc/compress/compressor.h"
 
-class spiht_encoder : public ovc_spiht_encoder
+class spiht_compressor : public compressor
 {
 public:
-	spiht_encoder();
+	spiht_compressor();
 
-	void encode(matrix<double> in_matrix, ovc_spiht_config in_config);
+	void compress(matrix<double> in_matrix, ovc::compression_config in_config);
 	void flush(uint8_t** out_bytes, uint16_t* out_step);
 
 private:
@@ -25,7 +25,7 @@ private:
 	size_t	 bits;
 	uint16_t output_step;
 
-	std::vector<ovc_spiht_pixel> lip;
-	std::vector<ovc_spiht_pixel> lsp;
-	std::vector<ovc_spiht_set>	 lis;
+	std::vector<ovc::spiht_pixel> lip;
+	std::vector<ovc::spiht_pixel> lsp;
+	std::vector<ovc::spiht_set>	  lis;
 };

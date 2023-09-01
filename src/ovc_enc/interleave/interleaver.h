@@ -6,11 +6,11 @@
 #include "ovc_common/interleave/interleave_config.h"
 #include "ovc_common/nal.h"
 
-class ovc_interleaver
+class interleaver
 {
 public:
-	virtual std::vector<ovc_nal> interleave(std::vector<ovc_nal> in_nals) = 0;
+	virtual std::vector<ovc::nal> interleave(std::vector<ovc::nal> in_nals) = 0;
 
 protected:
-	ovc_interleave_config config;
+	ovc::interleave_config config;
 };

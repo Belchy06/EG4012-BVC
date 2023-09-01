@@ -1,6 +1,6 @@
-#include "ovc_dec/spiht/skip/decoder.h"
+#include "ovc_dec/compress/skip/decompressor.h"
 
-void skip_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, ovc_spiht_config in_config)
+void skip_decompressor::decompress(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, size_t in_y, ovc::compression_config in_config)
 {
 	output = matrix<double>(in_y, in_x);
 	size_t byte_idx = 0;
@@ -18,7 +18,7 @@ void skip_spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t i
 	}
 }
 
-void skip_spiht_decoder::flush(matrix<double>& out_matrix)
+void skip_decompressor::flush(matrix<double>& out_matrix)
 {
 	out_matrix = output;
 }

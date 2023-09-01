@@ -15,7 +15,7 @@ huffman_node::huffman_node(int64_t in_symbol, size_t in_count, node<huffman_node
 
 bool huffman_node::is_internal() const
 {
-	return symbol == OVC_HUFFMAN_NODE_INTERNAL;
+	return symbol == ovc::HUFFMAN_NODE_INTERNAL;
 }
 
 bool huffman_node::is_leaf() const
@@ -25,12 +25,12 @@ bool huffman_node::is_leaf() const
 
 bool huffman_node::is_nyt() const
 {
-	return symbol == OVC_HUFFMAN_NODE_NYT;
+	return symbol == ovc::HUFFMAN_NODE_NYT;
 }
 
 huffman_node* huffman_node::expand(huffman_node* in_value_node, node<huffman_node*>* in_new_nyt_list_node)
 {
-	huffman_node* new_nyt = new huffman_node(OVC_HUFFMAN_NODE_NYT, 0, in_new_nyt_list_node);
+	huffman_node* new_nyt = new huffman_node(ovc::HUFFMAN_NODE_NYT, 0, in_new_nyt_list_node);
 	new_nyt->parent = this;
 	left = new_nyt;
 
@@ -40,7 +40,7 @@ huffman_node* huffman_node::expand(huffman_node* in_value_node, node<huffman_nod
 	new_nyt->adjust_code_to_parent(0);
 	in_value_node->adjust_code_to_parent(1);
 
-	symbol = OVC_HUFFMAN_NODE_INTERNAL;
+	symbol = ovc::HUFFMAN_NODE_INTERNAL;
 	increment();
 
 	return new_nyt;
@@ -111,7 +111,7 @@ huffman_node* huffman_node::go_via(uint8_t in_bit)
 	}
 }
 
-ovc_bitstream* huffman_node::get_code()
+ovc::bitstream* huffman_node::get_code()
 {
 	return &code;
 }

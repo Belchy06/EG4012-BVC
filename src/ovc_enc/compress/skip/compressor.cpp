@@ -1,6 +1,6 @@
-#include "ovc_enc/spiht/skip/encoder.h"
+#include "ovc_enc/compress/skip/compressor.h"
 
-void skip_spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_config)
+void skip_compressor::compress(matrix<double> in_matrix, ovc::compression_config in_config)
 {
 	for (size_t j = 0; j < in_matrix.get_num_columns(); j++)
 	{
@@ -20,11 +20,11 @@ void skip_spiht_encoder::encode(matrix<double> in_matrix, ovc_spiht_config in_co
 	}
 }
 
-void skip_spiht_encoder::flush(uint8_t** out_bytes, uint16_t* out_step)
+void skip_compressor::flush(uint8_t** out_bytes, uint16_t* out_step)
 {
 	*out_bytes = new uint8_t[bitstream->occupancy()];
 	memcpy(*out_bytes, bitstream->data(), bitstream->occupancy());
 
 	delete bitstream;
-	bitstream = new ovc_bitstream();
+	bitstream = new ovc::bitstream();
 }
