@@ -37,7 +37,7 @@ ovc_enc_result ovc_encoder::init(ovc_enc_config* in_config)
 		return OVC_ENC_INVALID_FORMAT;
 	}
 
-	if ((in_config->num_levels > 1 || in_config->num_parts_exp > 0) && in_config->partition_type == OVC_PARTITION_SKIP)
+	if (in_config->num_parts_exp > 0 && in_config->partition_type == OVC_PARTITION_SKIP)
 	{
 		return OVC_ENC_INVALID_PARAM;
 	}
