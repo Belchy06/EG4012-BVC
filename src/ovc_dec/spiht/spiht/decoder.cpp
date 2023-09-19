@@ -77,6 +77,11 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 				{
 					int64_t sx, sy;
 					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
+					if(sx == -1 || sy == -1)
+					{
+						continue;
+					}
+
 					/* process the four offsprings */
 					sig = 0;
 					bitstream->read_bit(&sig);
@@ -162,7 +167,7 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 					}
 					/* test if L(i, j) != 0 */
 					get_successor(output, in_config.num_levels, sx, sy, &sx, &sy);
-					if (sx != -1)
+					if (sx != -1 && sy != -1)
 					{
 						lis.push_back(ovc_spiht_set(lis[i].x, lis[i].y, OVC_SPIHT_TYPE_B));
 					}
@@ -182,6 +187,10 @@ void spiht_decoder::decode(uint8_t* in_bytes, size_t in_num_bytes, size_t in_x, 
 				{
 					int64_t sx, sy;
 					get_successor(output, in_config.num_levels, lis[i].x, lis[i].y, &sx, &sy);
+					if(sx == -1 || sy == -1)
+					{
+						continue;
+					}
 					lis.push_back(ovc_spiht_set(sx, sy, OVC_SPIHT_TYPE_A));
 					lis.push_back(ovc_spiht_set(sx + 1, sy, OVC_SPIHT_TYPE_A));
 					lis.push_back(ovc_spiht_set(sx, sy + 1, OVC_SPIHT_TYPE_A));

@@ -382,8 +382,6 @@ ovc_dec_result ovc_decoder::handle_vps(uint8_t* in_bytes, size_t in_size)
 	// Intialise components based on specified vps
 	wavelet_recomposer = ovc_wavelet_recomposer_factory::create_wavelet_recomposer(vps.wavelet_family, vps.wavelet_config);
 	departitioner = ovc_departitioner_factory::create_departitioner(vps.partition_type);
-	spiht_decoder = ovc_spiht_decoder_factory::create_spiht_decoder(vps.spiht);
-	entropy_decoder = ovc_entropy_decoder_factory::create_entropy_decoder(vps.entropy_coder);
 
 	return OVC_DEC_OK;
 }
@@ -459,12 +457,14 @@ ovc_dec_result ovc_decoder::handle_partition(uint8_t* in_bytes, size_t in_size)
 	size_t height = size_t(sqrt(vps.num_partitions) * (component == 0 ? vps.luma_height : vps.chroma_height) / vps.num_partitions);
 
 	// Decode
+	std::shared_ptr<ovc_entropy_decoder> entropy_decoder = ovc_entropy_decoder_factory::create_entropy_decoder(vps.entropy_coder);
 	//                               num_bytes            num_symbols (bits)
 	entropy_decoder->decode(in_bytes, in_size, (size_t)(ceil(width * height * vps.bits_per_pixel)));
 	uint8_t* entropy_decoded_bytes = new uint8_t();
 	size_t	 entropy_decoded_size = 0;
 	entropy_decoder->flush(&entropy_decoded_bytes, &entropy_decoded_size);
 
+	std::shared_ptr<ovc_spiht_decoder> spiht_decoder = ovc_spiht_decoder_factory::create_spiht_decoder(vps.spiht);
 	spiht_decoder->decode(entropy_decoded_bytes, entropy_decoded_size, width, height, { .bpp = vps.bits_per_pixel, .num_levels = (size_t)vps.num_levels, .step = step });
 	matrix<double> partition = matrix<double>(height, width);
 	spiht_decoder->flush(partition);

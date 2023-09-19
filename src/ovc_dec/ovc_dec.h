@@ -73,6 +73,4 @@ private:
 
 	std::shared_ptr<ovc_wavelet_recomposer> wavelet_recomposer;
 	std::shared_ptr<ovc_departitioner>		departitioner;
-	std::shared_ptr<ovc_spiht_decoder>		spiht_decoder;
-	std::shared_ptr<ovc_entropy_decoder>	entropy_decoder;
 };
